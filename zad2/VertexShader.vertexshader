@@ -3,16 +3,17 @@
 // Input vertex data, different for all executions of this shader.
 layout(location = 0) in vec3 vertexPosition_board;
 layout(location = 1) in vec3 vertexColor;
-layout(location = 2) in vec3 transform_centercoords;
+//layout(location = 2) in vec3 transform_centercoords;
 uniform float xsize;
 uniform float ysize;
+uniform float center_x;
+uniform float center_y;
 
 out vec3 fragmentColor;
 
 void main(){
-
-    gl_Position.x = vertexPosition_board.x * xsize + transform_centercoords.x;
-    gl_Position.y = vertexPosition_board.y * ysize + transform_centercoords.y;
+    gl_Position.x = vertexPosition_board.x * xsize + center_x;
+    gl_Position.y = vertexPosition_board.y * ysize + center_y;
     gl_Position.z = 0.0;
     gl_Position.w = 1.0;
     fragmentColor = vertexColor;

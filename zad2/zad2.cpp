@@ -12,10 +12,6 @@
 #include <glfw3.h>
 GLFWwindow* window;
 
-// Include GLM
-///#include <glm/glm.hpp>
-//using namespace glm;
-
 #include <common/shader.hpp>
 
 GLfloat card_vertices[] = {
@@ -36,51 +32,6 @@ GLfloat card_colors[] = {
 	0.7f, 0.0f, 0.0f,
 };
 
-GLfloat g_vertex_buffer_data2[] = {
-	-1.0f, -1.0f,
-	1.0f, -1.0f,
-	1.0f,  1.0f,
-	-1.0f, -1.0f,
-	1.0f,  1.0f,
-	-1.0f,  1.0f,
-};
-
-GLfloat g_card_centers[] = {
-	0.0f,  0.0f,
-	0.0f,  0.0f,
-	0.0f,  0.0f,
-	0.0f,  0.0f,
-	0.0f,  0.0f,
-	0.0f,  0.0f,
-};
-
-GLfloat card_buffer_vertices[1024];
-unsigned int card_buffer_vertices_no = 0;
-GLfloat card_buffer_colors[1024];
-unsigned int card_buffer_colors_no = 0;
-GLfloat card_buffer_centers[1024];
-unsigned int card_buffer_centers_no = 0;
-
-void clear_card_buffers(){
-	card_buffer_vertices_no = 0;
-	card_buffer_colors_no = 0;
-	card_buffer_centers_no = 0;
-}
-
-void add_card_triangle( std::pair<float, float> pos){
-	for(int i = 0; i < 12; i++)
-		card_buffer_vertices[card_buffer_vertices_no*2 + i] = card_vertices[i];
-	for(int i = 0; i < 18; i++)
-		card_buffer_colors[card_buffer_colors_no*3 + i] = card_colors[i];
-	for(int i = 0; i < 6; i++){
-		card_buffer_centers[card_buffer_centers_no*2 + i*2] = pos.first;
-		card_buffer_centers[card_buffer_centers_no*2 + i*2 + 1] = pos.second;
-	}
-	card_buffer_vertices_no += 6;
-	card_buffer_colors_no += 6;
-	card_buffer_centers_no += 6;
-}
-
 const unsigned int board_width = 4;
 const unsigned int board_height = 4;
 const unsigned int cards_no = board_height*board_width;
@@ -88,7 +39,6 @@ const float card_width = 2.0f/board_width;
 const float card_height = 2.0f/board_height;
 
 std::pair<float, float> card_xy_to_coords(unsigned int x, unsigned int y){
- 	//std::cout << "card width/2 = " << card_width/2.0f << std::endl;
 	float xf = -1.0f + x*card_width + card_width/2.0;
 	float yf = -1.0f + y*card_height + card_height/2.0;
 	return std::make_pair(xf,yf);
@@ -138,14 +88,14 @@ int main( void )
 	// Create and compile our GLSL program from the shaders
 	GLuint shader_program_id = LoadShaders( "VertexShader.vertexshader", "FragmentShader.fragmentshader" );
 
-
 	// Prepare uniforms of the vertex shader
-
-	GLint uniform_xsize, uniform_ysize;
+	GLint uniform_xsize, uniform_ysize, uniform_centerx, uniform_centery;
 	uniform_xsize = glGetUniformLocation(shader_program_id,"xsize");
 	uniform_ysize = glGetUniformLocation(shader_program_id,"ysize");
-	if(uniform_xsize == -1 || uniform_ysize == -1){
-			fprintf( stderr, "xsize/ysize uniforms are missing from shader.\n" );
+	uniform_centerx = glGetUniformLocation(shader_program_id,"center_x");
+	uniform_centery = glGetUniformLocation(shader_program_id,"center_y");
+	if(uniform_xsize == -1 || uniform_ysize == -1 || uniform_centerx == -1 || uniform_centery == -1){
+			fprintf( stderr, "A uniform is missing from shader.\n" );
 			glfwTerminate();
 			return -1;
 	}
@@ -154,28 +104,15 @@ int main( void )
 	glGenBuffers(1, &vertexbuffer);
 	GLuint colorbuffer;
 	glGenBuffers(1, &colorbuffer);
-	GLuint cardcenters;
-	glGenBuffers(1, &cardcenters);
+
 
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(card_buffer_vertices), card_buffer_vertices, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(card_vertices), card_vertices, GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(card_buffer_colors), card_buffer_colors, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(card_colors), card_colors, GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ARRAY_BUFFER, cardcenters);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(card_buffer_centers), card_buffer_centers, GL_DYNAMIC_DRAW);
 	do{
-
-		clear_card_buffers();
-		add_card_triangle( card_xy_to_coords(0,0) );
-		//add_card_triangle( card_xy_to_coords(1,1) );
-		//add_card_triangle( card_xy_to_coords(2,2) );
-		/*for(int i = 0; i < card_buffer_centers_no*2; i++)
-			std::cout << card_buffer_centers[i] << " ";
-		std::cout << std::endl;
-		*/
-
 		// Clear the screen
 		glClear( GL_COLOR_BUFFER_BIT );
 
@@ -184,27 +121,33 @@ int main( void )
 		glUniform1f(uniform_xsize, card_width*0.9);
 		glUniform1f(uniform_ysize, card_height*0.9);
 
-		// 1rst attribute buffer : vertices
+		// Card vertices
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 		glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0 );
 
-		// 2nd attribute buffer : colors
+		// Card colors
 		glEnableVertexAttribArray(1);
 		glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
 		glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0 );
 
-		// 3rd attribute buffer : centers
-		glEnableVertexAttribArray(2);
-		glBindBuffer(GL_ARRAY_BUFFER, cardcenters);
-		glVertexAttribPointer( 2, 2, GL_FLOAT, GL_FALSE, 0, (void*)0 );
+		for(int i = 0; i < board_height; i++){
+			for(int j = 0; j < board_width; j++){
 
-		// Draw the triangle !
-		glDrawArrays(GL_TRIANGLES, 0, card_buffer_vertices_no);
+				std::pair<float,float> pos = card_xy_to_coords(j,i);
+				glUniform1f(uniform_centerx, pos.first);
+				glUniform1f(uniform_centery, pos.second);
 
-		glDisableVertexAttribArray(0);
+				// Draw the card
+				glDrawArrays(GL_TRIANGLES, 0, 6);
+
+			}
+		}
+
 		glDisableVertexAttribArray(1);
-		glDisableVertexAttribArray(2);
+		glDisableVertexAttribArray(0);
+
+		glUseProgram(0);
 
 		// Swap buffers
 		glfwSwapBuffers(window);
