@@ -4,6 +4,7 @@
 #include <ctime>
 #include <algorithm>
 #include <iostream>
+#include <vector>
 
 // Include GLEW
 #include <GL/glew.h>
@@ -14,22 +15,68 @@ GLFWwindow* window;
 
 #include <common/shader.hpp>
 
-GLfloat card_vertices[] = {
+class CardState{
+public:
+	CardState(int m) : model(m){}
+	int model;
+	bool uncovered = false;
+	bool removed = false;
+	mutable int flip_phase = false;
+	mutable double flip_start = 0.0;
+};
+
+#define CARD_MODELS 2
+
+GLfloat card_sizes[CARD_MODELS+1] = {6,6,6};
+
+GLfloat card_vertices[CARD_MODELS+1][12] = {
+	{
 	-0.5f, -0.5f,
 	0.5f, -0.5f,
 	0.5f, 0.5f,
 	-0.5f, -0.5f,
 	0.5f, 0.5f,
 	-0.5f, 0.5f,
+},{
+	-0.5f, -0.5f,
+	0.5f, -0.5f,
+	0.5f, 0.5f,
+	-0.5f, -0.5f,
+	0.5f, 0.5f,
+	-0.5f, 0.5f,
+},{
+	-0.5f, -0.5f,
+	0.5f, -0.5f,
+	0.5f, 0.5f,
+	-0.5f, -0.5f,
+	0.5f, 0.5f,
+	-0.5f, 0.5f,
+}
 };
 
-GLfloat card_colors[] = {
-	1.0f, 0.3f, 0.3f,
-	0.7f, 0.0f, 0.0f,
-	1.0f, 0.3f, 0.3f,
-	1.0f, 0.3f, 0.3f,
-	1.0f, 0.3f, 0.3f,
-	0.7f, 0.0f, 0.0f,
+GLfloat card_colors[CARD_MODELS+1][18] = {
+	{
+		1.0f, 0.2f, 0.2f,
+		0.7f, 0.0f, 0.0f,
+		1.0f, 0.3f, 0.3f,
+		1.0f, 0.3f, 0.3f,
+		1.0f, 0.3f, 0.3f,
+		0.7f, 0.0f, 0.0f,
+	},{
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.2f, 0.7f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.2f, 0.7f,
+	},{
+		0.0f, 0.5f, 0.0f,
+		0.0f, 0.2f, 0.2f,
+		0.0f, 0.5f, 0.0f,
+		0.0f, 0.5f, 0.0f,
+		0.0f, 0.5f, 0.0f,
+		0.0f, 0.2f, 0.2f,
+	}
 };
 
 const unsigned int board_width = 4;
@@ -100,17 +147,31 @@ int main( void )
 			return -1;
 	}
 
-	GLuint vertexbuffer;
-	glGenBuffers(1, &vertexbuffer);
-	GLuint colorbuffer;
-	glGenBuffers(1, &colorbuffer);
+	GLuint vertexbuffer[8], colorbuffer[8];
+	glGenBuffers(8, vertexbuffer);
+	glGenBuffers(8, colorbuffer);
 
+	for(int i = 0; i <= CARD_MODELS; i++){
+			glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer[i]);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * card_sizes[i] * 2, card_vertices[i], GL_STATIC_DRAW);
+	}
+	for(int i = 0; i <= CARD_MODELS; i++){
+			glBindBuffer(GL_ARRAY_BUFFER, colorbuffer[i]);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * card_sizes[i] * 3, card_colors[i], GL_STATIC_DRAW);
+	}
 
-	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(card_vertices), card_vertices, GL_STATIC_DRAW);
+	// Prepare cards
+	std::vector<CardState> cards;
+	for(int i = 0; i < cards_no/2; i++){
+		cards.push_back( CardState(i) );
+		cards.push_back( CardState(i) );
+	}
 
-	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(card_colors), card_colors, GL_STATIC_DRAW);
+    std::random_shuffle(cards.begin(), cards.end());
+	cards[3].uncovered = true;
+	cards[4].uncovered = true;
+	cards[6].uncovered = true;
+	cards[8].uncovered = true;
 
 	do{
 		// Clear the screen
@@ -121,15 +182,8 @@ int main( void )
 		glUniform1f(uniform_xsize, card_width*0.9);
 		glUniform1f(uniform_ysize, card_height*0.9);
 
-		// Card vertices
 		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-		glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0 );
-
-		// Card colors
 		glEnableVertexAttribArray(1);
-		glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-		glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0 );
 
 		for(int i = 0; i < board_height; i++){
 			for(int j = 0; j < board_width; j++){
@@ -137,6 +191,33 @@ int main( void )
 				std::pair<float,float> pos = card_xy_to_coords(j,i);
 				glUniform1f(uniform_centerx, pos.first);
 				glUniform1f(uniform_centery, pos.second);
+
+				const CardState& card = cards[i*board_width + j];
+
+				// Determine which vertex buffer to use
+				if(card.uncovered){
+					if(card.model % 2 == 0){
+						glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer[1]);
+					}else{
+						glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer[2]);
+					}
+				}else{
+					glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer[0]);
+				}
+				glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0 );
+
+				// Determine which color buffer to use
+				if(card.uncovered){
+					if(card.model % 2 == 0){
+						glBindBuffer(GL_ARRAY_BUFFER, colorbuffer[1]);
+					}else{
+						glBindBuffer(GL_ARRAY_BUFFER, colorbuffer[2]);
+					}
+				}else{
+					glBindBuffer(GL_ARRAY_BUFFER, colorbuffer[0]);
+				}
+				glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0 );
+
 
 				// Draw the card
 				glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -153,13 +234,16 @@ int main( void )
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
-	} // Check if the ESC key was pressed or the window was closed
-	while( glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
-		   glfwWindowShouldClose(window) == 0 );
+		// Check if the ESC key was pressed or the window was closed
+		if(glfwGetKey(window, GLFW_KEY_ESCAPE ) == GLFW_PRESS || glfwWindowShouldClose(window) == 1)
+			break;
+
+	}
+	while(true);
 
 	// Cleanup VBO
-	glDeleteBuffers(1, &vertexbuffer);
-	glDeleteBuffers(1, &colorbuffer);
+	glDeleteBuffers(8, vertexbuffer);
+	glDeleteBuffers(8, colorbuffer);
 	glDeleteVertexArrays(1, &VertexArrayID);
 	glDeleteProgram(shader_program_id);
 

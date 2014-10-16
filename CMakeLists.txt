@@ -35,6 +35,8 @@ add_definitions(
 	-DTW_NO_DIRECT3D
 	-DGLEW_STATIC
 	-D_CRT_SECURE_NO_WARNINGS
+	-std=c++11
+	-g
 )
 
 
