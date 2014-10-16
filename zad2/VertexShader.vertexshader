@@ -10,13 +10,13 @@ uniform float center_y;
 uniform float flip_phase;
 uniform float alpha;
 
-out vec3 fragmentColor;
+out vec4 fragmentColor;
 
 void main(){
     gl_Position.x = vertexPosition_board.x * xsize + center_x;
     gl_Position.y = vertexPosition_board.y * ysize + center_y;
     gl_Position.z = 0.0;
     gl_Position.w = 1.0;
-    //fragmentColor = vec4(vertexColor,alpha);
-    fragmentColor = vertexColor;
+    fragmentColor = vec4(vertexColor,alpha);
+    //fragmentColor = vertexColor;
 }
