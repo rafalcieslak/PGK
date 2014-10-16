@@ -7,13 +7,18 @@ uniform float xsize;
 uniform float ysize;
 uniform float center_x;
 uniform float center_y;
-uniform float flip_phase;
+uniform float animation_phase;
 uniform float alpha;
+uniform int animation_mode;
+uniform bool reversed;
 
 out vec4 fragmentColor;
 
 void main(){
-    gl_Position.x = vertexPosition_board.x * xsize + center_x;
+    float reverse;
+    if(reversed) reverse = -1.0f;
+    else         reverse =  1.0f;
+    gl_Position.x = vertexPosition_board.x * xsize * cos( animation_phase * 3.14159265358) * reverse + center_x;
     gl_Position.y = vertexPosition_board.y * ysize + center_y;
     gl_Position.z = 0.0;
     gl_Position.w = 1.0;
