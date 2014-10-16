@@ -96,8 +96,8 @@ GLfloat card_colors[CARD_MODELS+1][18] = {
 	}
 };
 
-const unsigned int board_width = 4;
-const unsigned int board_height = 4;
+const unsigned int board_width = 6;
+const unsigned int board_height = 5;
 const unsigned int cards_no = board_height*board_width;
 const float card_width = 2.0f/board_width;
 const float card_height = 2.0f/board_height;
@@ -204,6 +204,8 @@ int main( void )
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	bool key_pressed_up = false, key_pressed_down = false, key_pressed_left = false, key_pressed_right = false, key_pressed_space = false;
+
 	do{
 		// Clear the screen
 		glClear( GL_COLOR_BUFFER_BIT );
@@ -285,7 +287,15 @@ int main( void )
 		if(glfwGetKey(window, GLFW_KEY_ESCAPE ) == GLFW_PRESS || glfwWindowShouldClose(window) == 1)
 			break;
 
-
+		// Selection movement keys
+		if(glfwGetKey(window, GLFW_KEY_UP) == GLFW_RELEASE)    key_pressed_up = false;
+		if(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS &&    key_pressed_up == false    && selection_y < board_height - 1) { selection_y++; key_pressed_up = true;}
+		if(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_RELEASE)  key_pressed_down = false;
+		if(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS &&  key_pressed_down == false  && selection_y > 0)                { selection_y--; key_pressed_down = true;}
+		if(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_RELEASE)  key_pressed_left = false;
+		if(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS &&  key_pressed_left == false  && selection_x > 0)                { selection_x--; key_pressed_left = true;}
+		if(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_RELEASE) key_pressed_right = false;
+		if(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS && key_pressed_right == false && selection_x < board_width - 1)  { selection_x++; key_pressed_right = true;}
 
 	}
 	while(true);
