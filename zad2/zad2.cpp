@@ -1,6 +1,7 @@
 // Include standard headers
 #include <cstdio>
 #include <cstdlib>
+#include <ctime>
 #include <algorithm>
 #include <iostream>
 #include <vector>
@@ -129,8 +130,8 @@ GLfloat card_colors[CARD_MODELS+1][18] = {
 	}
 };
 
-const unsigned int board_width = 6;
-const unsigned int board_height = 5;
+const unsigned int board_width = 4;
+const unsigned int board_height = 4;
 const unsigned int cards_no = board_height*board_width;
 const float card_width = 2.0f/board_width;
 const float card_height = 2.0f/board_height;
@@ -180,9 +181,6 @@ void finalize_animation(int n){
 				card_testedA = -1;
 			}else{
 				// not matching
-				//cards[n].uncovered = false;
-				//cards[uncovered_card].uncovered = false;
-				//uncovered_card = -1;
 				cards[card_testedA].animation_mode = CardState::ANIM_MODE_WAIT;
 				cards[card_testedB].animation_mode = CardState::ANIM_MODE_WAIT;
 				cards[card_testedA].animation_start = current_time;
@@ -208,10 +206,14 @@ void finalize_animation(int n){
 
 int main( void )
 {
+	// Test whether board dimentions make sense.
 	if( cards_no % 2 == 1){
 		std::cout << "Cards number with these dimentions is not an even number!" << std::endl;
 		return -2;
 	}
+
+	//Prepare random seed
+	srand(time(0));
 
 	// Initialise GLFW
 	if( !glfwInit() )
@@ -271,13 +273,13 @@ int main( void )
 			return -1;
 	}
 
-	// Preparing data in buffers
 	GLuint vertexbuffer[8], colorbuffer[8], hlvertices, hlcolors;
 	glGenBuffers(8, vertexbuffer);
 	glGenBuffers(8, colorbuffer);
 	glGenBuffers(1, &hlvertices);
 	glGenBuffers(1, &hlcolors);
 
+	// Preparing data in buffers
 	for(int i = 0; i <= CARD_MODELS; i++){
 			glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer[i]);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * card_sizes[i] * 2, card_vertices[i], GL_STATIC_DRAW);
@@ -291,27 +293,23 @@ int main( void )
 	glBindBuffer(GL_ARRAY_BUFFER, hlcolors);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(highlight_colors), highlight_colors, GL_STATIC_DRAW);
 
-	// Preparing cards
-	for(int i = 0; i < cards_no/2; i++){
+	// Prepare cards
+	for(unsigned int i = 0; i < cards_no/2; i++){
 		cards.push_back( CardState(i) );
 		cards.push_back( CardState(i) );
 	}
     std::random_shuffle(cards.begin(), cards.end());
 
-	// Enable blending
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 	// Prepare input tresholds
 	bool key_pressed_up = false, key_pressed_down = false, key_pressed_left = false, key_pressed_right = false, key_pressed_space = false;
 
-	do{
+	while(true){
 		current_time = glfwGetTime();
 
 		// Clear the screen
 		glClear( GL_COLOR_BUFFER_BIT );
 
-		// Use our shader
+		// Use the shader
 		glUseProgram(shader_program_id);
 
 		glEnableVertexAttribArray(0);
@@ -337,24 +335,24 @@ int main( void )
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 		}
 
-		// Prepare scaling for cards
+		// Prepare uniforms for cards
 		glUniform1f(uniform_xscale, card_width*0.9);
 		glUniform1f(uniform_yscale, card_height*0.9);
-
 		glUniform1f(uniform_alpha, 1.0f);
 
 		// Draw cards
-		for(int i = 0; i < board_height; i++){
-			for(int j = 0; j < board_width; j++){
+		for(unsigned int i = 0; i < board_height; i++){
+			for(unsigned int j = 0; j < board_width; j++){
 
 				// Take a card
 				int n = i*board_width + j;
 
+				// Set card position
 				std::pair<float,float> pos = card_xy_to_coords(j,i);
 				glUniform1f(uniform_centerx, pos.first);
 				glUniform1f(uniform_centery, pos.second);
 
-
+				// Process card's current animation
 				glUniform1i(uniform_animmode, cards[n].animation_mode);
 				float animation_phase = 0.0;
 				if(cards[n].animation_mode != -1){
@@ -366,8 +364,7 @@ int main( void )
 					glUniform1f(uniform_animphase, animation_phase);
 				}
 
-
-				// Determine which vertex buffer to use
+				// Determine which vertex buffer to use depending on card state/model
 				int card_data_index;
 				if(cards[n].uncovered ||
 				  (cards[n].animation_mode == CardState::ANIM_MODE_UNCOVER && animation_phase >= 0.5) ||
@@ -375,11 +372,12 @@ int main( void )
 				       card_data_index = 1 + (cards[n].model % CARD_MODELS);
 				else card_data_index = 0;
 
+				// Is the card currently reversed?
 				glUniform1i(uniform_reversed, cards[n].uncovered || cards[n].animation_mode == CardState::ANIM_MODE_COVER);
 
+				// Select buffers to use
 				glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer[card_data_index]);
 				glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0 );
-
 				glBindBuffer(GL_ARRAY_BUFFER, colorbuffer[card_data_index]);
 				glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0 );
 
@@ -392,16 +390,12 @@ int main( void )
 		glDisableVertexAttribArray(1);
 		glDisableVertexAttribArray(0);
 
-
 		glUseProgram(0);
 
 		// Swap buffers
 		glfwSwapBuffers(window);
+		// Check for events
 		glfwPollEvents();
-
-		// Check if the ESC key was pressed or the window was closed
-		if(glfwGetKey(window, GLFW_KEY_ESCAPE ) == GLFW_PRESS || glfwWindowShouldClose(window) == 1)
-			break;
 
 		// Selection movement keys
 		if(glfwGetKey(window, GLFW_KEY_UP) == GLFW_RELEASE)    key_pressed_up =  false;
@@ -418,16 +412,18 @@ int main( void )
 			process_space_press();
 		}
 
+		// Check if the ESC key was pressed or the window was closed
+		if(glfwGetKey(window, GLFW_KEY_ESCAPE ) == GLFW_PRESS || glfwWindowShouldClose(window) == 1)
+			break; // This is where we exit the loop
 	}
-	while(true);
 
-	// Cleanup VBO
+	// Cleanup
 	glDeleteBuffers(8, vertexbuffer);
 	glDeleteBuffers(8, colorbuffer);
 	glDeleteVertexArrays(1, &VertexArrayID);
 	glDeleteProgram(shader_program_id);
 
-	// Close OpenGL window and terminate GLFW
+	// Close the window
 	glfwTerminate();
 
 	return 0;

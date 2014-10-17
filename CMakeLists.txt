@@ -37,6 +37,7 @@ add_definitions(
 	-D_CRT_SECURE_NO_WARNINGS
 	-std=c++11
 	-g
+	-Wall
 )
 
 
