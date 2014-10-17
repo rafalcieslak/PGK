@@ -33,7 +33,7 @@ const double animation_lengts[3] = {1.0, 0.5, 0.7};
 
 #define CARD_MODELS 4
 
-GLfloat card_sizes[CARD_MODELS+1] = {6,6,6,6,6};
+GLfloat card_sizes[CARD_MODELS+1] = {12,6,6,6,6};
 
 GLfloat highlight_vertices[] = {
 	-1.0f, -1.0f, -1.0f, -0.5f, -0.5f, -1.0f,
@@ -48,14 +48,12 @@ GLfloat highlight_colors[] = {
 	1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f,
 };
 
-GLfloat card_vertices[CARD_MODELS+1][12] = {
+GLfloat card_vertices[CARD_MODELS+1][24] = {
 	{
-	-1.0f, -1.0f,
-	1.0f, -1.0f,
-	1.0f, 1.0f,
-	-1.0f, -1.0f,
-	1.0f, 1.0f,
-	-1.0f, 1.0f,
+	-1.0f, -1.0f, 0.0f, 0.0f,  1.0f, -1.0f,
+	-1.0f, -1.0f, 0.0f, 0.0f, -1.0f,  1.0f,
+	 1.0f,  1.0f, 0.0f, 0.0f, -1.0f,  1.0f,
+	 1.0f,  1.0f, 0.0f, 0.0f,  1.0f, -1.0f,
 },{
 	-1.0f, -1.0f,
 	1.0f, -1.0f,
@@ -87,14 +85,15 @@ GLfloat card_vertices[CARD_MODELS+1][12] = {
 }
 };
 
-GLfloat card_colors[CARD_MODELS+1][18] = {
+#define COLOR_D_BROWN 85/255.0f, 46/255.0f, 1/255.0f
+#define COLOR_L_BROWN 150/255.0f, 81/255.0f, 2/255.0f
+
+GLfloat card_colors[CARD_MODELS+1][36] = {
 	{
-		1.0f, 0.2f, 0.2f,
-		0.7f, 0.0f, 0.0f,
-		1.0f, 0.3f, 0.3f,
-		1.0f, 0.3f, 0.3f,
-		1.0f, 0.3f, 0.3f,
-		0.7f, 0.0f, 0.0f,
+		COLOR_D_BROWN, COLOR_D_BROWN, COLOR_L_BROWN,
+		COLOR_D_BROWN, COLOR_L_BROWN, COLOR_L_BROWN,
+		COLOR_D_BROWN, COLOR_D_BROWN, COLOR_L_BROWN,
+		COLOR_D_BROWN, COLOR_L_BROWN, COLOR_L_BROWN,
 	},{
 		0.0f, 0.0f, 1.0f,
 		0.0f, 0.2f, 0.7f,
@@ -273,18 +272,18 @@ int main( void )
 	glBindVertexArray(VertexArrayID);
 
 	// Create and compile our GLSL program from the shaders
-	GLuint shader_program_id = LoadShaders( "VertexShader.vertexshader", "FragmentShader.fragmentshader" );
+	GLuint board_shader_program_id = LoadShaders( "BoardVertexShader.vertexshader", "FragmentShader.fragmentshader" );
 
 	// Prepare uniforms of the vertex shader
 	GLint uniform_xscale, uniform_yscale, uniform_centerx, uniform_centery, uniform_alpha, uniform_animphase, uniform_reversed, uniform_animmode;
-	uniform_xscale = glGetUniformLocation(shader_program_id,"xscale");
-	uniform_yscale = glGetUniformLocation(shader_program_id,"yscale");
-	uniform_centerx = glGetUniformLocation(shader_program_id,"center_x");
-	uniform_centery = glGetUniformLocation(shader_program_id,"center_y");
-	uniform_alpha = glGetUniformLocation(shader_program_id,"alpha");
-	uniform_animphase = glGetUniformLocation(shader_program_id,"animation_phase");
-	uniform_animmode = glGetUniformLocation(shader_program_id,"animation_mode");
-	uniform_reversed = glGetUniformLocation(shader_program_id,"reversed");
+	uniform_xscale = glGetUniformLocation(board_shader_program_id,"xscale");
+	uniform_yscale = glGetUniformLocation(board_shader_program_id,"yscale");
+	uniform_centerx = glGetUniformLocation(board_shader_program_id,"center_x");
+	uniform_centery = glGetUniformLocation(board_shader_program_id,"center_y");
+	uniform_alpha = glGetUniformLocation(board_shader_program_id,"alpha");
+	uniform_animphase = glGetUniformLocation(board_shader_program_id,"animation_phase");
+	uniform_animmode = glGetUniformLocation(board_shader_program_id,"animation_mode");
+	uniform_reversed = glGetUniformLocation(board_shader_program_id,"reversed");
 	if(uniform_xscale == -1 || uniform_yscale == -1 || uniform_centerx == -1 || uniform_centery == -1 || uniform_alpha == -1 || uniform_animphase == -1 || uniform_reversed == -1 || uniform_animmode == -1){
 			fprintf( stderr, "A uniform is missing from shader.\n" );
 			glfwTerminate();
@@ -340,8 +339,8 @@ int main( void )
 		// Clear the screen
 		glClear( GL_COLOR_BUFFER_BIT );
 
-		// Use the shader
-		glUseProgram(shader_program_id);
+		// Use the board shader
+		glUseProgram(board_shader_program_id);
 
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
@@ -479,7 +478,7 @@ int main( void )
 	glDeleteBuffers(1, &vert_lines_buffer);
 	glDeleteBuffers(1, &lines_color_buffer);
 	glDeleteVertexArrays(1, &VertexArrayID);
-	glDeleteProgram(shader_program_id);
+	glDeleteProgram(board_shader_program_id);
 
 	// Close the window
 	glfwTerminate();

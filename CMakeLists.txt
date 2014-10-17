@@ -38,6 +38,8 @@ add_definitions(
 	-std=c++11
 	-g
 	-Wall
+	-Wextra
+	-Werror
 )
 
 
@@ -48,7 +50,7 @@ add_executable(zad2
 	common/shader.hpp
 
 	zad2/FragmentShader.fragmentshader
-	zad2/VertexShader.vertexshader
+	zad2/BoardVertexShader.vertexshader
 )
 target_link_libraries(zad2
 	${ALL_LIBS}
