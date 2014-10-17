@@ -50,6 +50,19 @@ double current_time = 0.0;
 // The array of cards.
 std::vector<Card> cards;
 
+// Used for tracking whether there is a game in progress, or has it finished.
+typedef enum{
+	GAME_STATE_NONE,
+	GAME_STATE_READY_TO_START,
+	GAME_STATE_IN_PROGRESS,
+	GAME_STATE_FINISHED
+} GameState;
+GameState game_state;
+// How card pairs the player has yet to find? How many rounds have been played?
+int pairs_left, rounds;
+// Used for measuring game time.
+double game_start_time, game_finish_time;
+
 std::pair<float, float> card_xy_to_coords(unsigned int x, unsigned int y){
 	float xf = -1.0f + x*card_width + card_width/2.0;
 	float yf = -1.0f + y*card_height + card_height/2.0;
@@ -57,8 +70,7 @@ std::pair<float, float> card_xy_to_coords(unsigned int x, unsigned int y){
 }
 
 // This procedure is called when the player presses space to select a card.
-void process_space_press(){
-	int n = selection_y*board_width + selection_x;
+void select_card(int n){
 	if(cards[n].removed || cards[n].uncovered || card_testedB != -1 || n == card_testedA) return;
 	cards[n].animation_start = current_time;
 	cards[n].animation_mode = Card::ANIM_MODE_UNCOVER;
@@ -79,6 +91,7 @@ void finalize_animation(int n){
 			// this is the first card in a pair
 		}else if(card_testedB == n){
 			// this is the second card in a pair
+			rounds++;
 			// Do these two uncovered cards match each other?
 			if( cards[card_testedB].model % CARD_MODELS == cards[card_testedA].model % CARD_MODELS){
 				// Yes, they match!
@@ -86,6 +99,11 @@ void finalize_animation(int n){
 				cards[card_testedA].removed = true;
 				card_testedB = -1;
 				card_testedA = -1;
+				pairs_left -= 1;
+				if(pairs_left == 0){
+					game_finish_time = current_time;
+					game_state = GAME_STATE_FINISHED;
+				}
 			}else{
 				// Cards are not matching. Let the player see them for a while
 				cards[card_testedA].animation_mode = Card::ANIM_MODE_WAIT;
@@ -112,6 +130,20 @@ void finalize_animation(int n){
 		card_testedA = -1;
 		card_testedB = -1;
 	}
+}
+
+// Used to reset game state
+void start_new_game(){
+	cards.clear();
+	// Prepare cards
+	for(unsigned int i = 0; i < cards_no/2; i++){
+		cards.push_back( Card(i) ); // Add 2 cards of i-th model.
+		cards.push_back( Card(i) );
+	}
+	std::random_shuffle(cards.begin(), cards.end()); // Shuffle the deck!
+	pairs_left = cards_no/2;
+	rounds = 0;
+	game_state = GAME_STATE_READY_TO_START;
 }
 
 int main( void )
@@ -234,19 +266,14 @@ int main( void )
 	glBindBuffer(GL_ARRAY_BUFFER, horiz_lines_buffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(horiz_lines), horiz_lines, GL_STATIC_DRAW);
 
-	// Prepare cards
-	for(unsigned int i = 0; i < cards_no/2; i++){
-		cards.push_back( Card(i) ); // Add 2 cards of i-th model.
-		cards.push_back( Card(i) );
-	}
-    std::random_shuffle(cards.begin(), cards.end()); // Shuffle the deck!
-
     // Enable blending for several alpha effects.
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// Prepare input tresholds
 	bool key_pressed_up = false, key_pressed_down = false, key_pressed_left = false, key_pressed_right = false, key_pressed_space = false;
+
+	start_new_game();
 
 	// This is the main loop.
 	while(true){
@@ -382,7 +409,15 @@ int main( void )
 		if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) key_pressed_space =  false;
 		if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && key_pressed_space == false){
 			key_pressed_space = true;
-			process_space_press();
+			if(game_state == GAME_STATE_READY_TO_START){
+				game_start_time = current_time;
+				game_state = GAME_STATE_IN_PROGRESS;
+				select_card(selection_y*board_width + selection_x);
+			}else if(game_state == GAME_STATE_IN_PROGRESS){
+				select_card(selection_y*board_width + selection_x);
+			}else if(game_state == GAME_STATE_FINISHED){
+				start_new_game();
+			}
 		}
 
 		// Check if the ESC key was pressed or the window was closed
