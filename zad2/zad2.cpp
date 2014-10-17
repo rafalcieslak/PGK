@@ -217,11 +217,11 @@ int main( void )
 	// Preparing data in buffers
 	for(int i = 0; i <= CARD_MODELS; i++){
 			glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer[i]);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * card_sizes[i] * 2, card_vertices[i], GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * card_sizes[i] * 6, card_vertices[i], GL_STATIC_DRAW);
 	}
 	for(int i = 0; i <= CARD_MODELS; i++){
 			glBindBuffer(GL_ARRAY_BUFFER, colorbuffer[i]);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * card_sizes[i] * 3, card_colors[i], GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * card_sizes[i] * 9, card_colors[i], GL_STATIC_DRAW);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, hlvertices);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(highlight_vertices), highlight_vertices, GL_STATIC_DRAW);
@@ -308,6 +308,7 @@ int main( void )
 						animation_phase = 1.0;
 						finalize_animation(n);
 					}
+					//if(animation_phase >= 0.55) animation_phase = 0.55f;
 					glUniform1f(uniform_animphase, animation_phase);
 				}
 
