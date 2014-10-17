@@ -43,11 +43,15 @@ link_directories(
 # zad 2
 add_executable(zad2
 	zad2/zad2.cpp
+	zad2/fonts.cpp
+	zad2/fonts.hpp
 	common/shader.cpp
 	common/shader.hpp
 
-	zad2/FragmentShader.fragmentshader
+	zad2/BoardFragmentShader.fragmentshader
 	zad2/BoardVertexShader.vertexshader
+	zad2/TextFragmentShader.fragmentshader
+	zad2/TextVertexShader.vertexshader
 )
 
 add_dependencies(zad2 FreeType)

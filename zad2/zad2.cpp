@@ -6,11 +6,9 @@
 #include <vector>
 #include <GL/glew.h>
 #include <glfw3.h>
-#include <ft2build.h>
-#include FT_FREETYPE_H
 GLFWwindow* window;
-
 #include "common/shader.hpp"
+#include "fonts.hpp"
 
 // This class represents a single card on the board, tracking its state
 // orientation, and current animation.
@@ -150,12 +148,7 @@ void start_new_game(){
 
 int main( void )
 {
-	FT_Library ft;
-
-	if(FT_Init_FreeType(&ft)) {
-	  fprintf(stderr, "Could not init freetype library\n");
-	  return 1;
-	}
+	char buffer[50];
 
 	// Test whether board dimentions make sense.
 	if( cards_no % 2 == 1){
@@ -201,6 +194,8 @@ int main( void )
 
 	// Open a window and create its OpenGL context
 	window = glfwCreateWindow( 1024, 768, "Memory game", NULL, NULL);
+	const float pxsizex = 2.0 / 768; // These are needed for pixel alignment.
+	const float pxsizey = 2.0 / 1024;
 	if( window == NULL ){
 		std::cerr << "Failed to open GLFW window." << std::endl;
 		glfwTerminate();
@@ -227,7 +222,7 @@ int main( void )
 	glBindVertexArray(VertexArrayID);
 
 	// Create and compile our GLSL program from the shaders
-	GLuint board_shader_program_id = LoadShaders( "BoardVertexShader.vertexshader", "FragmentShader.fragmentshader" );
+	GLuint board_shader_program_id = LoadShaders( "BoardVertexShader.vertexshader", "BoardFragmentShader.fragmentshader" );
 
 	// Prepare uniforms of the vertex shader
 	GLint uniform_xscale, uniform_yscale, uniform_centerx, uniform_centery, uniform_darkening, uniform_animphase, uniform_reversed, uniform_animmode;
@@ -282,7 +277,11 @@ int main( void )
 	// Prepare input tresholds
 	bool key_pressed_up = false, key_pressed_down = false, key_pressed_left = false, key_pressed_right = false, key_pressed_space = false;
 
+	// Reset game state
 	start_new_game();
+
+	// Prepare for rendering fonts
+	init_font();
 
 	// This is the main loop.
 	while(true){
@@ -361,7 +360,8 @@ int main( void )
 				glUniform1i(uniform_animmode, cards[n].animation_mode);
 				float animation_phase = 0.0;
 				if(cards[n].animation_mode != -1){
-					animation_phase = (current_time - cards[n].animation_start) / animation_lengts[ cards[n].animation_mode ];
+					animation_phase = (current_time - cards[n].animation_start)
+					                  / animation_lengts[ cards[n].animation_mode ];
 					if(animation_phase >= 1.0){
 						animation_phase = 1.0;
 						finalize_animation(n);
@@ -379,7 +379,8 @@ int main( void )
 				else card_data_index = 0;
 
 				// Is the card currently reversed?
-				glUniform1i(uniform_reversed, cards[n].uncovered || cards[n].animation_mode == Card::ANIM_MODE_COVER);
+				glUniform1i(uniform_reversed, cards[n].uncovered ||
+				                              cards[n].animation_mode == Card::ANIM_MODE_COVER);
 				// Is the card removed?
 				if(cards[n].removed == false) glUniform1f(uniform_darkening, 0.0f);
 				else						  glUniform1f(uniform_darkening, 0.8f);
@@ -398,6 +399,27 @@ int main( void )
 
 		glDisableVertexAttribArray(1);
 		glDisableVertexAttribArray(0);
+
+		float gametime;
+		if(game_state == GAME_STATE_READY_TO_START) gametime = 0.0;
+		else if(game_state == GAME_STATE_FINISHED) gametime = game_finish_time - game_start_time;
+		else gametime = current_time - game_start_time;
+
+		//Render texts. For perfect text display, it has to be pixel-aligned.
+		//                                                   color       fontsize
+		render_text("Use cursor keys to select a card.",//  /  |  \     /
+		          -1.0f + 2.0f*pxsizex, 1.0f -23*pxsizey, 1.0,0.0,0.0, 24,pxsizex, pxsizey);
+		render_text("Space to select. Esc to quit."    ,
+		          -1.0f + 2.0f*pxsizex, 1.0f -52*pxsizey, 1.0,0.0,0.0, 24,pxsizex, pxsizey);
+		sprintf(buffer,"Round: %d", rounds);
+		render_text(buffer,
+		          -1.0f + 2.0f*pxsizex, 1.0f -81*pxsizey, 1.0,0.4,0.4, 24,pxsizex, pxsizey);
+		sprintf(buffer,"Pairs left: %d", pairs_left);
+		render_text(buffer,
+				  -1.0f+120.0f*pxsizex, 1.0f -81*pxsizey, 0.0,1.0,0.0, 24,pxsizex, pxsizey);
+		sprintf(buffer,"Time: %.1f", gametime);
+		render_text(buffer,
+				  -1.0f+400.0f*pxsizex, 1.0f -52*pxsizey, 0.0,1.0,0.0, 48,pxsizex, pxsizey);
 
 		glUseProgram(0);
 
@@ -420,6 +442,7 @@ int main( void )
 			key_pressed_space = true;
 			if(game_state == GAME_STATE_READY_TO_START){
 				game_start_time = current_time;
+				std::cout << "Starging game" << std::endl;
 				game_state = GAME_STATE_IN_PROGRESS;
 				select_card(selection_y*board_width + selection_x);
 			}else if(game_state == GAME_STATE_IN_PROGRESS){
