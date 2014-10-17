@@ -29,7 +29,8 @@ public:
 	} AnimModes;
 	mutable int animation_mode = -1;
 };
-const double animation_lengts[3] = {1.0, 0.5, 0.7};
+// Time (in seconds) each animation should take to complete.
+const double animation_lengts[3] = {0.7, 0.5, 0.5};
 
 #define CARD_MODELS 4
 
@@ -165,7 +166,6 @@ void finalize_animation(int n){
 		cards[n].animation_mode = -1;
 		if(card_testedA == n){
 			// this is the first card in a pair
-			// uncovered_card = n;
 		}else if(card_testedB == n){
 			// this is the second card
 			if( cards[card_testedB].model % CARD_MODELS == cards[card_testedA].model % CARD_MODELS){
@@ -185,6 +185,7 @@ void finalize_animation(int n){
 			std::cerr << "ERROR: This card was is not being tested, it shold not be uncovered!" << std::endl;
 		}
 	}else if(cards[n].animation_mode == CardState::ANIM_MODE_WAIT){
+		// Card has waited, time to cover it (and the other tested one too).
 		cards[card_testedA].uncovered = false;
 		cards[card_testedB].uncovered = false;
 		cards[card_testedA].animation_mode = CardState::ANIM_MODE_COVER;
