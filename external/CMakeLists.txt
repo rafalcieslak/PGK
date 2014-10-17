@@ -54,3 +54,14 @@ target_link_libraries(GLEW_190
 	${OPENGL_LIBRARY}
 	${EXTRA_LIBS}
 )
+
+## FREETYPE ##
+
+include(ExternalProject)
+ExternalProject_Add(FreeType
+	PREFIX freetype
+	GIT_REPOSITORY git://git.sv.nongnu.org/freetype/freetype2.git
+    BUILD_COMMAND ${MAKE}
+	INSTALL_DIR ${CMAKE_BINARY_DIR}/install
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/install
+)

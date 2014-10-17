@@ -1,5 +1,5 @@
 # CMake entry point
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required(VERSION 2.8)
 project (PGK)
 
 find_package(OpenGL REQUIRED)
@@ -13,21 +13,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/external/rpavlik-cmake-module
 include(CreateLaunchers)
 include(MSVCMultipleProcessCompile) # /MP
 
-include_directories(
-	external/AntTweakBar-1.16/include/
-	external/glfw-3.0.3/include/GLFW/
-	external/glm-0.9.4.0/
-	external/glew-1.9.0/include/
-	external/assimp-3.0.1270/include/
-	external/bullet-2.81-rev2613/src/
-	.
-)
-
-set(ALL_LIBS
-	${OPENGL_LIBRARY}
-	GLFW_303
-	GLEW_190
-)
 
 add_definitions(
 	-DTW_STATIC
@@ -42,6 +27,18 @@ add_definitions(
 	-Werror
 )
 
+ExternalProject_Get_Property(FreeType install_dir)
+
+include_directories(
+	external/glfw-3.0.3/include/GLFW/
+	external/glm-0.9.4.0/
+	external/glew-1.9.0/include/
+	${install_dir}/include/freetype2
+	.
+)
+link_directories(
+	${CMAKE_BINARY_DIR}/external/freetype-2.5.3-prefix/lib
+)
 
 # zad 2
 add_executable(zad2
@@ -52,8 +49,14 @@ add_executable(zad2
 	zad2/FragmentShader.fragmentshader
 	zad2/BoardVertexShader.vertexshader
 )
+
+add_dependencies(zad2 FreeType)
+
 target_link_libraries(zad2
-	${ALL_LIBS}
+	${OPENGL_LIBRARY}
+	GLFW_303
+	GLEW_190
+	freetype
 )
 set_target_properties(zad2 PROPERTIES XCODE_ATTRIBUTE_CONFIGURATION_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/zad2/")
 create_target_launcher(zad2 WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/zad2/")

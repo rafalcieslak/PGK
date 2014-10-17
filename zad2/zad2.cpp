@@ -6,6 +6,8 @@
 #include <vector>
 #include <GL/glew.h>
 #include <glfw3.h>
+#include <ft2build.h>
+#include FT_FREETYPE_H
 GLFWwindow* window;
 
 #include "common/shader.hpp"
@@ -148,6 +150,13 @@ void start_new_game(){
 
 int main( void )
 {
+	FT_Library ft;
+
+	if(FT_Init_FreeType(&ft)) {
+	  fprintf(stderr, "Could not init freetype library\n");
+	  return 1;
+	}
+
 	// Test whether board dimentions make sense.
 	if( cards_no % 2 == 1){
 		std::cout << "Cards number with these dimentions is not an even number!" << std::endl;
