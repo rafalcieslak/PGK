@@ -189,17 +189,17 @@ int main( void )
 	GLuint board_shader_program_id = LoadShaders( "BoardVertexShader.vertexshader", "FragmentShader.fragmentshader" );
 
 	// Prepare uniforms of the vertex shader
-	GLint uniform_xscale, uniform_yscale, uniform_centerx, uniform_centery, uniform_alpha, uniform_animphase, uniform_reversed, uniform_animmode;
+	GLint uniform_xscale, uniform_yscale, uniform_centerx, uniform_centery, uniform_darkening, uniform_animphase, uniform_reversed, uniform_animmode;
 	uniform_xscale = glGetUniformLocation(board_shader_program_id,"xscale");
 	uniform_yscale = glGetUniformLocation(board_shader_program_id,"yscale");
 	uniform_centerx = glGetUniformLocation(board_shader_program_id,"center_x");
 	uniform_centery = glGetUniformLocation(board_shader_program_id,"center_y");
-	uniform_alpha = glGetUniformLocation(board_shader_program_id,"alpha");
+	uniform_darkening = glGetUniformLocation(board_shader_program_id,"darkening");
 	uniform_animphase = glGetUniformLocation(board_shader_program_id,"animation_phase");
 	uniform_animmode = glGetUniformLocation(board_shader_program_id,"animation_mode");
 	uniform_reversed = glGetUniformLocation(board_shader_program_id,"reversed");
-	if(uniform_xscale == -1 || uniform_yscale == -1 || uniform_centerx == -1 || uniform_centery == -1 || uniform_alpha == -1 || uniform_animphase == -1 || uniform_reversed == -1 || uniform_animmode == -1){
-			fprintf( stderr, "A uniform is missing from shader.\n" );
+	if(uniform_xscale == -1 || uniform_yscale == -1 || uniform_centerx == -1 || uniform_centery == -1 || uniform_darkening == -1 || uniform_animphase == -1 || uniform_reversed == -1 || uniform_animmode == -1){
+			std::cerr << "A uniform is missing from the shader." << std::endl;
 			glfwTerminate();
 			return -1;
 	}
@@ -277,8 +277,8 @@ int main( void )
 			glUniform1f(uniform_centery, pos.second);
 
 			// Is the selected card removed?
-			if(cards[selection_y*board_width + selection_x].removed == false) glUniform1f(uniform_alpha, 1.0f);
-			else						  									  glUniform1f(uniform_alpha, 0.35f);
+			if(cards[selection_y*board_width + selection_x].removed == false) glUniform1f(uniform_darkening, 0.0f);
+			else						  									  glUniform1f(uniform_darkening, 0.8f);
 
 			glDrawArrays(GL_TRIANGLES, 0, sizeof(highlight_vertices)/sizeof(highlight_vertices[0]) );
 		}
@@ -323,8 +323,8 @@ int main( void )
 				// Is the card currently reversed?
 				glUniform1i(uniform_reversed, cards[n].uncovered || cards[n].animation_mode == Card::ANIM_MODE_COVER);
 				// Is the card removed?
-				if(cards[n].removed == false) glUniform1f(uniform_alpha, 1.0f);
-				else						  glUniform1f(uniform_alpha, 0.2f);
+				if(cards[n].removed == false) glUniform1f(uniform_darkening, 0.0f);
+				else						  glUniform1f(uniform_darkening, 0.8f);
 
 				// Select buffers to use
 				glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer[card_data_index]);
@@ -345,7 +345,7 @@ int main( void )
 			glUniform1f(uniform_centerx, 0.0);
 			glUniform1f(uniform_centery, 0.0);
 			glUniform1i(uniform_animmode, -1);
-			glUniform1f(uniform_alpha, 1.0f);
+			glUniform1f(uniform_darkening, 0.0f);
 			glBindBuffer(GL_ARRAY_BUFFER, vert_lines_buffer);
 			glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0 );
 			glBindBuffer(GL_ARRAY_BUFFER, lines_color_buffer);

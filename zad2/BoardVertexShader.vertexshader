@@ -8,7 +8,7 @@ uniform float yscale;
 uniform float center_x;
 uniform float center_y;
 uniform float animation_phase;
-uniform float alpha;
+uniform float darkening;
 uniform int animation_mode;
 uniform bool reversed;
 
@@ -41,13 +41,12 @@ void main(){
     if(animation_mode == 0 || animation_mode == 1){
         float lighting = -sin( animation_phase * 3.14159265358 * 2);
         if(animation_phase >= 0.25 && animation_phase <= 0.5) lighting = -1.0;
-        lighting = lighting*lighting*lighting;//*sign(lighting);
-        //color += vec4(0.28*lighting);
-        color = lighten_color(color, 0.2*lighting);
+        lighting = lighting*lighting*lighting;
+        color = lighten_color(color, 1.0 + 0.8*lighting);
     }
+    color = lighten_color(color, 1.0-darkening);
 
-
-    gl_Position.z = 0.0;
+    gl_Position.z = 0.0 + 0.000001*darkening;
     gl_Position.w = 1.0;
 
     // Translate to card's position on board
@@ -57,11 +56,13 @@ void main(){
     gl_Position.y *= 0.9;
     gl_Position.y -= 0.1;
 
-    fragmentColor = vec4(color, alpha);
+    fragmentColor = vec4(color, 1.0);
 }
 
-vec3 lighten_color(vec3 color, float amt){
-    return HSLtoRGB( clamp( RGBtoHSL(color) + vec3(0.0,0.0,amt) , vec3(0.0), vec3(1.0)));
+vec3 lighten_color(vec3 color, float ratio){
+    vec3 hls = RGBtoHSL(color);
+    hls.z *= ratio;
+    return HSLtoRGB( clamp( hls , vec3(0.0), vec3(1.0)));
 }
 
 // I admit, I do not know how exactly the conversion between grb<->hsv works.
