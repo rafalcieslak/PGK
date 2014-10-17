@@ -36,14 +36,20 @@ const double animation_lengts[3] = {1.0, 0.5, 0.7};
 GLfloat card_sizes[CARD_MODELS+1] = {6,6,6,6,6};
 
 GLfloat highlight_vertices[] = {
-	-0.5f, -0.5f,
-	0.5f, -0.5f,
-	0.5f, 0.5f,
-	-0.5f, -0.5f,
-	0.5f, 0.5f,
-	-0.5f, 0.5f,
+	-1.0f, -1.0f,
+	1.0f, -1.0f,
+	1.0f, 1.0f,
+	-1.0f, -1.0f,
+	1.0f, 1.0f,
+	-1.0f, 1.0f,
 };
 GLfloat highlight_colors[] = {
+	1.0f, 1.0f, 0.0f,
+	1.0f, 1.0f, 0.0f,
+	1.0f, 1.0f, 0.0f,
+	1.0f, 1.0f, 0.0f,
+	1.0f, 1.0f, 0.0f,
+	1.0f, 1.0f, 0.0f,
 	1.0f, 1.0f, 0.0f,
 	1.0f, 1.0f, 0.0f,
 	1.0f, 1.0f, 0.0f,
@@ -54,40 +60,40 @@ GLfloat highlight_colors[] = {
 
 GLfloat card_vertices[CARD_MODELS+1][12] = {
 	{
-	-0.5f, -0.5f,
-	0.5f, -0.5f,
-	0.5f, 0.5f,
-	-0.5f, -0.5f,
-	0.5f, 0.5f,
-	-0.5f, 0.5f,
+	-1.0f, -1.0f,
+	1.0f, -1.0f,
+	1.0f, 1.0f,
+	-1.0f, -1.0f,
+	1.0f, 1.0f,
+	-1.0f, 1.0f,
 },{
-	-0.5f, -0.5f,
-	0.5f, -0.5f,
-	0.5f, 0.5f,
-	-0.5f, -0.5f,
-	0.5f, 0.5f,
-	-0.5f, 0.5f,
+	-1.0f, -1.0f,
+	1.0f, -1.0f,
+	1.0f, 1.0f,
+	-1.0f, -1.0f,
+	1.0f, 1.0f,
+	-1.0f, 1.0f,
 },{
-	-0.5f, -0.5f,
-	0.5f, -0.5f,
-	0.5f, 0.5f,
-	-0.5f, -0.5f,
-	0.5f, 0.5f,
-	-0.5f, 0.5f,
+	-1.0f, -1.0f,
+	1.0f, -1.0f,
+	1.0f, 1.0f,
+	-1.0f, -1.0f,
+	1.0f, 1.0f,
+	-1.0f, 1.0f,
 },{
-	-0.5f, -0.5f,
-	0.5f, -0.5f,
-	0.5f, 0.5f,
-	-0.5f, -0.5f,
-	0.5f, 0.5f,
-	-0.5f, 0.5f,
+	-1.0f, -1.0f,
+	1.0f, -1.0f,
+	1.0f, 1.0f,
+	-1.0f, -1.0f,
+	1.0f, 1.0f,
+	-1.0f, 1.0f,
 },{
-	-0.5f, -0.5f,
-	0.5f, -0.5f,
-	0.5f, 0.5f,
-	-0.5f, -0.5f,
-	0.5f, 0.5f,
-	-0.5f, 0.5f,
+	-1.0f, -1.0f,
+	1.0f, -1.0f,
+	1.0f, 1.0f,
+	-1.0f, -1.0f,
+	1.0f, 1.0f,
+	-1.0f, 1.0f,
 }
 };
 
@@ -351,8 +357,8 @@ int main( void )
 		glEnableVertexAttribArray(1);
 
 		// Prepare uniforms for highlight
-		glUniform1f(uniform_xscale, card_width);
-		glUniform1f(uniform_yscale, card_height);
+		glUniform1f(uniform_xscale, card_width/2);
+		glUniform1f(uniform_yscale, card_height/2);
 		glUniform1i(uniform_animmode, -1);
 		// Draw highlight
 		{
@@ -373,8 +379,8 @@ int main( void )
 		}
 
 		// Prepare uniforms for cards
-		glUniform1f(uniform_xscale, card_width*0.9);
-		glUniform1f(uniform_yscale, card_height*0.9);
+		glUniform1f(uniform_xscale, card_width/2*0.9);
+		glUniform1f(uniform_yscale, card_height/2*0.9);
 
 		// Draw cards
 		for(unsigned int i = 0; i < board_height; i++){
