@@ -194,8 +194,8 @@ int main( void )
 
 	// Open a window and create its OpenGL context
 	window = glfwCreateWindow( 1024, 768, "Memory game", NULL, NULL);
-	const float pxsizex = 2.0 / 768; // These are needed for pixel alignment.
-	const float pxsizey = 2.0 / 1024;
+	const float pxsizex = 2.0 / 1024; // These are needed for pixel alignment.
+	const float pxsizey = 2.0 / 768;
 	if( window == NULL ){
 		std::cerr << "Failed to open GLFW window." << std::endl;
 		glfwTerminate();
@@ -408,18 +408,28 @@ int main( void )
 		//Render texts. For perfect text display, it has to be pixel-aligned.
 		//                                                   color       fontsize
 		render_text("Use cursor keys to select a card.",//  /  |  \     /
-		          -1.0f + 2.0f*pxsizex, 1.0f -23*pxsizey, 1.0,0.0,0.0, 24,pxsizex, pxsizey);
-		render_text("Space to select. Esc to quit."    ,
-		          -1.0f + 2.0f*pxsizex, 1.0f -52*pxsizey, 1.0,0.0,0.0, 24,pxsizex, pxsizey);
+		          -1.0f + 2.0f*pxsizex, 1.0f -22*pxsizey, 1.0,0.0,0.0, 24,pxsizex, pxsizey);
+		if(game_state != GAME_STATE_FINISHED)
+			render_text("Space to select. Esc to quit." ,
+						-1.0f + 2.0f*pxsizex, 1.0f -48*pxsizey, 1.0,0.0,0.0, 24,pxsizex, pxsizey);
+		else
+			render_text("Space to start a new game. Esc to quit." ,
+							-1.0f + 2.0f*pxsizex, 1.0f -48*pxsizey, 1.0,0.0,0.0, 24,pxsizex, pxsizey);
 		sprintf(buffer,"Round: %d", rounds);
 		render_text(buffer,
-		          -1.0f + 2.0f*pxsizex, 1.0f -81*pxsizey, 1.0,0.4,0.4, 24,pxsizex, pxsizey);
+		          -1.0f + 2.0f*pxsizex, 1.0f -74*pxsizey, 0.0,1.0,0.4, 24,pxsizex, pxsizey);
 		sprintf(buffer,"Pairs left: %d", pairs_left);
 		render_text(buffer,
-				  -1.0f+120.0f*pxsizex, 1.0f -81*pxsizey, 0.0,1.0,0.0, 24,pxsizex, pxsizey);
+				  -1.0f+120.0f*pxsizex, 1.0f -74*pxsizey, 1.0,0.4,0.0, 24,pxsizex, pxsizey);
 		sprintf(buffer,"Time: %.1f", gametime);
 		render_text(buffer,
-				  -1.0f+400.0f*pxsizex, 1.0f -52*pxsizey, 0.0,1.0,0.0, 48,pxsizex, pxsizey);
+				  -1.0f+650.0f*pxsizex, 1.0f -48*pxsizey, 0.0,1.0,0.0, 48,pxsizex, pxsizey);
+
+		// Render congratilations message
+		if(game_state == GAME_STATE_FINISHED){
+			render_text("Congratulations!" ,
+				-1.0f + 240.0f*pxsizex, 1.0f -440*pxsizey, 0.0,1.0,0.0, 72,pxsizex, pxsizey);
+		}
 
 		glUseProgram(0);
 
@@ -442,7 +452,6 @@ int main( void )
 			key_pressed_space = true;
 			if(game_state == GAME_STATE_READY_TO_START){
 				game_start_time = current_time;
-				std::cout << "Starging game" << std::endl;
 				game_state = GAME_STATE_IN_PROGRESS;
 				select_card(selection_y*board_width + selection_x);
 			}else if(game_state == GAME_STATE_IN_PROGRESS){
