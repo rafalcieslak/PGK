@@ -22,11 +22,13 @@ public:
 	bool removed = false;
 	mutable double animation_start = 0.0;
 	enum{
-		ANIM_MODE_UNCOVER,
-		ANIM_MODE_COVER
+		ANIM_MODE_UNCOVER = 0,
+		ANIM_MODE_COVER,
+		ANIM_MODE_WAIT
 	} AnimModes;
-	mutable int animation = -1;
+	mutable int animation_mode = -1;
 };
+const double animation_lengts[3] = {1.2, 0.5, 0.7};
 
 #define CARD_MODELS 4
 
@@ -134,12 +136,10 @@ const float card_width = 2.0f/board_width;
 const float card_height = 2.0f/board_height;
 
 unsigned int selection_x = 0, selection_y = 0;
-int uncovered_card = -1;
-int animated_card  = -1;
-bool uncover_animation_in_progress = false;
-const double flip_animation_length = 1.2f;
-const double animation_wait_time = 0.5f;
+int card_testedA = -1;
+int card_testedB = -1;
 
+double current_time = 0.0;
 
 std::vector<CardState> cards;
 
@@ -149,34 +149,60 @@ std::pair<float, float> card_xy_to_coords(unsigned int x, unsigned int y){
 	return std::make_pair(xf,yf);
 }
 
-void process_space_press(double tm){
+void process_space_press(){
 	int n = selection_y*board_width + selection_x;
-	if(cards[n].removed || cards[n].uncovered) return;
-	cards[n].animation_start = tm;
-	uncover_animation_in_progress = true;
-	animated_card = n;
+	if(cards[n].removed || cards[n].uncovered || card_testedB != -1 || n == card_testedA) return;
+	cards[n].animation_start = current_time;
+	cards[n].animation_mode = CardState::ANIM_MODE_UNCOVER;
+	if(card_testedA == -1){ // first card from a tested pair
+		card_testedA = n;
+	}else{ // second card from a tested pair
+		card_testedB = n;
+	}
 }
 
-void uncover_card(int n){
-	cards[n].uncovered = true;
-	uncover_animation_in_progress = false;
-	animated_card = -1;
-	if(uncovered_card == -1){
-		// this is the first card in a pair
-		uncovered_card = n;
-	}else{
-		// this is the second card
-		if( cards[n].model % CARD_MODELS == cards[uncovered_card].model % CARD_MODELS){
-			// match!
-			cards[n].removed = true;
-			cards[uncovered_card].removed = true;
-			uncovered_card = -1;
+
+void finalize_animation(int n){
+	if(cards[n].animation_mode == CardState::ANIM_MODE_UNCOVER){
+		// Finalize card uncovering
+		cards[n].uncovered = true;
+		cards[n].animation_mode = -1;
+		if(card_testedA == n){
+			// this is the first card in a pair
+			// uncovered_card = n;
+		}else if(card_testedB == n){
+			// this is the second card
+			if( cards[card_testedB].model % CARD_MODELS == cards[card_testedA].model % CARD_MODELS){
+				// match!
+				cards[card_testedB].removed = true;
+				cards[card_testedA].removed = true;
+				card_testedB = -1;
+				card_testedA = -1;
+			}else{
+				// not matching
+				//cards[n].uncovered = false;
+				//cards[uncovered_card].uncovered = false;
+				//uncovered_card = -1;
+				cards[card_testedA].animation_mode = CardState::ANIM_MODE_WAIT;
+				cards[card_testedB].animation_mode = CardState::ANIM_MODE_WAIT;
+				cards[card_testedA].animation_start = current_time;
+				cards[card_testedB].animation_start = current_time;
+			}
 		}else{
-			// not matching
-			cards[n].uncovered = false;
-			cards[uncovered_card].uncovered = false;
-			uncovered_card = -1;
+			std::cerr << "ERROR: This card was is not being tested, it shold not be uncovered!" << std::endl;
 		}
+	}else if(cards[n].animation_mode == CardState::ANIM_MODE_WAIT){
+		cards[card_testedA].uncovered = false;
+		cards[card_testedB].uncovered = false;
+		cards[card_testedA].animation_mode = CardState::ANIM_MODE_COVER;
+		cards[card_testedB].animation_mode = CardState::ANIM_MODE_COVER;
+		cards[card_testedA].animation_start = current_time;
+		cards[card_testedB].animation_start = current_time;
+	}else if(cards[n].animation_mode == CardState::ANIM_MODE_COVER){
+		cards[card_testedA].animation_mode = -1;
+		cards[card_testedB].animation_mode = -1;
+		card_testedA = -1;
+		card_testedB = -1;
 	}
 }
 
@@ -230,15 +256,16 @@ int main( void )
 	GLuint shader_program_id = LoadShaders( "VertexShader.vertexshader", "FragmentShader.fragmentshader" );
 
 	// Prepare uniforms of the vertex shader
-	GLint uniform_xsize, uniform_ysize, uniform_centerx, uniform_centery, uniform_alpha, uniform_animphase, uniform_reversed;
-	uniform_xsize = glGetUniformLocation(shader_program_id,"xsize");
-	uniform_ysize = glGetUniformLocation(shader_program_id,"ysize");
+	GLint uniform_xscale, uniform_yscale, uniform_centerx, uniform_centery, uniform_alpha, uniform_animphase, uniform_reversed, uniform_animmode;
+	uniform_xscale = glGetUniformLocation(shader_program_id,"xscale");
+	uniform_yscale = glGetUniformLocation(shader_program_id,"yscale");
 	uniform_centerx = glGetUniformLocation(shader_program_id,"center_x");
 	uniform_centery = glGetUniformLocation(shader_program_id,"center_y");
 	uniform_alpha = glGetUniformLocation(shader_program_id,"alpha");
 	uniform_animphase = glGetUniformLocation(shader_program_id,"animation_phase");
+	uniform_animmode = glGetUniformLocation(shader_program_id,"animation_mode");
 	uniform_reversed = glGetUniformLocation(shader_program_id,"reversed");
-	if(uniform_xsize == -1 || uniform_ysize == -1 || uniform_centerx == -1 || uniform_centery == -1 || uniform_alpha == -1 || uniform_animphase == -1 || uniform_reversed == -1){
+	if(uniform_xscale == -1 || uniform_yscale == -1 || uniform_centerx == -1 || uniform_centery == -1 || uniform_alpha == -1 || uniform_animphase == -1 || uniform_reversed == -1 || uniform_animmode == -1){
 			fprintf( stderr, "A uniform is missing from shader.\n" );
 			glfwTerminate();
 			return -1;
@@ -279,7 +306,7 @@ int main( void )
 	bool key_pressed_up = false, key_pressed_down = false, key_pressed_left = false, key_pressed_right = false, key_pressed_space = false;
 
 	do{
-		double tm = glfwGetTime();
+		current_time = glfwGetTime();
 
 		// Clear the screen
 		glClear( GL_COLOR_BUFFER_BIT );
@@ -290,9 +317,10 @@ int main( void )
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 
-		// Prepare scaling for highlight
-		glUniform1f(uniform_xsize, card_width);
-		glUniform1f(uniform_ysize, card_height);
+		// Prepare uniforms for highlight
+		glUniform1f(uniform_xscale, card_width);
+		glUniform1f(uniform_yscale, card_height);
+		glUniform1i(uniform_animmode, -1);
 		// Draw highlight
 		{
 			glBindBuffer(GL_ARRAY_BUFFER, hlvertices);
@@ -310,8 +338,8 @@ int main( void )
 		}
 
 		// Prepare scaling for cards
-		glUniform1f(uniform_xsize, card_width*0.9);
-		glUniform1f(uniform_ysize, card_height*0.9);
+		glUniform1f(uniform_xscale, card_width*0.9);
+		glUniform1f(uniform_yscale, card_height*0.9);
 
 		glUniform1f(uniform_alpha, 1.0f);
 
@@ -326,22 +354,28 @@ int main( void )
 				glUniform1f(uniform_centerx, pos.first);
 				glUniform1f(uniform_centery, pos.second);
 
-				float animation_phase;
-				if(animated_card == n) animation_phase = tm - cards[n].animation_start;
-				else animation_phase = 0.0;
-				glUniform1f(uniform_animphase, animation_phase);
 
-				if(animation_phase >= 1.0){
-					animation_phase = 1.0;
-					uncover_card(n);
+				glUniform1i(uniform_animmode, cards[n].animation_mode);
+				float animation_phase = 0.0;
+				if(cards[n].animation_mode != -1){
+					animation_phase = (current_time - cards[n].animation_start) / animation_lengts[ cards[n].animation_mode ];
+					if(animation_phase >= 1.0){
+						animation_phase = 1.0;
+						finalize_animation(n);
+					}
+					glUniform1f(uniform_animphase, animation_phase);
 				}
+
 
 				// Determine which vertex buffer to use
 				int card_data_index;
-				if(cards[n].uncovered || animation_phase >= 0.5) card_data_index = 1 + (cards[n].model % CARD_MODELS);
+				if(cards[n].uncovered ||
+				  (cards[n].animation_mode == CardState::ANIM_MODE_UNCOVER && animation_phase >= 0.5) ||
+				  (cards[n].animation_mode == CardState::ANIM_MODE_COVER   && animation_phase <= 0.5) )
+				       card_data_index = 1 + (cards[n].model % CARD_MODELS);
 				else card_data_index = 0;
 
-				glUniform1i(uniform_reversed,cards[n].uncovered);
+				glUniform1i(uniform_reversed, cards[n].uncovered || cards[n].animation_mode == CardState::ANIM_MODE_COVER);
 
 				glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer[card_data_index]);
 				glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0 );
@@ -379,9 +413,9 @@ int main( void )
 		if(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_RELEASE) key_pressed_right =  false;
 		if(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS && key_pressed_right == false && selection_x < board_width - 1)  { selection_x++; key_pressed_right = true;}
 		if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) key_pressed_space =  false;
-		if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && key_pressed_space == false && uncover_animation_in_progress == false){
-			key_pressed_right = true;
-			process_space_press(tm);
+		if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && key_pressed_space == false){
+			key_pressed_space = true;
+			process_space_press();
 		}
 
 	}
