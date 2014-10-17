@@ -36,12 +36,10 @@ const double animation_lengts[3] = {1.0, 0.5, 0.7};
 GLfloat card_sizes[CARD_MODELS+1] = {6,6,6,6,6};
 
 GLfloat highlight_vertices[] = {
-	-1.0f, -1.0f,
-	1.0f, -1.0f,
-	1.0f, 1.0f,
-	-1.0f, -1.0f,
-	1.0f, 1.0f,
-	-1.0f, 1.0f,
+	-1.0f, -1.0f, -1.0f, -0.5f, -0.5f, -1.0f,
+	1.0f, -1.0f, 1.0f, -0.5f, 0.5f, -1.0f,
+	-1.0f, 1.0f, -1.0f, 0.5f, -0.5f, 1.0f,
+	1.0f, 1.0f, 1.0f, 0.5f, 0.5f, 1.0f,
 };
 GLfloat highlight_colors[] = {
 	1.0f, 1.0f, 0.0f,
@@ -375,7 +373,7 @@ int main( void )
 			if(cards[selection_y*board_width + selection_x].removed == false) glUniform1f(uniform_alpha, 1.0f);
 			else						  									  glUniform1f(uniform_alpha, 0.35f);
 
-			glDrawArrays(GL_TRIANGLES, 0, 6);
+			glDrawArrays(GL_TRIANGLES, 0, sizeof(highlight_vertices)/sizeof(highlight_vertices[0]) );
 		}
 
 		// Prepare uniforms for cards
@@ -433,20 +431,22 @@ int main( void )
 		}
 
 		// Draw grid lines
-		glUniform1f(uniform_xscale, 1.0);
-		glUniform1f(uniform_yscale, 1.0);
-		glUniform1f(uniform_centerx, 0.0);
-		glUniform1f(uniform_centery, 0.0);
-		glUniform1i(uniform_animmode, -1);
-		glUniform1f(uniform_alpha, 1.0f);
-		glBindBuffer(GL_ARRAY_BUFFER, vert_lines_buffer);
-		glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0 );
-		glBindBuffer(GL_ARRAY_BUFFER, lines_color_buffer);
-		glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0 );
-		glDrawArrays(GL_LINES, 0, 2*(board_width-1));
-		glBindBuffer(GL_ARRAY_BUFFER, horiz_lines_buffer);
-		glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0 );
-		glDrawArrays(GL_LINES, 0, 2*(board_height-1));
+		{
+			glUniform1f(uniform_xscale, 1.0);
+			glUniform1f(uniform_yscale, 1.0);
+			glUniform1f(uniform_centerx, 0.0);
+			glUniform1f(uniform_centery, 0.0);
+			glUniform1i(uniform_animmode, -1);
+			glUniform1f(uniform_alpha, 1.0f);
+			glBindBuffer(GL_ARRAY_BUFFER, vert_lines_buffer);
+			glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0 );
+			glBindBuffer(GL_ARRAY_BUFFER, lines_color_buffer);
+			glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0 );
+			glDrawArrays(GL_LINES, 0, 2*(board_width-1));
+			glBindBuffer(GL_ARRAY_BUFFER, horiz_lines_buffer);
+			glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0 );
+			glDrawArrays(GL_LINES, 0, 2*(board_height-1));
+		}
 
 		glDisableVertexAttribArray(1);
 		glDisableVertexAttribArray(0);
