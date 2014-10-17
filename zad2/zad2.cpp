@@ -300,6 +300,10 @@ int main( void )
 	}
     std::random_shuffle(cards.begin(), cards.end());
 
+    // Enable blending
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	// Prepare input tresholds
 	bool key_pressed_up = false, key_pressed_down = false, key_pressed_left = false, key_pressed_right = false, key_pressed_space = false;
 
@@ -330,7 +334,9 @@ int main( void )
 			glUniform1f(uniform_centerx, pos.first);
 			glUniform1f(uniform_centery, pos.second);
 
-			glUniform1f(uniform_alpha, 1.0f);
+			// Is the selected card removed?
+			if(cards[selection_y*board_width + selection_x].removed == false) glUniform1f(uniform_alpha, 1.0f);
+			else						  									  glUniform1f(uniform_alpha, 0.2f);
 
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 		}
@@ -338,7 +344,6 @@ int main( void )
 		// Prepare uniforms for cards
 		glUniform1f(uniform_xscale, card_width*0.9);
 		glUniform1f(uniform_yscale, card_height*0.9);
-		glUniform1f(uniform_alpha, 1.0f);
 
 		// Draw cards
 		for(unsigned int i = 0; i < board_height; i++){
@@ -374,6 +379,9 @@ int main( void )
 
 				// Is the card currently reversed?
 				glUniform1i(uniform_reversed, cards[n].uncovered || cards[n].animation_mode == CardState::ANIM_MODE_COVER);
+				// Is the card removed?
+				if(cards[n].removed == false) glUniform1f(uniform_alpha, 1.0f);
+				else						  glUniform1f(uniform_alpha, 0.2f);
 
 				// Select buffers to use
 				glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer[card_data_index]);
