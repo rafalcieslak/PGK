@@ -212,8 +212,30 @@ int main( void )
 		return -2;
 	}
 
-	//Prepare random seed
+	// Prepare random seed
 	srand(time(0));
+
+	// Calculate grid lines
+	GLfloat  vert_lines[4*(board_width -1)];
+	GLfloat horiz_lines[4*(board_height-1)];
+	GLfloat lines_colors[6*std::max(board_width,board_height)];
+	for(unsigned int i = 0; i < board_width; i++){
+		vert_lines[4*i + 0] = -1.0f + card_width*(i+1);
+		vert_lines[4*i + 1] =  1.0f;
+		vert_lines[4*i + 2] = -1.0f + card_width*(i+1);
+		vert_lines[4*i + 3] = -1.0f;
+	}
+	for(unsigned int i = 0; i < board_height; i++){
+		horiz_lines[4*i + 0] =  1.0f;
+		horiz_lines[4*i + 1] = -1.0f + card_height*(i+1);
+		horiz_lines[4*i + 2] = -1.0f;
+		horiz_lines[4*i + 3] = -1.0f + card_height*(i+1);
+	}
+	for(unsigned int i = 0; i < 2*std::max(board_width,board_height); i++){
+		lines_colors[3*i + 0] = 1.0f;
+		lines_colors[3*i + 1] = 0.0f;
+		lines_colors[3*i + 2] = 0.0f;
+	}
 
 	// Initialise GLFW
 	if( !glfwInit() )
@@ -273,11 +295,14 @@ int main( void )
 			return -1;
 	}
 
-	GLuint vertexbuffer[8], colorbuffer[8], hlvertices, hlcolors;
+	GLuint vertexbuffer[8], colorbuffer[8], hlvertices, hlcolors, lines_color_buffer, vert_lines_buffer, horiz_lines_buffer;
 	glGenBuffers(8, vertexbuffer);
 	glGenBuffers(8, colorbuffer);
 	glGenBuffers(1, &hlvertices);
 	glGenBuffers(1, &hlcolors);
+	glGenBuffers(1, &horiz_lines_buffer);
+	glGenBuffers(1, &vert_lines_buffer);
+	glGenBuffers(1, &lines_color_buffer);
 
 	// Preparing data in buffers
 	for(int i = 0; i <= CARD_MODELS; i++){
@@ -292,6 +317,12 @@ int main( void )
 	glBufferData(GL_ARRAY_BUFFER, sizeof(highlight_vertices), highlight_vertices, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, hlcolors);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(highlight_colors), highlight_colors, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, lines_color_buffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(lines_colors), lines_colors, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, vert_lines_buffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vert_lines), vert_lines, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, horiz_lines_buffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(horiz_lines), horiz_lines, GL_STATIC_DRAW);
 
 	// Prepare cards
 	for(unsigned int i = 0; i < cards_no/2; i++){
@@ -336,7 +367,7 @@ int main( void )
 
 			// Is the selected card removed?
 			if(cards[selection_y*board_width + selection_x].removed == false) glUniform1f(uniform_alpha, 1.0f);
-			else						  									  glUniform1f(uniform_alpha, 0.2f);
+			else						  									  glUniform1f(uniform_alpha, 0.35f);
 
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 		}
@@ -395,6 +426,22 @@ int main( void )
 			}
 		}
 
+		// Draw grid lines
+		glUniform1f(uniform_xscale, 1.0);
+		glUniform1f(uniform_yscale, 1.0);
+		glUniform1f(uniform_centerx, 0.0);
+		glUniform1f(uniform_centery, 0.0);
+		glUniform1i(uniform_animmode, -1);
+		glUniform1f(uniform_alpha, 1.0f);
+		glBindBuffer(GL_ARRAY_BUFFER, vert_lines_buffer);
+		glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0 );
+		glBindBuffer(GL_ARRAY_BUFFER, lines_color_buffer);
+		glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0 );
+		glDrawArrays(GL_LINES, 0, 2*(board_width-1));
+		glBindBuffer(GL_ARRAY_BUFFER, horiz_lines_buffer);
+		glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0 );
+		glDrawArrays(GL_LINES, 0, 2*(board_height-1));
+
 		glDisableVertexAttribArray(1);
 		glDisableVertexAttribArray(0);
 
@@ -428,6 +475,11 @@ int main( void )
 	// Cleanup
 	glDeleteBuffers(8, vertexbuffer);
 	glDeleteBuffers(8, colorbuffer);
+	glDeleteBuffers(1, &hlvertices);
+	glDeleteBuffers(1, &hlcolors);
+	glDeleteBuffers(1, &horiz_lines_buffer);
+	glDeleteBuffers(1, &vert_lines_buffer);
+	glDeleteBuffers(1, &lines_color_buffer);
 	glDeleteVertexArrays(1, &VertexArrayID);
 	glDeleteProgram(shader_program_id);
 
