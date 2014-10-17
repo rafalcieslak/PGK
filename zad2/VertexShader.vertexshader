@@ -17,17 +17,30 @@ out vec4 fragmentColor;
 void main(){
     gl_Position.x = vertexPosition_board.x * xscale;
     gl_Position.y = vertexPosition_board.y * yscale;
-
     if(reversed) gl_Position.x *= -1.0f;
 
-    if(animation_mode == 0) gl_Position.x *= cos( animation_phase * 3.14159265358 ); //uncover animation
-    if(animation_mode == 1) gl_Position.y *= cos( animation_phase * 3.14159265358 ); //cover animation
+    fragmentColor = vec4(vertexColor,alpha);
+
+    if(animation_mode == 0){ //uncover animation
+        gl_Position.y += sign(gl_Position.y) * (gl_Position.x - 0.1) * sin( animation_phase * 3.14159265358 ) * 0.25;
+        gl_Position.x *= cos( animation_phase * 3.14159265358 );
+    }
+    if(animation_mode == 1){
+        gl_Position.x += sign(gl_Position.x) * (gl_Position.y - 0.1) * sin( animation_phase * 3.14159265358 ) * 0.25;
+        gl_Position.y *= cos( animation_phase * 3.14159265358 );
+    }
     if(animation_mode == 2) ; //wait animation
+
+    if(animation_mode == 0 || animation_mode == 1){
+        float lighting = -sin( animation_phase * 3.14159265358 * 2);
+        if(animation_phase >= 0.25 && animation_phase <= 0.5) lighting = -1.0;
+        lighting = lighting*lighting*lighting;//*sign(lighting);
+        fragmentColor += vec4(0.28*lighting);
+    }
 
     gl_Position.z = 0.0;
     gl_Position.w = 1.0;
 
     gl_Position += vec4(center_x, center_y, 0.0, 0.0);
 
-    fragmentColor = vec4(vertexColor,alpha);
 }

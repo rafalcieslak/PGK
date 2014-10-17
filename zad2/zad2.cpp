@@ -28,7 +28,7 @@ public:
 	} AnimModes;
 	mutable int animation_mode = -1;
 };
-const double animation_lengts[3] = {1.2, 0.5, 0.7};
+const double animation_lengts[3] = {1.0, 0.5, 0.7};
 
 #define CARD_MODELS 4
 
