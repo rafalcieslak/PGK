@@ -28,7 +28,7 @@ public:
 };
 
 // Time (in seconds) each animation should take to complete.
-const double animation_lengts[3] = {0.7, 0.5, 0.5};
+const double animation_lengts[3] = {0.8, 0.5, 0.5};
 
 // This is where card model vertices/colors are defined.
 #include "models.cpp"
@@ -205,9 +205,9 @@ int main( void )
 	}
 
 	// Prepare data buffers
-	GLuint vertexbuffer[8], colorbuffer[8], hlvertices, hlcolors, lines_color_buffer, vert_lines_buffer, horiz_lines_buffer;
-	glGenBuffers(8, vertexbuffer);
-	glGenBuffers(8, colorbuffer);
+	GLuint vertexbuffer[9], colorbuffer[9], hlvertices, hlcolors, lines_color_buffer, vert_lines_buffer, horiz_lines_buffer;
+	glGenBuffers(9, vertexbuffer);
+	glGenBuffers(9, colorbuffer);
 	glGenBuffers(1, &hlvertices);
 	glGenBuffers(1, &hlcolors);
 	glGenBuffers(1, &horiz_lines_buffer);
@@ -282,6 +282,28 @@ int main( void )
 
 			glDrawArrays(GL_TRIANGLES, 0, sizeof(highlight_vertices)/sizeof(highlight_vertices[0]) );
 		}
+		// This causes drawn lines to be closer to the far clipping plane, making them appear "below" animated cards.
+		glDepthRange (0.1, 1.0);
+		// Draw grid lines
+		{
+			glUniform1f(uniform_xscale, 1.0);
+			glUniform1f(uniform_yscale, 1.0);
+			glUniform1f(uniform_centerx, 0.0);
+			glUniform1f(uniform_centery, 0.0);
+			glUniform1i(uniform_animmode, -1);
+			glUniform1f(uniform_darkening, 0.0f);
+			glBindBuffer(GL_ARRAY_BUFFER, vert_lines_buffer);
+			glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0 );
+			glBindBuffer(GL_ARRAY_BUFFER, lines_color_buffer);
+			glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0 );
+			glDrawArrays(GL_LINES, 0, 2*(board_width-1));
+			glBindBuffer(GL_ARRAY_BUFFER, horiz_lines_buffer);
+			glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0 );
+			glDrawArrays(GL_LINES, 0, 2*(board_height-1));
+		}
+
+		// This causes drawn cards to be closer to the near clipping plane, making them appear "above" grid lines when animate.
+ 		glDepthRange (0.0, 0.9);
 
 		// Prepare uniforms for cards
 		glUniform1f(uniform_xscale, card_width/2*0.9);
@@ -338,24 +360,6 @@ int main( void )
 			}
 		}
 
-		// Draw grid lines
-		{
-			glUniform1f(uniform_xscale, 1.0);
-			glUniform1f(uniform_yscale, 1.0);
-			glUniform1f(uniform_centerx, 0.0);
-			glUniform1f(uniform_centery, 0.0);
-			glUniform1i(uniform_animmode, -1);
-			glUniform1f(uniform_darkening, 0.0f);
-			glBindBuffer(GL_ARRAY_BUFFER, vert_lines_buffer);
-			glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0 );
-			glBindBuffer(GL_ARRAY_BUFFER, lines_color_buffer);
-			glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0 );
-			glDrawArrays(GL_LINES, 0, 2*(board_width-1));
-			glBindBuffer(GL_ARRAY_BUFFER, horiz_lines_buffer);
-			glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0 );
-			glDrawArrays(GL_LINES, 0, 2*(board_height-1));
-		}
-
 		glDisableVertexAttribArray(1);
 		glDisableVertexAttribArray(0);
 
@@ -387,8 +391,8 @@ int main( void )
 	}
 
 	// Cleanup
-	glDeleteBuffers(8, vertexbuffer);
-	glDeleteBuffers(8, colorbuffer);
+	glDeleteBuffers(9, vertexbuffer);
+	glDeleteBuffers(9, colorbuffer);
 	glDeleteBuffers(1, &hlvertices);
 	glDeleteBuffers(1, &hlcolors);
 	glDeleteBuffers(1, &horiz_lines_buffer);

@@ -28,11 +28,11 @@ void main(){
 
     // Process animation
     if(animation_mode == 0){ //uncover animation
-        gl_Position.y += (gl_Position.y) * ( gl_Position.x ) * sin( animation_phase * 3.14159265358 ) * 0.4;
+        gl_Position.y += (gl_Position.y) * ( gl_Position.x + 0.1) * sin( animation_phase * 3.14159265358 ) * 0.9;
         gl_Position.x *= cos( animation_phase * 3.14159265358 );
     }
     if(animation_mode == 1){
-        gl_Position.x += (gl_Position.x) * ( gl_Position.y ) * sin( animation_phase * 3.14159265358 ) * 0.4;
+        gl_Position.x += (gl_Position.x) * ( gl_Position.y ) * sin( animation_phase * 3.14159265358 ) * 0.9;
         gl_Position.y *= cos( animation_phase * 3.14159265358 );
     }
     if(animation_mode == 2) ; //wait animation
@@ -65,7 +65,7 @@ vec3 lighten_color(vec3 color, float ratio){
     return HSLtoRGB( clamp( hls , vec3(0.0), vec3(1.0)));
 }
 
-// I admit, I do not know how exactly the conversion between grb<->hsv works.
+// I admit, I do not know how exactly the conversion between rgb<->hsv works.
 // I've taken these routines from the web.
 float Epsilon = 1e-10;
 vec3 RGBtoHCV(in vec3 RGB){

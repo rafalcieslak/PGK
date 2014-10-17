@@ -1,40 +1,63 @@
 // This includable file provides vertex coordinates and colors for all models,
 // mainly card templates and highlight shape.
 
-#define CARD_MODELS 4
+#define CARD_MODELS 8
 
 // The 0th model represents card cover.
 
 // How many triangles does each card model have?
-GLfloat card_sizes[CARD_MODELS+1] = {4,3,4,4,6};
+GLfloat card_sizes[CARD_MODELS+1] = {4,3,4,4,6,5,6,4,4};
 
-GLfloat card_vertices[CARD_MODELS+1][48] = {
-	{
+GLfloat card_vertices[CARD_MODELS+2][48] = {
+	{   // card cover
 		-1.0f, -1.0f, 0.0f, 0.0f,  1.0f, -1.0f,
 		-1.0f, -1.0f, 0.0f, 0.0f, -1.0f,  1.0f,
 		 1.0f,  1.0f, 0.0f, 0.0f, -1.0f,  1.0f,
 		 1.0f,  1.0f, 0.0f, 0.0f,  1.0f, -1.0f,
-	},{
+	},{ // triangle
 		-1.0f, -1.0f, 1.0f, -1.0f,  1.0f, 1.0f,
 		-1.0f, -1.0f, 1.0f,  1.0f, -1.0f, 1.0f,
 		-0.5f, -0.5f, 0.5f, -0.5f,  0.0f, 0.5f,
-	},{
+	},{ // rectangle
 		-1.0f, -1.0f, 1.0f, -1.0f,  1.0f, 1.0f,
 		-1.0f, -1.0f, 1.0f,  1.0f, -1.0f, 1.0f,
 		-0.5f, -0.5f, 0.5f, -0.5f,  0.5f, 0.5f,
 		-0.5f, -0.5f, 0.5f,  0.5f, -0.5f, 0.5f,
-	},{
+	},{ // fat line
 		-1.0f, -1.0f, 1.0f, -1.0f,  1.0f, 1.0f,
 		-1.0f, -1.0f, 1.0f,  1.0f, -1.0f, 1.0f,
 		-0.5f, 0.75f, 0.75f, -0.5f, 0.5f, -0.75f,
 		-0.5f, 0.75f, -0.75f, 0.5f, 0.5f, -0.75f,
-	},{
+	},{ // cross
 		-1.0f, -1.0f, 1.0f, -1.0f,  1.0f, 1.0f,
 		-1.0f, -1.0f, 1.0f,  1.0f, -1.0f, 1.0f,
 		-0.5f, -0.25f, 0.5f, -0.25f, 0.5f, 0.25f,
 		-0.5f, -0.25f, -0.5f, 0.25f, 0.5f, 0.25f,
 		-0.25f, -0.5f, 0.25f, -0.5f, 0.25f, 0.5f,
 		-0.25f, -0.5f, -0.25f, 0.5f, 0.25f, 0.5f,
+	},{ // five-pointed star
+		-1.0f, -1.0f, 1.0f, -1.0f,  1.0f, 1.0f,
+		-1.0f, -1.0f, 1.0f,  1.0f, -1.0f, 1.0f,
+		0.362f, -0.498f, 0.132f, 0.190f, -0.223f, -0.072f,
+		0.585f, 0.190f, 0.0f, -0.235f, -0.585f, 0.190f,
+		0.0f, 0.615f, 0.223f, -0.072f, -0.362f, -0.498f,
+	},{ // hexagon
+		-1.0f, -1.0f, 1.0f, -1.0f,  1.0f, 1.0f,
+		-1.0f, -1.0f, 1.0f,  1.0f, -1.0f, 1.0f,
+		-0.283f, 0.490f, 0.283f, 0.490f, -0.566f, 0.0f,
+		0.283f, 0.490f, 0.566f, 0.0f, -0.566f, 0.0f,
+		-0.283f, -0.490f, 0.283f, -0.490f, -0.566f, 0.0f,
+		0.283f, -0.490f, 0.566f, 0.0f, -0.566f, 0.0f,
+	},{ // rhombus
+		-1.0f, -1.0f, 1.0f, -1.0f,  1.0f, 1.0f,
+		-1.0f, -1.0f, 1.0f,  1.0f, -1.0f, 1.0f,
+		0.75f, -0.5f, -0.25f, -0.5f, 0.25f, 0.5f,
+		-0.25f, -0.5f, 0.25f, 0.5f, -0.75f, 0.5f,
+	},{ // two triangles
+		-1.0f, -1.0f, 1.0f, -1.0f,  1.0f, 1.0f,
+		-1.0f, -1.0f, 1.0f,  1.0f, -1.0f, 1.0f,
+		-0.25f, -0.5f, -0.25f, 0.5f, -0.75f, 0.0f,
+		0.25f, -0.5f, 0.25f, 0.5f, 0.75f, 0.0f,
 	}
 };
 
@@ -54,6 +77,18 @@ GLfloat card_vertices[CARD_MODELS+1][48] = {
 #define COLOR_M_RED RGB(226, 65, 65)
 #define COLOR_D_RED RGB(96, 25, 25)
 #define COLOR_H_RED RGB(178, 0, 0)
+#define COLOR_M_VIOLET RGB(146, 42, 178)
+#define COLOR_D_VIOLET RGB(98, 47, 114)
+#define COLOR_H_VIOLET RGB(76, 0, 99)
+#define COLOR_M_GRAY RGB(165, 165, 165)
+#define COLOR_D_GRAY RGB(117, 117, 117)
+#define COLOR_H_GRAY RGB(66, 66, 66)
+#define COLOR_M_PINK RGB(209, 43, 148)
+#define COLOR_D_PINK RGB(117, 49, 92)
+#define COLOR_H_PINK RGB(153, 0, 96)
+#define COLOR_M_CYAN RGB(58, 175, 160)
+#define COLOR_D_CYAN RGB(42, 94, 87)
+#define COLOR_H_CYAN RGB(0, 91, 79)
 
 GLfloat card_colors[CARD_MODELS+1][60] = {
 	{
@@ -82,6 +117,29 @@ GLfloat card_colors[CARD_MODELS+1][60] = {
 		COLOR_H_RED, COLOR_H_RED, COLOR_H_RED,
 		COLOR_H_RED, COLOR_H_RED, COLOR_H_RED,
 		COLOR_H_RED, COLOR_H_RED, COLOR_H_RED,
+	},{
+		COLOR_M_VIOLET, COLOR_M_VIOLET, COLOR_D_VIOLET,
+		COLOR_M_VIOLET, COLOR_M_VIOLET, COLOR_D_VIOLET,
+		COLOR_H_VIOLET, COLOR_H_VIOLET, COLOR_H_VIOLET,
+		COLOR_H_VIOLET, COLOR_H_VIOLET, COLOR_H_VIOLET,
+		COLOR_H_VIOLET, COLOR_H_VIOLET, COLOR_H_VIOLET,
+	},{
+		COLOR_M_GRAY, COLOR_M_GRAY, COLOR_D_GRAY,
+		COLOR_M_GRAY, COLOR_M_GRAY, COLOR_D_GRAY,
+		COLOR_H_GRAY, COLOR_H_GRAY, COLOR_H_GRAY,
+		COLOR_H_GRAY, COLOR_H_GRAY, COLOR_H_GRAY,
+		COLOR_H_GRAY, COLOR_H_GRAY, COLOR_H_GRAY,
+		COLOR_H_GRAY, COLOR_H_GRAY, COLOR_H_GRAY,
+	},{
+		COLOR_M_PINK, COLOR_M_PINK, COLOR_D_PINK,
+		COLOR_M_PINK, COLOR_M_PINK, COLOR_D_PINK,
+		COLOR_H_PINK, COLOR_H_PINK, COLOR_H_PINK,
+		COLOR_H_PINK, COLOR_H_PINK, COLOR_H_PINK,
+	},{
+		COLOR_M_CYAN, COLOR_M_CYAN, COLOR_D_CYAN,
+		COLOR_M_CYAN, COLOR_M_CYAN, COLOR_D_CYAN,
+		COLOR_H_CYAN, COLOR_H_CYAN, COLOR_H_CYAN,
+		COLOR_H_CYAN, COLOR_H_CYAN, COLOR_H_CYAN,
 	}
 };
 
