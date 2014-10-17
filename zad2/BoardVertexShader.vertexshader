@@ -27,15 +27,15 @@ void main(){
     if(reversed) gl_Position.x *= -1.0f;
 
     // Process animation
-    if(animation_mode == 0){ //uncover animation
+    if(animation_mode == 0){ // uncover animation
         gl_Position.y += (gl_Position.y) * ( gl_Position.x + 0.1) * sin( animation_phase * 3.14159265358 ) * 0.9;
         gl_Position.x *= cos( animation_phase * 3.14159265358 );
     }
-    if(animation_mode == 1){
+    if(animation_mode == 1){ // cover animation
         gl_Position.x += (gl_Position.x) * ( gl_Position.y ) * sin( animation_phase * 3.14159265358 ) * 0.9;
         gl_Position.y *= cos( animation_phase * 3.14159265358 );
     }
-    if(animation_mode == 2) ; //wait animation
+    if(animation_mode == 2) ; // wait animation
 
     // Apply color and lighting effect
     if(animation_mode == 0 || animation_mode == 1){
