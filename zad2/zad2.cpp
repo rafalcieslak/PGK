@@ -1,23 +1,20 @@
-// Include standard headers
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
 #include <algorithm>
 #include <iostream>
 #include <vector>
-
-// Include GLEW
 #include <GL/glew.h>
-
-// Include GLFW
 #include <glfw3.h>
 GLFWwindow* window;
 
-#include <common/shader.hpp>
+#include "common/shader.hpp"
 
-class CardState{
+// This class represents a single card on the board, tracking its state
+// orientation, and current animation.
+class Card{
 public:
-	CardState(int m) : model(m) {}
+	Card(int m) : model(m) {}
 	int model;
 	bool uncovered = false;
 	bool removed = false;
@@ -29,116 +26,29 @@ public:
 	} AnimModes;
 	mutable int animation_mode = -1;
 };
+
 // Time (in seconds) each animation should take to complete.
 const double animation_lengts[3] = {0.7, 0.5, 0.5};
 
-#define CARD_MODELS 4
+// This is where card model vertices/colors are defined.
+#include "models.cpp"
 
-GLfloat card_sizes[CARD_MODELS+1] = {12,6,6,6,6};
-
-GLfloat highlight_vertices[] = {
-	-1.0f, -1.0f, -1.0f, -0.5f, -0.5f, -1.0f,
-	1.0f, -1.0f, 1.0f, -0.5f, 0.5f, -1.0f,
-	-1.0f, 1.0f, -1.0f, 0.5f, -0.5f, 1.0f,
-	1.0f, 1.0f, 1.0f, 0.5f, 0.5f, 1.0f,
-};
-GLfloat highlight_colors[] = {
-	1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-	1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-	1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-	1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-};
-
-GLfloat card_vertices[CARD_MODELS+1][24] = {
-	{
-	-1.0f, -1.0f, 0.0f, 0.0f,  1.0f, -1.0f,
-	-1.0f, -1.0f, 0.0f, 0.0f, -1.0f,  1.0f,
-	 1.0f,  1.0f, 0.0f, 0.0f, -1.0f,  1.0f,
-	 1.0f,  1.0f, 0.0f, 0.0f,  1.0f, -1.0f,
-},{
-	-1.0f, -1.0f,
-	1.0f, -1.0f,
-	1.0f, 1.0f,
-	-1.0f, -1.0f,
-	1.0f, 1.0f,
-	-1.0f, 1.0f,
-},{
-	-1.0f, -1.0f,
-	1.0f, -1.0f,
-	1.0f, 1.0f,
-	-1.0f, -1.0f,
-	1.0f, 1.0f,
-	-1.0f, 1.0f,
-},{
-	-1.0f, -1.0f,
-	1.0f, -1.0f,
-	1.0f, 1.0f,
-	-1.0f, -1.0f,
-	1.0f, 1.0f,
-	-1.0f, 1.0f,
-},{
-	-1.0f, -1.0f,
-	1.0f, -1.0f,
-	1.0f, 1.0f,
-	-1.0f, -1.0f,
-	1.0f, 1.0f,
-	-1.0f, 1.0f,
-}
-};
-
-#define COLOR_D_BROWN 85/255.0f, 46/255.0f, 1/255.0f
-#define COLOR_L_BROWN 150/255.0f, 81/255.0f, 2/255.0f
-
-GLfloat card_colors[CARD_MODELS+1][36] = {
-	{
-		COLOR_D_BROWN, COLOR_D_BROWN, COLOR_L_BROWN,
-		COLOR_D_BROWN, COLOR_L_BROWN, COLOR_L_BROWN,
-		COLOR_D_BROWN, COLOR_D_BROWN, COLOR_L_BROWN,
-		COLOR_D_BROWN, COLOR_L_BROWN, COLOR_L_BROWN,
-	},{
-		0.0f, 0.0f, 1.0f,
-		0.0f, 0.2f, 0.7f,
-		0.0f, 0.0f, 1.0f,
-		0.0f, 0.0f, 1.0f,
-		0.0f, 0.0f, 1.0f,
-		0.0f, 0.2f, 0.7f,
-	},{
-		0.0f, 0.5f, 0.0f,
-		0.0f, 0.2f, 0.2f,
-		0.0f, 0.5f, 0.0f,
-		0.0f, 0.5f, 0.0f,
-		0.0f, 0.5f, 0.0f,
-		0.0f, 0.2f, 0.2f,
-	},{
-		0.9f, 0.6f, 0.0f,
-		1.0f, 1.0f, 0.2f,
-		0.9f, 0.6f, 0.0f,
-		0.9f, 0.6f, 0.0f,
-		0.9f, 0.6f, 0.0f,
-		1.0f, 1.0f, 0.2f,
-	},{
-		0.0f, 1.0f, 0.8f,
-		0.0f, 0.8f, 0.9f,
-		0.0f, 1.0f, 0.8f,
-		0.0f, 1.0f, 0.8f,
-		0.0f, 1.0f, 0.8f,
-		0.0f, 0.8f, 0.9f,
-	}
-};
-
+// Here is board size defined, can be set (compile-time) to any other value.
 const unsigned int board_width = 4;
 const unsigned int board_height = 4;
 const unsigned int cards_no = board_height*board_width;
 const float card_width = 2.0f/board_width;
 const float card_height = 2.0f/board_height;
 
+// Cursor coordinates
 unsigned int selection_x = 0, selection_y = 0;
-int card_testedA = -1;
-int card_testedB = -1;
+// The ids of cards in pair that are being tested by the player.
+int card_testedA = -1, card_testedB = -1;
 
 double current_time = 0.0;
 
-std::vector<CardState> cards;
+// The array of cards.
+std::vector<Card> cards;
 
 std::pair<float, float> card_xy_to_coords(unsigned int x, unsigned int y){
 	float xf = -1.0f + x*card_width + card_width/2.0;
@@ -146,53 +56,57 @@ std::pair<float, float> card_xy_to_coords(unsigned int x, unsigned int y){
 	return std::make_pair(xf,yf);
 }
 
+// This procedure is called when the player presses space to select a card.
 void process_space_press(){
 	int n = selection_y*board_width + selection_x;
 	if(cards[n].removed || cards[n].uncovered || card_testedB != -1 || n == card_testedA) return;
 	cards[n].animation_start = current_time;
-	cards[n].animation_mode = CardState::ANIM_MODE_UNCOVER;
+	cards[n].animation_mode = Card::ANIM_MODE_UNCOVER;
 	if(card_testedA == -1){ // first card from a tested pair
 		card_testedA = n;
-	}else{ // second card from a tested pair
+	}else{ 					// second card from a tested pair
 		card_testedB = n;
 	}
 }
 
-
+// This procedure is called when a card's animation is completed.
 void finalize_animation(int n){
-	if(cards[n].animation_mode == CardState::ANIM_MODE_UNCOVER){
+	if(cards[n].animation_mode == Card::ANIM_MODE_UNCOVER){
 		// Finalize card uncovering
 		cards[n].uncovered = true;
 		cards[n].animation_mode = -1;
 		if(card_testedA == n){
 			// this is the first card in a pair
 		}else if(card_testedB == n){
-			// this is the second card
+			// this is the second card in a pair
+			// Do these two uncovered cards match each other?
 			if( cards[card_testedB].model % CARD_MODELS == cards[card_testedA].model % CARD_MODELS){
-				// match!
+				// Yes, they match!
 				cards[card_testedB].removed = true;
 				cards[card_testedA].removed = true;
 				card_testedB = -1;
 				card_testedA = -1;
 			}else{
-				// not matching
-				cards[card_testedA].animation_mode = CardState::ANIM_MODE_WAIT;
-				cards[card_testedB].animation_mode = CardState::ANIM_MODE_WAIT;
+				// Cards are not matching. Let the player see them for a while
+				cards[card_testedA].animation_mode = Card::ANIM_MODE_WAIT;
+				cards[card_testedB].animation_mode = Card::ANIM_MODE_WAIT;
 				cards[card_testedA].animation_start = current_time;
 				cards[card_testedB].animation_start = current_time;
 			}
 		}else{
 			std::cerr << "ERROR: This card was is not being tested, it shold not be uncovered!" << std::endl;
 		}
-	}else if(cards[n].animation_mode == CardState::ANIM_MODE_WAIT){
+	}else if(cards[n].animation_mode == Card::ANIM_MODE_WAIT){
 		// Card has waited, time to cover it (and the other tested one too).
 		cards[card_testedA].uncovered = false;
 		cards[card_testedB].uncovered = false;
-		cards[card_testedA].animation_mode = CardState::ANIM_MODE_COVER;
-		cards[card_testedB].animation_mode = CardState::ANIM_MODE_COVER;
+		// Start covering these cards.
+		cards[card_testedA].animation_mode = Card::ANIM_MODE_COVER;
+		cards[card_testedB].animation_mode = Card::ANIM_MODE_COVER;
 		cards[card_testedA].animation_start = current_time;
 		cards[card_testedB].animation_start = current_time;
-	}else if(cards[n].animation_mode == CardState::ANIM_MODE_COVER){
+	}else if(cards[n].animation_mode == Card::ANIM_MODE_COVER){
+		// Cards covered. Stop their animation
 		cards[card_testedA].animation_mode = -1;
 		cards[card_testedB].animation_mode = -1;
 		card_testedA = -1;
@@ -211,7 +125,7 @@ int main( void )
 	// Prepare random seed
 	srand(time(0));
 
-	// Calculate grid lines
+	// Calculate grid lines coordinates (depending on board size)
 	GLfloat  vert_lines[4*(board_width -1)];
 	GLfloat horiz_lines[4*(board_height-1)];
 	GLfloat lines_colors[6*std::max(board_width,board_height)];
@@ -234,9 +148,8 @@ int main( void )
 	}
 
 	// Initialise GLFW
-	if( !glfwInit() )
-	{
-		fprintf( stderr, "Failed to initialize GLFW\n" );
+	if( !glfwInit() ){
+		std::cerr << "Failed to initialize GLFW." << std::endl;
 		return -1;
 	}
 
@@ -248,7 +161,7 @@ int main( void )
 	// Open a window and create its OpenGL context
 	window = glfwCreateWindow( 1024, 768, "Memory game", NULL, NULL);
 	if( window == NULL ){
-		fprintf( stderr, "Failed to open GLFW window.\n" );
+		std::cerr << "Failed to open GLFW window." << std::endl;
 		glfwTerminate();
 		return -1;
 	}
@@ -262,7 +175,7 @@ int main( void )
 		return -1;
 	}
 
-	// Ensure we can capture the escape key being pressed below
+	// Ensure we can capture the escape key being pressed
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
 	// Black background
@@ -291,6 +204,7 @@ int main( void )
 			return -1;
 	}
 
+	// Prepare data buffers
 	GLuint vertexbuffer[8], colorbuffer[8], hlvertices, hlcolors, lines_color_buffer, vert_lines_buffer, horiz_lines_buffer;
 	glGenBuffers(8, vertexbuffer);
 	glGenBuffers(8, colorbuffer);
@@ -322,18 +236,19 @@ int main( void )
 
 	// Prepare cards
 	for(unsigned int i = 0; i < cards_no/2; i++){
-		cards.push_back( CardState(i) );
-		cards.push_back( CardState(i) );
+		cards.push_back( Card(i) ); // Add 2 cards of i-th model.
+		cards.push_back( Card(i) );
 	}
-    std::random_shuffle(cards.begin(), cards.end());
+    std::random_shuffle(cards.begin(), cards.end()); // Shuffle the deck!
 
-    // Enable blending
+    // Enable blending for several alpha effects.
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// Prepare input tresholds
 	bool key_pressed_up = false, key_pressed_down = false, key_pressed_left = false, key_pressed_right = false, key_pressed_space = false;
 
+	// This is the main loop.
 	while(true){
 		current_time = glfwGetTime();
 
@@ -399,13 +314,13 @@ int main( void )
 				// Determine which vertex buffer to use depending on card state/model
 				int card_data_index;
 				if(cards[n].uncovered ||
-				  (cards[n].animation_mode == CardState::ANIM_MODE_UNCOVER && animation_phase >= 0.5) ||
-				  (cards[n].animation_mode == CardState::ANIM_MODE_COVER   && animation_phase <= 0.5) )
+				  (cards[n].animation_mode == Card::ANIM_MODE_UNCOVER && animation_phase >= 0.5) ||
+				  (cards[n].animation_mode == Card::ANIM_MODE_COVER   && animation_phase <= 0.5) )
 				       card_data_index = 1 + (cards[n].model % CARD_MODELS);
 				else card_data_index = 0;
 
 				// Is the card currently reversed?
-				glUniform1i(uniform_reversed, cards[n].uncovered || cards[n].animation_mode == CardState::ANIM_MODE_COVER);
+				glUniform1i(uniform_reversed, cards[n].uncovered || cards[n].animation_mode == Card::ANIM_MODE_COVER);
 				// Is the card removed?
 				if(cards[n].removed == false) glUniform1f(uniform_alpha, 1.0f);
 				else						  glUniform1f(uniform_alpha, 0.2f);
