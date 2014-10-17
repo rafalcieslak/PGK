@@ -161,7 +161,7 @@ int main( void )
 
 	// Calculate grid lines coordinates (depending on board size)
 	GLfloat  vert_lines[4*(board_width -1)];
-	GLfloat horiz_lines[4*(board_height-1)];
+	GLfloat horiz_lines[4*(board_height  )];
 	GLfloat lines_colors[6*std::max(board_width,board_height)];
 	for(unsigned int i = 0; i < board_width; i++){
 		vert_lines[4*i + 0] = -1.0f + card_width*(i+1);
@@ -169,13 +169,13 @@ int main( void )
 		vert_lines[4*i + 2] = -1.0f + card_width*(i+1);
 		vert_lines[4*i + 3] = -1.0f;
 	}
-	for(unsigned int i = 0; i < board_height; i++){
+	for(unsigned int i = 0; i < board_height+1; i++){ // one extra line for upper margin
 		horiz_lines[4*i + 0] =  1.0f;
 		horiz_lines[4*i + 1] = -1.0f + card_height*(i+1);
 		horiz_lines[4*i + 2] = -1.0f;
 		horiz_lines[4*i + 3] = -1.0f + card_height*(i+1);
 	}
-	for(unsigned int i = 0; i < 2*std::max(board_width,board_height); i++){
+	for(unsigned int i = 0; i < 2*std::max(board_width,board_height+1); i++){
 		lines_colors[3*i + 0] = 1.0f;
 		lines_colors[3*i + 1] = 0.0f;
 		lines_colors[3*i + 2] = 0.0f;
@@ -334,7 +334,7 @@ int main( void )
 			glDrawArrays(GL_LINES, 0, 2*(board_width-1));
 			glBindBuffer(GL_ARRAY_BUFFER, horiz_lines_buffer);
 			glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0 );
-			glDrawArrays(GL_LINES, 0, 2*(board_height-1));
+			glDrawArrays(GL_LINES, 0, 2*(board_height ));
 		}
 
 		// This causes drawn cards to be closer to the near clipping plane, making them appear "above" grid lines when animate.
