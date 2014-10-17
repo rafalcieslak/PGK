@@ -3,3 +3,7 @@ build/
 tutorial01_first_window/tutorial01_first_window
 zad2/zad2
 *.o
+external/freetype-2.5.3/builds/
+external/freetype-2.5.3/objs/
+external/freetype-2.5.3/config.mk
+external/freetype-2.5.3/objs/.libs/
