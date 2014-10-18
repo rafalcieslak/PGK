@@ -1,7 +1,6 @@
 *~
 build/
-tutorial01_first_window/tutorial01_first_window
-zad2/zad2
+zadanie2/zadanie2
 *.o
 external/freetype-2.5.3/builds/
 external/freetype-2.5.3/objs/

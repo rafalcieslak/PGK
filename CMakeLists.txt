@@ -41,35 +41,35 @@ link_directories(
 )
 
 # zad 2
-add_executable(zad2
-	zad2/zad2.cpp
-	zad2/fonts.cpp
-	zad2/fonts.hpp
+add_executable(zadanie2
+	zadanie2/main.cpp
+	zadanie2/fonts.cpp
+	zadanie2/fonts.hpp
 	common/shader.cpp
 	common/shader.hpp
 
-	zad2/BoardFragmentShader.fragmentshader
-	zad2/BoardVertexShader.vertexshader
-	zad2/TextFragmentShader.fragmentshader
-	zad2/TextVertexShader.vertexshader
+	zadanie2/BoardFragmentShader.fragmentshader
+	zadanie2/BoardVertexShader.vertexshader
+	zadanie2/TextFragmentShader.fragmentshader
+	zadanie2/TextVertexShader.vertexshader
 )
 
-add_dependencies(zad2 FreeType)
+add_dependencies(zadanie2 FreeType)
 
-target_link_libraries(zad2
+target_link_libraries(zadanie2
 	${OPENGL_LIBRARY}
 	GLFW_303
 	GLEW_190
 	freetype
 )
-set_target_properties(zad2 PROPERTIES XCODE_ATTRIBUTE_CONFIGURATION_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/zad2/")
-create_target_launcher(zad2 WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/zad2/")
-create_default_target_launcher(zad2 WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/zad2/")
+set_target_properties(zadanie2 PROPERTIES XCODE_ATTRIBUTE_CONFIGURATION_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/zadanie2/")
+create_target_launcher(zadanie2 WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/zadanie2/")
+create_default_target_launcher(zadanie2 WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/zadanie2/")
 
 SOURCE_GROUP(common REGULAR_EXPRESSION ".*/common/.*" )
 SOURCE_GROUP(shaders REGULAR_EXPRESSION ".*/.*shader$" )
 
 add_custom_command(
-   TARGET zad2 POST_BUILD
-   COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/zad2${CMAKE_EXECUTABLE_SUFFIX}" "${CMAKE_CURRENT_SOURCE_DIR}/zad2/"
+   TARGET zadanie2 POST_BUILD
+   COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/zadanie2${CMAKE_EXECUTABLE_SUFFIX}" "${CMAKE_CURRENT_SOURCE_DIR}/zadanie2/"
 )
