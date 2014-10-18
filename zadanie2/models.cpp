@@ -1,7 +1,7 @@
 // This includable file provides vertex coordinates and colors for all models,
 // mainly card templates and highlight shape.
 
-#define CARD_MODELS 8
+#include "models.hpp"
 
 // The 0th model represents card cover.
 

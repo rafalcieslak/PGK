@@ -45,8 +45,13 @@ add_executable(zadanie2
 	zadanie2/main.cpp
 	zadanie2/fonts.cpp
 	zadanie2/fonts.hpp
-	common/shader.cpp
-	common/shader.hpp
+	zadanie2/shader.cpp
+	zadanie2/shader.hpp
+	zadanie2/render.cpp
+	zadanie2/render.hpp
+	zadanie2/game.cpp
+	zadanie2/game.hpp
+	zadanie2/models.hpp
 
 	zadanie2/BoardFragmentShader.fragmentshader
 	zadanie2/BoardVertexShader.vertexshader
