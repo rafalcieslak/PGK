@@ -15,7 +15,8 @@ public:
 	enum{
 		ANIM_MODE_UNCOVER = 0,
 		ANIM_MODE_COVER,
-		ANIM_MODE_WAIT
+		ANIM_MODE_WAIT,
+		ANIM_MODE_REMOVED
 	} AnimModes;
 	mutable int animation_mode = -1;
 };

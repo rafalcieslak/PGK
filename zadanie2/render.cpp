@@ -24,7 +24,7 @@ GLFWwindow* window;
 extern unsigned int selection_x, selection_y;
 
 // Time (in seconds) each animation should take to complete.
-const double animation_lengts[3] = {0.8, 0.5, 0.5};
+const double animation_lengts[4] = {0.8, 0.5, 0.5, 0.8};
 
 std::pair<float, float> Render::card_xy_to_coords(unsigned int x, unsigned int y){
 	float xf = -1.0f + x*card_width + card_width/2.0;

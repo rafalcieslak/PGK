@@ -18,7 +18,7 @@ void Game::StartNewGame(){
 		cards.push_back( Card(i) ); // Add 2 cards of i-th model.
 		cards.push_back( Card(i) );
 	}
-	std::random_shuffle(cards.begin(), cards.end()); // Shuffle the deck!
+	//std::random_shuffle(cards.begin(), cards.end()); // Shuffle the deck!
 	pairs_left = cards_no/2;
 	rounds = 0;
 	game_state = GAME_STATE_READY_TO_START;
@@ -60,6 +60,11 @@ void Game::OnCardAnimationFinished(int n){
 				// Yes, they match!
 				cards[card_testedB].removed = true;
 				cards[card_testedA].removed = true;
+				cards[card_testedA].animation_mode = Card::ANIM_MODE_REMOVED;
+				cards[card_testedB].animation_mode = Card::ANIM_MODE_REMOVED;
+				cards[card_testedA].animation_start = Render::GetTime();
+				cards[card_testedB].animation_start = Render::GetTime();
+			//	std::cout << card_testedA << " " << card_testedB << std::endl;
 				card_testedB = -1;
 				card_testedA = -1;
 				pairs_left -= 1;
@@ -92,5 +97,9 @@ void Game::OnCardAnimationFinished(int n){
 		cards[card_testedB].animation_mode = -1;
 		card_testedA = -1;
 		card_testedB = -1;
+	}else if(cards[n].animation_mode == Card::ANIM_MODE_REMOVED){
+		// Cards removed. Stop their animation
+		cards[n].animation_mode = -1;
+		cards[n].animation_mode = -1;
 	}
 }

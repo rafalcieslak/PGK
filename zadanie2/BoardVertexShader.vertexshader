@@ -20,6 +20,7 @@ vec3 lighten_color(vec3 color, float amt);
 
 void main(){
     vec3 color = vertexColor;
+    float eff_darkening = darkening;
 
     // Base position and scale
     gl_Position.x = vertexPosition_board.x * xscale;
@@ -27,15 +28,22 @@ void main(){
     if(reversed) gl_Position.x *= -1.0f;
 
     // Process animation
-    if(animation_mode == 0){ // uncover animation
+    if(animation_mode == 0){
+        // uncover animation
         gl_Position.y += (gl_Position.y) * ( gl_Position.x + 0.1) * sin( animation_phase * 3.14159265358 ) * 0.9;
         gl_Position.x *= cos( animation_phase * 3.14159265358 );
     }
-    if(animation_mode == 1){ // cover animation
+    else if(animation_mode == 1){
+        // cover animation
         gl_Position.x += (gl_Position.x) * ( gl_Position.y ) * sin( animation_phase * 3.14159265358 ) * 0.9;
         gl_Position.y *= cos( animation_phase * 3.14159265358 );
     }
-    if(animation_mode == 2) ; // wait animation
+    else if(animation_mode == 2) ; // wait animation
+    else if(animation_mode == 3){
+        // remove animation
+        // Ignore darkening, calculate it on our own.
+        eff_darkening = mix(0.0f, 0.8f, animation_phase);
+    }
 
     // Apply color and lighting effect
     if(animation_mode == 0 || animation_mode == 1){
@@ -44,9 +52,9 @@ void main(){
         lighting = lighting*lighting*lighting;
         color = lighten_color(color, 1.0 + 0.8*lighting);
     }
-    color = lighten_color(color, 1.0-darkening);
+    color = lighten_color(color, 1.0-eff_darkening);
 
-    gl_Position.z = 0.0 + 0.000001*darkening;
+    gl_Position.z = 0.0 + 0.000001*eff_darkening;
     gl_Position.w = 1.0;
 
     // Translate to card's position on board
