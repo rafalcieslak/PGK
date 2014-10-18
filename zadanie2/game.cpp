@@ -18,7 +18,7 @@ void Game::StartNewGame(){
 		cards.push_back( Card(i) ); // Add 2 cards of i-th model.
 		cards.push_back( Card(i) );
 	}
-	//std::random_shuffle(cards.begin(), cards.end()); // Shuffle the deck!
+	std::random_shuffle(cards.begin(), cards.end()); // Shuffle the deck!
 	pairs_left = cards_no/2;
 	rounds = 0;
 	game_state = GAME_STATE_READY_TO_START;
