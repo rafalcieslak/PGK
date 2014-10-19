@@ -65,7 +65,7 @@ int Render::Init(){
 		horiz_lines[4*i + 2] = -1.0f;
 		horiz_lines[4*i + 3] = -1.0f + card_height*(i+1);
 	}
-	for(unsigned int i = 0; i < 2*std::max(Game::board_width,Game::board_height+1); i++){
+	for(unsigned int i = 0; i < 2*std::max(Game::board_width,Game::board_height); i++){
 		lines_colors[3*i + 0] = 1.0f;
 		lines_colors[3*i + 1] = 0.0f;
 		lines_colors[3*i + 2] = 0.0f;
