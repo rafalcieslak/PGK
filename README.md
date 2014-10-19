@@ -13,10 +13,9 @@ make
 
 Running
 ===
-Make sure the application is run from within the `zadanie2` dirctory, as it
-loads some additional files on runtime.
+You can run the application from within the `build` or `zadanie2` directory.
 
 <pre>
-cd zadanie2
+cd build
 ./zadanie2
 </pre>
