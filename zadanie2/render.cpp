@@ -242,6 +242,10 @@ void Render::Frame(){
 			glUniform1f(uniform_centerx, pos.first);
 			glUniform1f(uniform_centery, pos.second);
 
+			// Is the card currently reversed?
+			glUniform1i(uniform_reversed, Game::cards[n].uncovered ||
+										Game::cards[n].animation_mode == Card::ANIM_MODE_COVER);
+
 			// Process card's current animation
 			glUniform1i(uniform_animmode, Game::cards[n].animation_mode);
 			float animation_phase = 0.0;
@@ -264,9 +268,6 @@ void Render::Frame(){
 				card_data_index = 1 + (Game::cards[n].model % CARD_MODELS);
 			else card_data_index = 0;
 
-			// Is the card currently reversed?
-			glUniform1i(uniform_reversed, Game::cards[n].uncovered ||
-										Game::cards[n].animation_mode == Card::ANIM_MODE_COVER);
 			// Is the card removed?
 			if(Game::cards[n].removed == false) glUniform1f(uniform_darkening, 0.0f);
 			else						  glUniform1f(uniform_darkening, 0.8f);
