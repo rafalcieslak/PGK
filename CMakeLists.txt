@@ -22,67 +22,104 @@ add_definitions(
 
 include_directories(
 	${GLFW_GLEW_INCLUDE_DIRS}
-	external/glm-0.9.4.0/
+	${GLM_INCLUDE_DIRS}
 	${FREETYPE_INCLUDE_DIRS}
 )
 
+if   (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	set(OPENGL_LIBRARY ${OPENGL_LIBRARY} -lGL -lGLU -lXrandr -lXext -lX11 -lrt)
+endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 link_directories(
 	${FREETYPE_CUSTOM_LINK_DIR} # Used if freetype was compiled manually
 	${GLFW_GLEW_LIBRARY_DIRS}
 )
 
-add_executable(zadanie2
-	zadanie2/main.cpp
-	zadanie2/fonts.cpp
-	zadanie2/fonts.hpp
-	zadanie2/shader.cpp
-	zadanie2/shader.hpp
-	zadanie2/render.cpp
-	zadanie2/render.hpp
-	zadanie2/game.cpp
-	zadanie2/game.hpp
-	zadanie2/models.hpp
+# ZADANIE 2
 
-	zadanie2/BoardFragmentShader.fragmentshader
-	zadanie2/BoardVertexShader.vertexshader
-	zadanie2/TextFragmentShader.fragmentshader
-	zadanie2/TextVertexShader.vertexshader
-)
+	add_executable(zadanie2
+		zadanie2/main.cpp
+		zadanie2/fonts.cpp
+		zadanie2/fonts.hpp
+		zadanie2/shader.cpp
+		zadanie2/shader.hpp
+		zadanie2/render.cpp
+		zadanie2/render.hpp
+		zadanie2/game.cpp
+		zadanie2/game.hpp
+		zadanie2/models.hpp
 
-# Files needed by zadanie2 on runtime.
-set( RUNTIME_FILES
-	zadanie2/BoardFragmentShader.fragmentshader
-	zadanie2/BoardVertexShader.vertexshader
-	zadanie2/TextFragmentShader.fragmentshader
-	zadanie2/TextVertexShader.vertexshader
-	zadanie2/Ubuntu.ttf
-)
+		zadanie2/BoardFragmentShader.fragmentshader
+		zadanie2/BoardVertexShader.vertexshader
+		zadanie2/TextFragmentShader.fragmentshader
+		zadanie2/TextVertexShader.vertexshader
+	)
 
-add_dependencies(zadanie2 Freetype GLFW_303 GLFW GLEW)
+	# Files needed by zadanie2 on runtime.
+	set( ZAD2_RUNTIME_FILES
+		zadanie2/BoardFragmentShader.fragmentshader
+		zadanie2/BoardVertexShader.vertexshader
+		zadanie2/TextFragmentShader.fragmentshader
+		zadanie2/TextVertexShader.vertexshader
+		zadanie2/Ubuntu.ttf
+	)
 
-if   (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-	set(OPENGL_LIBRARY ${OPENGL_LIBRARY} -lGL -lGLU -lXrandr -lXext -lX11 -lrt)
-endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	add_dependencies(zadanie2 Freetype GLFW_303 GLFW GLEW)
 
-target_link_libraries(zadanie2
-	${GLFW_GLEW_LIBRARIES}
-	${FREETYPE_LIBRARIES}
-	${OPENGL_LIBRARY}
-	${CMAKE_DL_LIBS}
-)
+	target_link_libraries(zadanie2
+		${GLFW_GLEW_LIBRARIES}
+		${FREETYPE_LIBRARIES}
+		${OPENGL_LIBRARY}
+		${CMAKE_DL_LIBS}
+	)
 
-# Copy the binary
-add_custom_command(
-	TARGET zadanie2 POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/zadanie2${CMAKE_EXECUTABLE_SUFFIX}" "${CMAKE_CURRENT_SOURCE_DIR}/zadanie2/"
-)
+	# Copy the binary
+	add_custom_command(
+		TARGET zadanie2 POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/zadanie2${CMAKE_EXECUTABLE_SUFFIX}" "${CMAKE_CURRENT_SOURCE_DIR}/zadanie2/"
+	)
 
-# Copy runtime files
-foreach( file ${RUNTIME_FILES})
-    add_custom_command(
-	    TARGET zadanie2 POST_BUILD
-	    COMMAND ${CMAKE_COMMAND}
-	    ARGS -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${file}" "${CMAKE_CURRENT_BINARY_DIR}"
-)
-endforeach( file )
+	# Copy runtime files
+	foreach( file ${RUNTIME_FILES})
+	    add_custom_command(
+		    TARGET zadanie2 POST_BUILD
+		    COMMAND ${CMAKE_COMMAND}
+		    ARGS -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${file}" "${CMAKE_CURRENT_BINARY_DIR}"
+	)
+	endforeach( file )
+
+# ZADANIE3
+
+
+	add_executable(zadanie3
+		zadanie3/main.cpp
+	)
+
+	# Files needed by zadanie3 on runtime.
+	set( ZAD3_RUNTIME_FILES
+
+	)
+
+	add_dependencies(zadanie3 Freetype GLFW_303 GLFW GLEW GLM)
+
+	target_link_libraries(zadanie3
+		${GLFW_GLEW_LIBRARIES}
+		${FREETYPE_LIBRARIES}
+		${OPENGL_LIBRARY}
+		${CMAKE_DL_LIBS}
+	)
+
+	# Copy the binary
+	add_custom_command(
+		TARGET zadanie3 POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/zadanie3${CMAKE_EXECUTABLE_SUFFIX}" "${CMAKE_CURRENT_SOURCE_DIR}/zadanie3/"
+	)
+
+	# Copy runtime files
+	foreach( file ${RUNTIME_FILES})
+		add_custom_command(
+			TARGET zadanie3 POST_BUILD
+			COMMAND ${CMAKE_COMMAND}
+			ARGS -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${file}" "${CMAKE_CURRENT_BINARY_DIR}"
+	)
+	endforeach( file )

@@ -1,8 +1,5 @@
 *~
 build/
 zadanie2/zadanie2
+zadanie3/zadanie3
 *.o
-external/freetype-2.5.3/builds/
-external/freetype-2.5.3/objs/
-external/freetype-2.5.3/config.mk
-external/freetype-2.5.3/objs/.libs/

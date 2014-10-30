@@ -1,4 +1,4 @@
-
+include(ExternalProject)
 
 ### GLFW + GLEW ###
 
@@ -16,9 +16,9 @@ add_definitions(
 
 if(GLFW_FOUND AND GLEW_FOUND)
 	message("-- GLFW 3 and GLEW found.")
-	set(GLFW_GLEW_INCLUDE_DIRS "${GLFW_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS}" PARENT_SCOPE)
-	set(GLFW_GLEW_LIBRARIES "${GLFW_LIBRARIES} ${GLEW_LIBRARIES}" PARENT_SCOPE)
-	set(GLFW_GLEW_LIBRARY_DIRS "${GLFW_LIBDIR}" PARENT_SCOPE)
+	set(GLFW_GLEW_INCLUDE_DIRS ${GLFW_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS} PARENT_SCOPE)
+	set(GLFW_GLEW_LIBRARIES ${GLFW_LIBRARIES} ${GLEW_LIBRARIES} PARENT_SCOPE)
+	set(GLFW_GLEW_LIBRARY_DIRS ${GLFW_LIBDIR} PARENT_SCOPE)
 
 
 else(GLFW_FOUND AND GLEW_FOUND)
@@ -48,6 +48,41 @@ else(GLFW_FOUND AND GLEW_FOUND)
 
 endif(GLFW_FOUND AND GLEW_FOUND)
 
+## GLM ##
+find_path(GLM_INCLUDE_DIRS "glm/glm.hpp"
+	HINTS
+	"${GLM_DIR}/include"
+	"${CMAKE_INSTALL_PREFIX}/include"
+)
+
+include(FindPackageHandleStandardArgs)
+	find_package_handle_standard_args(
+	GLM
+	DEFAULT_MSG
+	GLM_INCLUDE_DIRS
+)
+
+if(GLM_FOUND)
+	message("-- GLM found.")
+	set(GLM_INCLUDE_DIRS "${GLM_INCLUDE_DIR}" PARENT_SCOPE)
+else(GLM_FOUND)
+	message("!!! GLM development headers NOT FOUND!")
+	message("!!! GLM will be downloaded automatically during build process!!!")
+
+	ExternalProject_Add(GLM
+		PREFIX GLM
+		GIT_REPOSITORY https://github.com/g-truc/glm.git
+		GIT_TAG 0.9.4
+		CONFIGURE_COMMAND ""
+		BUILD_COMMAND ""
+	    INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/glm ${CMAKE_BINARY_DIR}/install/glm
+		INSTALL_DIR ${CMAKE_BINARY_DIR}/install
+		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/install
+	)
+	ExternalProject_Get_Property(GLM install_dir)
+	set(GLM_INCLUDE_DIRS "${install_dir}/" PARENT_SCOPE)
+endif(GLM_FOUND)
+
 ## FREETYPE ##
 
 find_package(Freetype QUIET)
@@ -62,7 +97,6 @@ else(FREETYPE_FOUND)
 	message("!!! Freetype development headers NOT FOUND!")
 	message("!!! Freetype will be downloaded and compiled automatically during build process!!!")
 
-	include(ExternalProject)
 	ExternalProject_Add(Freetype
 		PREFIX freetype
 		GIT_REPOSITORY git://git.sv.nongnu.org/freetype/freetype2.git
