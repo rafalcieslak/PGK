@@ -7,7 +7,6 @@ find_package(OpenGL REQUIRED)
 # Compile external dependencies
 add_subdirectory (external)
 
-
 add_definitions(
 	-DTW_STATIC
 	-DTW_NO_LIB_PRAGMA
@@ -22,15 +21,15 @@ add_definitions(
 )
 
 include_directories(
-	external/glfw-3.0.3/include/GLFW/
+	${GLFW_GLEW_INCLUDE_DIRS}
 	external/glm-0.9.4.0/
-	external/glew-1.9.0/include/
 	${FREETYPE_INCLUDE_DIRS}
 )
 
-# Used if freetype was compiled manually
+
 link_directories(
-	${FREETYPE_CUSTOM_LINK_DIR}
+	${FREETYPE_CUSTOM_LINK_DIR} # Used if freetype was compiled manually
+	${GLFW_GLEW_LIBRARY_DIRS}
 )
 
 add_executable(zadanie2
@@ -60,13 +59,17 @@ set( RUNTIME_FILES
 	zadanie2/Ubuntu.ttf
 )
 
-add_dependencies(zadanie2 Freetype)
+add_dependencies(zadanie2 Freetype GLFW_303 GLFW GLEW)
+
+if   (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	set(OPENGL_LIBRARY ${OPENGL_LIBRARY} -lGL -lGLU -lXrandr -lXext -lX11 -lrt)
+endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 target_link_libraries(zadanie2
-	${OPENGL_LIBRARY}
-	GLFW_303
-	GLEW_190
+	${GLFW_GLEW_LIBRARIES}
 	${FREETYPE_LIBRARIES}
+	${OPENGL_LIBRARY}
+	${CMAKE_DL_LIBS}
 )
 
 # Copy the binary
