@@ -21,17 +21,16 @@ add_definitions(
 	-Werror
 )
 
-ExternalProject_Get_Property(FreeType install_dir)
-
 include_directories(
 	external/glfw-3.0.3/include/GLFW/
 	external/glm-0.9.4.0/
 	external/glew-1.9.0/include/
-	${install_dir}/include/freetype2
-	.
+	${FREETYPE_INCLUDE_DIRS}
 )
+
+# Used if freetype was compiled manually
 link_directories(
-	${CMAKE_BINARY_DIR}/external/freetype-2.5.3-prefix/lib
+	${FREETYPE_CUSTOM_LINK_DIR}
 )
 
 add_executable(zadanie2
@@ -61,13 +60,13 @@ set( RUNTIME_FILES
 	zadanie2/Ubuntu.ttf
 )
 
-add_dependencies(zadanie2 FreeType)
+add_dependencies(zadanie2 Freetype)
 
 target_link_libraries(zadanie2
 	${OPENGL_LIBRARY}
 	GLFW_303
 	GLEW_190
-	freetype
+	${FREETYPE_LIBRARIES}
 )
 
 # Copy the binary

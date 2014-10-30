@@ -53,11 +53,31 @@ target_link_libraries(GLEW_190
 
 ## FREETYPE ##
 
-include(ExternalProject)
-ExternalProject_Add(FreeType
-	PREFIX freetype
-	GIT_REPOSITORY git://git.sv.nongnu.org/freetype/freetype2.git
-    BUILD_COMMAND ${MAKE}
-	INSTALL_DIR ${CMAKE_BINARY_DIR}/install
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/install
-)
+find_package(Freetype QUIET)
+
+if(FREETYPE_FOUND)
+	message("--- Freetype found.")
+	set(FREETYPE_INCLUDE_DIRS "${FREETYPE_INCLUDE_DIR_ft2build}" PARENT_SCOPE)
+	set(FREETYPE_LIBRARIES "${FREETYPE_LIBRARIES}" PARENT_SCOPE)
+
+else(FREETYPE_FOUND)
+
+	message("!!! Freetype development headers NOT FOUND!")
+	message("!!! Freetype will be downloaded and compiled automatically during build process!!!")
+
+	include(ExternalProject)
+	ExternalProject_Add(Freetype
+		PREFIX freetype
+		GIT_REPOSITORY git://git.sv.nongnu.org/freetype/freetype2.git
+		# using a particular commit id, just in case they mess something up
+		GIT_TAG 465ab99585cb748f9de0087d369677cc9e196785
+		BUILD_COMMAND ${MAKE}
+		INSTALL_DIR ${CMAKE_BINARY_DIR}/install
+		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/install
+	)
+	ExternalProject_Get_Property(Freetype install_dir)
+	set(FREETYPE_INCLUDE_DIRS "${install_dir}/include/freetype2" PARENT_SCOPE)
+	set(FREETYPE_CUSTOM_LINK_DIR "${CMAKE_BINARY_DIR}/install/lib" PARENT_SCOPE)
+	set(FREETYPE_LIBRARIES "freetype" PARENT_SCOPE)
+
+endif(FREETYPE_FOUND)
