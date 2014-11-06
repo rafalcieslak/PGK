@@ -25,3 +25,17 @@ glm::vec2 Positionable::GetPos(){
 	if(parent == nullptr) return relative_pos;
 	return parent->GetPos() + relative_pos;
 }
+
+void PositionableGroup::SetTop(std::shared_ptr<Positionable> t){
+	top = t;
+	Positionable::LinkChild(top);
+}
+
+void PositionableGroup::SetBottom(std::shared_ptr<Positionable> p){
+	bottom = p;
+}
+
+void PositionableGroup::LinkChild(std::shared_ptr<Positionable> ch){
+	if(bottom == nullptr) Positionable::LinkChild(ch);
+	else bottom->LinkChild(ch);
+}
