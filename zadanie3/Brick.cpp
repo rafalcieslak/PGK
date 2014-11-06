@@ -1,7 +1,7 @@
 #include "Brick.h"
 #include "ModelBase.h"
 
-Brick::Brick(std::shared_ptr<Positionable> parent, glm::vec2 pos) : Drawable("", parent, pos){
+BrickDrawable::BrickDrawable(glm::vec2 pos) : Drawable("", pos){
 	if(!ModelBase::GetInstance().HasModel("brick")){
 		ModelBase::GetInstance().AddModel("brick",2, (float[]){ -0.5, -0.5, 0.5, -0.5, -0.5, 0.5,
 															    0.5, -0.5, -0.5, 0.5,  0.5, 0.5},
@@ -9,4 +9,9 @@ Brick::Brick(std::shared_ptr<Positionable> parent, glm::vec2 pos) : Drawable("",
 													           1.0,0.0,0.0, 1.0,0.0,0.0, 1.0,0.0,0.0,});
 	}
 	model_id = "brick";
+}
+
+BrickBody::BrickBody(glm::vec2 relative_pos){
+	SetPosRelative(relative_pos);
+	if(parent) parent->LinkChild(Positionable::shared_from_this());
 }

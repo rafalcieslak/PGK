@@ -8,7 +8,7 @@
 
 class Drawable : public Positionable{
 public:
-	Drawable(std::string id, std::shared_ptr<Positionable> parent, glm::vec2 relative_pos);
+	Drawable(std::string id, glm::vec2 relative_pos);
 	~Drawable();
 	std::string model_id;
 public:

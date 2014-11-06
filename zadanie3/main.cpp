@@ -10,7 +10,9 @@ int main(){
 	if(n) return n;
 	glm::vec4 test;
 
-	Brick b(nullptr, glm::vec2(0.4,0.4));
+	std::shared_ptr<BrickBody> bb = std::make_shared<BrickBody>(glm::vec2(-0.2,-0.2));
+	std::shared_ptr<BrickDrawable> bd = std::make_shared<BrickDrawable>(glm::vec2(0.4,0.4));
+	bb->LinkChild(bd);
 
 	// This is the main loop.
 	do{

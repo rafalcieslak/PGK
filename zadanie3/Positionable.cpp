@@ -1,13 +1,14 @@
 #include "Positionable.h"
 
-Positionable::Positionable(std::shared_ptr<Positionable> parent_, glm::vec2 relative_pos_) : parent(parent_), relative_pos(relative_pos_){
-	if(parent != nullptr){
-		parent->AddChild(shared_from_this());
-	}
+Positionable::Positionable(glm::vec2 relative_pos_) : relative_pos(relative_pos_){
 }
 
-void Positionable::AddChild(std::shared_ptr<Positionable> ch){
+void Positionable::LinkChild(std::shared_ptr<Positionable> ch){
 	children.push_back(ch);
+	ch->parent = shared_from_this();
+}
+void Positionable::SetParent(std::shared_ptr<Positionable> p){
+	parent = p;
 }
 
 glm::vec2 Positionable::GetPosRelative(){

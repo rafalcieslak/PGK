@@ -1,8 +1,9 @@
 #ifndef BODY_H
 #define BODY_H
 
-class Body{
-	glm::vec2 pos;
+#include "Positionable.h"
+
+class Body : public Positionable{
 
 public:
 	typedef enum{

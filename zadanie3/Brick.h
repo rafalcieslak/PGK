@@ -4,9 +4,14 @@
 #include "Drawable.h"
 #include "body.h"
 
-class Brick : public Drawable, public StaticBody{
+class BrickDrawable : public Drawable{
 public:
-	Brick(std::shared_ptr<Positionable> parent = nullptr, glm::vec2 pos = glm::vec2(0.0,0.0));
+	BrickDrawable(glm::vec2 pos = glm::vec2(0.0,0.0));
+};
+
+class BrickBody : public DynamicBody{
+public:
+	BrickBody( glm::vec2 relative_pos);
 };
 
 #endif //BRICK_H
