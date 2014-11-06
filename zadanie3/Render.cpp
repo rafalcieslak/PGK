@@ -110,8 +110,7 @@ void Render::Frame(){
 			std::cerr << "Warning: A drawable has no model in base (" << d->model_id << ")" << std::endl;
 			continue;
 		}
-		glUniform2fv(uniform_center, 1, glm::value_ptr(d->pos));
-		glUniform2fv(uniform_scale,  1, glm::value_ptr(d->scale));
+		glUniform2fv(uniform_center, 1, glm::value_ptr(d->GetPos()));
 		m->metaDraw();
 	}
 

@@ -105,6 +105,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie3")
 		zadanie3/fonts.cpp
 		zadanie3/Render.cpp
 		zadanie3/shader.cpp
+		zadanie3/Positionable.cpp
 	)
 
 	# Files needed by zadanie3 on runtime.

@@ -9,8 +9,8 @@ int main(){
 
 	if(n) return n;
 	glm::vec4 test;
-	
-	Brick b(glm::vec2(0.5,0.5));
+
+	Brick b(nullptr, glm::vec2(0.4,0.4));
 
 	// This is the main loop.
 	do{

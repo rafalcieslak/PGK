@@ -4,14 +4,13 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include <string>
+#include "Positionable.h"
 
-class Drawable{
+class Drawable : public Positionable{
 public:
-	Drawable(std::string id, glm::vec2 position = glm::vec2(0.0,0.0), glm::vec2 s = glm::vec2(1.0,1.0));
+	Drawable(std::string id, std::shared_ptr<Positionable> parent, glm::vec2 relative_pos);
 	~Drawable();
 	std::string model_id;
-	glm::vec2 pos;
-	glm::vec2 scale;
 public:
 	static std::vector<Drawable *> drawables;
 };

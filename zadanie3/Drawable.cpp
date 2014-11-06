@@ -3,9 +3,8 @@
 #include <iostream>
 
 std::vector<Drawable*> Drawable::drawables;
-
-Drawable::Drawable(std::string id, glm::vec2 position, glm::vec2 s) : model_id(id), pos(position), scale(s){
-	std::cerr << "Creating drawable" << std::endl;
+Drawable::Drawable(std::string id, std::shared_ptr<Positionable> parent, glm::vec2 relative_pos):
+		Positionable(parent, relative_pos),  model_id(id){
 	drawables.emplace_back(this);
 }
 
