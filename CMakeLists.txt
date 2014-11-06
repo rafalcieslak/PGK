@@ -7,6 +7,11 @@ find_package(OpenGL REQUIRED)
 # Compile external dependencies
 add_subdirectory (external)
 
+if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+	message(STATUS "Using clang.")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+endif()
+
 add_definitions(
 	-DTW_STATIC
 	-DTW_NO_LIB_PRAGMA
