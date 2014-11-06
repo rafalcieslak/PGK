@@ -106,6 +106,8 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie3")
 		zadanie3/Render.cpp
 		zadanie3/shader.cpp
 		zadanie3/Positionable.cpp
+		zadanie3/body.cpp
+		zadanie3/simplephysics.cpp
 	)
 
 	# Files needed by zadanie3 on runtime.

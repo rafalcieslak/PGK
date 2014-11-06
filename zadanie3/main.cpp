@@ -2,6 +2,7 @@
 #include "ModelBase.h"
 #include "Brick.h"
 #include "Render.h"
+#include "simplephysics.h"
 
 int main(){
 	// Prepare the renderer.
@@ -13,9 +14,15 @@ int main(){
 	std::shared_ptr<BrickBody> bb = std::make_shared<BrickBody>(glm::vec2(-0.2,-0.2));
 	std::shared_ptr<BrickDrawable> bd = std::make_shared<BrickDrawable>(glm::vec2(0.4,0.4));
 	bb->LinkChild(bd);
+	bb->linearVelocity = glm::vec2(-0.1,0.1);
 
+	double lasttime = glfwGetTime();
 	// This is the main loop.
 	do{
+		double newtime = glfwGetTime();
+		SimplePhysics::PerformIteration(newtime-lasttime);
+		lasttime = newtime;
+
 		// Draw a single frame.
 		Render::Frame();
 

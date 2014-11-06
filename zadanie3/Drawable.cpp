@@ -11,6 +11,6 @@ Drawable::Drawable(std::string id, glm::vec2 relative_pos):
 
 Drawable::~Drawable(){
 	auto p = std::find(drawables.begin(), drawables.end(), this);
-	if (p != drawables.end()) // == vector.end() means the element was not found
+	if (p != drawables.end())
 	    drawables.erase(p);
 }

@@ -4,11 +4,13 @@
 #include "body.h"
 
 class SimplePhysics{
-	std::vector<Body> static_bodies;
-	std::vector<Body> dynamic_bodies;
+	SimplePhysics() = delete;
+	static std::vector<StaticBody*> static_bodies;
+	static std::vector<DynamicBody*> dynamic_bodies;
+	friend class StaticBody;
+	friend class DynamicBody;
 public:
-	void PerformIteration(float time_delta);
-	void AddBody( std::shared_ptr<Body> body);
+	static void PerformIteration(float time_delta);
 };
 
 #endif //SIMPLEPHYSICS_H

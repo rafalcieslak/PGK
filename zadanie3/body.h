@@ -2,6 +2,7 @@
 #define BODY_H
 
 #include "Positionable.h"
+#include <vector>
 
 class Body : public Positionable{
 
@@ -15,13 +16,19 @@ public:
 
 class StaticBody : public Body{
 public:
+	StaticBody();
+	~StaticBody();
 	virtual BodyType GetBodyType() {return Body::BODY_TYPE_STATIC;}
+	static std::vector<StaticBody *> static_bodies;
 };
 
 class DynamicBody : public Body{
 public:
-	glm::vec2 linearSpeed;
+	DynamicBody();
+	~DynamicBody();
+	glm::vec2 linearVelocity;
 	virtual BodyType GetBodyType() {return Body::BODY_TYPE_DYNAMIC;}
+	static std::vector<DynamicBody *> dynamic_bodies;
 };
 
 #endif //BODY_H
