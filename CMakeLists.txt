@@ -85,7 +85,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie2")
 	)
 
 	# Copy runtime files
-	foreach( file ${RUNTIME_FILES})
+	foreach( file ${ZAD2_RUNTIME_FILES})
 	    add_custom_command(
 		    TARGET zadanie2 POST_BUILD
 		    COMMAND ${CMAKE_COMMAND}
@@ -102,11 +102,18 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie3")
 		zadanie3/Brick.cpp
 		zadanie3/ModelBase.cpp
 		zadanie3/Drawable.cpp
+		zadanie3/fonts.cpp
+		zadanie3/Render.cpp
+		zadanie3/shader.cpp
 	)
 
 	# Files needed by zadanie3 on runtime.
 	set( ZAD3_RUNTIME_FILES
-
+		zadanie3/MainFragmentShader.fragmentshader
+		zadanie3/MainVertexShader.vertexshader
+		zadanie3/TextFragmentShader.fragmentshader
+		zadanie3/TextVertexShader.vertexshader
+		zadanie3/Ubuntu.ttf
 	)
 
 	add_dependencies(zadanie3 Freetype GLFW_303 GLFW GLEW GLM)
@@ -125,7 +132,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie3")
 	)
 
 	# Copy runtime files
-	foreach( file ${RUNTIME_FILES})
+	foreach( file ${ZAD3_RUNTIME_FILES})
 		add_custom_command(
 			TARGET zadanie3 POST_BUILD
 			COMMAND ${CMAKE_COMMAND}

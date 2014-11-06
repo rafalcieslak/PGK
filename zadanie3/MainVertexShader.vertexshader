@@ -1,0 +1,29 @@
+#version 330 core
+
+layout(location = 0) in vec2 vertexPosition_board;
+layout(location = 1) in vec3 vertexColor;
+
+uniform vec2 scale;
+uniform vec2 center;
+
+out vec3 fragmentColor;
+
+void main(){
+    vec3 color = vertexColor;
+
+    // Base position and scale
+
+    gl_Position.x = vertexPosition_board.x * scale.x;
+    gl_Position.y = vertexPosition_board.y * scale.y;
+
+    gl_Position.w = 1.0;
+    gl_Position.z = 0.0;
+
+    // Translate to card's position on board
+    gl_Position += vec4(center, 0.0, 0.0);
+
+    //fragmentColor = vec4(color, 1.0);
+
+    gl_Position = vec4(vertexPosition_board,0.0,1.0) + vec4(0.000001*scale,0.0,0.0) + vec4(0.0000001*center,0.0,0.0);
+    fragmentColor = vec3(1.0,1.0,1.0);
+}

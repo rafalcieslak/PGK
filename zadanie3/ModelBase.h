@@ -1,6 +1,7 @@
 #ifndef MODEL_BASE_H
 #define MODEL_BASE_H
 
+#include <GL/glew.h>
 #include <map>
 #include <string>
 #include <memory>
@@ -11,6 +12,8 @@ public:
 	~Model();
 	float *vertices, *colors;
 	unsigned int size;
+	GLuint buffer_vertex, buffer_color;
+	void metaDraw();
 };
 
 class ModelBase{
