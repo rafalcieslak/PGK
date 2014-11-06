@@ -36,7 +36,7 @@ link_directories(
 )
 
 # ZADANIE 2
-
+if(EXISTS zadanie2)
 	add_executable(zadanie2
 		zadanie2/main.cpp
 		zadanie2/fonts.cpp
@@ -87,10 +87,11 @@ link_directories(
 		    ARGS -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${file}" "${CMAKE_CURRENT_BINARY_DIR}"
 	)
 	endforeach( file )
+endif(EXISTS zadanie2)
+
 
 # ZADANIE3
-
-
+if(EXISTS zadanie3)
 	add_executable(zadanie3
 		zadanie3/main.cpp
 	)
@@ -123,3 +124,4 @@ link_directories(
 			ARGS -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${file}" "${CMAKE_CURRENT_BINARY_DIR}"
 	)
 	endforeach( file )
+endif(EXISTS zadanie3)
