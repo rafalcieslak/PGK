@@ -36,7 +36,7 @@ link_directories(
 )
 
 # ZADANIE 2
-if(EXISTS zadanie2)
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie2")
 	add_executable(zadanie2
 		zadanie2/main.cpp
 		zadanie2/fonts.cpp
@@ -87,13 +87,16 @@ if(EXISTS zadanie2)
 		    ARGS -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${file}" "${CMAKE_CURRENT_BINARY_DIR}"
 	)
 	endforeach( file )
-endif(EXISTS zadanie2)
+endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie2")
 
 
 # ZADANIE3
-if(EXISTS zadanie3)
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie3")
 	add_executable(zadanie3
 		zadanie3/main.cpp
+		zadanie3/Brick.cpp
+		zadanie3/ModelBase.cpp
+		zadanie3/Drawable.cpp
 	)
 
 	# Files needed by zadanie3 on runtime.
@@ -124,4 +127,4 @@ if(EXISTS zadanie3)
 			ARGS -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${file}" "${CMAKE_CURRENT_BINARY_DIR}"
 	)
 	endforeach( file )
-endif(EXISTS zadanie3)
+endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie3")
