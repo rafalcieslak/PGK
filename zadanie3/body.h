@@ -3,15 +3,44 @@
 
 #include "Positionable.h"
 #include <vector>
+#include <cmath>
+
+
+struct CollisionShape : Positionable{
+	CollisionShape(float br) : bounding_radius(br) {}
+	float GetBoundingRadius() {
+		glm::vec2 v = GetScale();
+		float q = std::max(v.x, v.y);
+		return bounding_radius * q;
+	}
+private:
+	float bounding_radius;
+};
+
+struct CollisionShapeRectangle : public CollisionShape{
+	CollisionShapeRectangle(glm::vec2 s) : CollisionShape(sqrt(s.x*s.x + s.y*s.y)), size(s) {};
+	glm::vec2 size;
+};
+struct CollisionShapeCircle : public CollisionShape{
+	CollisionShapeCircle(float r) : CollisionShape(r), radius(r) {};
+	float radius;
+};
+
 
 class Body : public Positionable{
-
 public:
 	typedef enum{
 		BODY_TYPE_STATIC,
 		BODY_TYPE_DYNAMIC
 	} BodyType;
 	virtual BodyType GetBodyType() const = 0;
+	template<typename T, typename... Args> void AddNewCollisionShape(glm::vec2 offset, Args... args){
+		auto n = std::make_shared<T>(args...);
+		n->SetPosRelative(offset);
+		LinkChild(n);
+		shapes.push_back(n);
+	}
+	std::vector<std::shared_ptr<CollisionShape>> shapes;
 };
 
 class StaticBody : public Body{

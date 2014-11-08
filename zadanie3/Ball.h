@@ -18,6 +18,7 @@ private:
 	class BallBody : public DynamicBody{
 	public:
 		BallBody();
+		void init();
 	};
 	std::shared_ptr<BallDrawable> bd;
 	Ball();

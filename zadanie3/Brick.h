@@ -11,9 +11,10 @@ private:
 	public:
 		BrickDrawable();
 	};
-	class BrickBody : public DynamicBody{
+	class BrickBody : public StaticBody{
 	public:
 		BrickBody();
+		void init();
 	};
 	std::shared_ptr<BrickDrawable> bd;
 	std::shared_ptr<BrickBody> bb;

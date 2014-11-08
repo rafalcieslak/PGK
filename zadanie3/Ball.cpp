@@ -47,9 +47,14 @@ Ball::BallBody::BallBody(){
 	if(parent) parent->LinkChild(Positionable::shared_from_this());
 }
 
+void Ball::BallBody::init(){
+	AddNewCollisionShape<CollisionShapeCircle>(glm::vec2(0.0, 0.0), 1.0);
+}
+
 Ball::Ball(){
 	bd = std::make_shared<BallDrawable>();
 	body = std::make_shared<BallBody>();
+	body->init();
 }
 
 void Ball::init(glm::vec2 pos){

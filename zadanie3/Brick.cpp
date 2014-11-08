@@ -17,9 +17,14 @@ Brick::BrickBody::BrickBody(){
 	if(parent) parent->LinkChild(Positionable::shared_from_this());
 }
 
+void Brick::BrickBody::init(){
+	AddNewCollisionShape<CollisionShapeRectangle>(glm::vec2(0.0, 0.0), glm::vec2(0.5,0.5));
+}
+
 Brick::Brick(){
 	bd = std::make_shared<BrickDrawable>();
 	bb = std::make_shared<BrickBody>();
+	bb->init();
 }
 
 void Brick::init(glm::vec2 pos){

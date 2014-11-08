@@ -16,7 +16,7 @@ int main(){
 	std::shared_ptr<Ball> ba = Ball::Create(glm::vec2(-0.5,-0.5));
 	b->SetScale(glm::vec2(1.0,1.0));
 	ba->SetScale(glm::vec2(0.03,0.03));
-	ba->body->linearVelocity = glm::vec2(0.35,0.35);
+	ba->body->linearVelocity = glm::vec2(0.25,0.25);
 
 	double lasttime = glfwGetTime();
 	// This is the main loop.
