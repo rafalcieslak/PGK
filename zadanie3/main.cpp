@@ -19,7 +19,7 @@ int main(){
 	ba->body->linearVelocity = glm::vec2(0.15,0.65);
 
 	auto paddle = Paddle::Create(glm::vec2(0.0,-SQRT3/2.0));
-	const float paddle_speed = 0.25;
+	const float paddle_speed = 0.4;
 
 	double lasttime = glfwGetTime();
 	// This is the main loop.
@@ -37,6 +37,7 @@ int main(){
 		if(Render::IsKeyPressed(GLFW_KEY_LEFT)) px += -1.0;
 		if(Render::IsKeyPressed(GLFW_KEY_RIGHT)) px += 1.0;
 		float newx = paddle->GetPosRelative().x + px * paddle_speed * time_delta;
+		newx = glm::clamp(newx, -0.38f, 0.38f);
 		paddle->SetPosRelative(glm::vec2(newx,-SQRT3/2.0));
 
 
