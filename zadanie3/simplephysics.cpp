@@ -25,7 +25,7 @@ void SimplePhysics::PerformIteration(float time_delta){
 		glm::vec2 new_pos = current_pos + p->linearVelocity*time_delta;
 		p->SetPosAbsolute(new_pos);
 	}
-	std::cout << "end iteration" << std::endl;
+	//std::cout << "end iteration" << std::endl;
 }
 
 inline glm::vec2 CheckCollisionCircleRectangle(std::shared_ptr<CollisionShape> circle_, std::shared_ptr<CollisionShape> rectangle_){
@@ -33,7 +33,10 @@ inline glm::vec2 CheckCollisionCircleRectangle(std::shared_ptr<CollisionShape> c
 	auto rectangle = std::dynamic_pointer_cast<CollisionShapeRectangle>(rectangle_);
 	if(!circle || !rectangle) return glm::vec2(0.0,0.0);
 
-	std::cout << "Circle-rectangle" << std::endl;
+	//std::cout << "Circle-rectangle" << std::endl;
+
+
+
 	return glm::vec2(0.0,0.0);
 }
 

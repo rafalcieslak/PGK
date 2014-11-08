@@ -9,7 +9,7 @@
 GLFWwindow* window;
 
 // All the static members of Render class.
-GLint Render::uniform_scale, Render::uniform_center;
+GLint Render::uniform_scale, Render::uniform_center, Render::uniform_angle;
 GLuint Render::VertexArrayID;
 float Render::pxsizex, Render::pxsizey;
 GLuint Render::shader_program_id;
@@ -75,7 +75,8 @@ int Render::Init(){
 	// Prepare uniforms of the vertex shader
 	uniform_scale = glGetUniformLocation(shader_program_id,"scale");
 	uniform_center = glGetUniformLocation(shader_program_id,"center");
-	if(uniform_scale == -1 || uniform_center == -1){
+	uniform_angle = glGetUniformLocation(shader_program_id,"angle");
+	if(uniform_scale == -1 || uniform_center == -1 || uniform_angle == -1){
 		std::cerr << "A uniform is missing from the shader." << std::endl;
 		glfwTerminate();
 		return -1;
@@ -111,7 +112,8 @@ void Render::Frame(){
 			continue;
 		}
 		glUniform2fv(uniform_center, 1, glm::value_ptr(d->GetPos()));
-		glUniform2fv(uniform_scale , 1, glm::value_ptr(d->GetScale()));
+		glUniform1f(uniform_scale, d->GetScale());
+		glUniform1f(uniform_angle, d->GetAngle()*2.0*M_PI);
 		m->metaDraw();
 	}
 

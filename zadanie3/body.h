@@ -9,9 +9,7 @@
 struct CollisionShape : Positionable{
 	CollisionShape(float br) : bounding_radius(br) {}
 	float GetBoundingRadius() {
-		glm::vec2 v = GetScale();
-		float q = std::max(v.x, v.y);
-		return bounding_radius * q;
+		return bounding_radius * GetScale();
 	}
 private:
 	float bounding_radius;

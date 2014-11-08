@@ -3,7 +3,8 @@
 layout(location = 0) in vec2 vertexPosition_board;
 layout(location = 1) in vec3 vertexColor;
 
-uniform vec2 scale = vec2(1.0,1.0);
+uniform float scale = 1.0;
+uniform float angle = 0.0;
 uniform vec2 center;
 
 out vec3 fragmentColor;
@@ -11,10 +12,13 @@ out vec3 fragmentColor;
 void main(){
     vec3 color = vertexColor;
 
-    // Base position and scale
+    mat2 rot = mat2( cos(angle), -sin(angle), sin(angle), cos(angle) );
+    //mat2 ro2 = mat2( cos(0.5) ,sin(0.5),-sin(0.5),cos(0.5) );
 
-    gl_Position.x = vertexPosition_board.x * scale.x;
-    gl_Position.y = vertexPosition_board.y * scale.y;
+    gl_Position.x = vertexPosition_board.x * scale;
+    gl_Position.y = vertexPosition_board.y * scale;
+
+    gl_Position.xy = rot * gl_Position.xy;
 
     gl_Position.w = 1.0;
     gl_Position.z = 0.0;

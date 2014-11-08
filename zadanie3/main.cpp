@@ -14,8 +14,10 @@ int main(){
 
 	std::shared_ptr<Brick> b = Brick::Create(glm::vec2(0.0,0.5));
 	std::shared_ptr<Ball> ba = Ball::Create(glm::vec2(-0.5,-0.5));
-	b->SetScale(glm::vec2(1.0,1.0));
-	ba->SetScale(glm::vec2(0.03,0.03));
+	b->SetScale(1.0);
+	ba->SetScale(0.03);
+	b->SetAngle(-0.2);
+	ba->SetAngle(0.0);
 	ba->body->linearVelocity = glm::vec2(0.25,0.25);
 
 	double lasttime = glfwGetTime();
