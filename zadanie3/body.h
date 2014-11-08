@@ -11,14 +11,14 @@ public:
 		BODY_TYPE_STATIC,
 		BODY_TYPE_DYNAMIC
 	} BodyType;
-	virtual BodyType GetBodyType() = 0;
+	virtual BodyType GetBodyType() const = 0;
 };
 
 class StaticBody : public Body{
 public:
 	StaticBody();
 	~StaticBody();
-	virtual BodyType GetBodyType() {return Body::BODY_TYPE_STATIC;}
+	virtual BodyType GetBodyType() const {return Body::BODY_TYPE_STATIC;}
 	static std::vector<StaticBody *> static_bodies;
 };
 
@@ -27,7 +27,7 @@ public:
 	DynamicBody();
 	~DynamicBody();
 	glm::vec2 linearVelocity;
-	virtual BodyType GetBodyType() {return Body::BODY_TYPE_DYNAMIC;}
+	virtual BodyType GetBodyType() const {return Body::BODY_TYPE_DYNAMIC;}
 	static std::vector<DynamicBody *> dynamic_bodies;
 };
 

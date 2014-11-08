@@ -28,9 +28,9 @@ public:
 		return instance;
 	}
 	void AddModel(std::string id, unsigned int vertices, float* coords, float* colors);
-	bool HasModel(std::string id);
+	bool HasModel(std::string id) const;
 	void Clear();
-	std::shared_ptr<Model> GetModel(std::string id);
+	std::shared_ptr<Model> GetModel(std::string id) const;
 };
 
 #endif //MODEL_BASE_H

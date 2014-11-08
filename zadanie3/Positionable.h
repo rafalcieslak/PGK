@@ -11,12 +11,12 @@ protected:
 	std::shared_ptr<Positionable> parent = nullptr;
 	glm::vec2 relative_pos;
 	glm::vec2 relative_scale = glm::vec2(1.0,1.0);
-	glm::vec4 GetPosScale();
+	glm::vec4 GetPosScale() const;
 public:
 	Positionable() {};
 	Positionable(glm::vec2 relative_pos);
-	glm::vec2 GetPos();
-	glm::vec2 GetScale();
+	glm::vec2 GetPos() const;
+	glm::vec2 GetScale() const;
 	glm::vec2& GetPosRelative();
 	glm::vec2& GetScaleRelative();
 	void SetPosRelative(glm::vec2);

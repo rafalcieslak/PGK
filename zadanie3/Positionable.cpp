@@ -25,15 +25,15 @@ void Positionable::SetScale(glm::vec2 scale){
 	relative_scale = scale;
 }
 
-glm::vec2 Positionable::GetPos(){
+glm::vec2 Positionable::GetPos() const{
 	return GetPosScale().xy();
 }
 
-glm::vec2 Positionable::GetScale(){
+glm::vec2 Positionable::GetScale() const{
 	return GetPosScale().zw();
 }
 
-glm::vec4 Positionable::GetPosScale(){
+glm::vec4 Positionable::GetPosScale() const{
 	if(parent == nullptr) return glm::vec4(relative_pos,relative_scale);
 	glm::vec4 base = parent->GetPosScale();
 	glm::vec2 mypos = base.xy() + (relative_pos * base.zw());

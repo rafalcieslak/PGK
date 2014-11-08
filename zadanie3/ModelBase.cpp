@@ -25,7 +25,7 @@ Model::~Model(){
 
 
 void Model::metaDraw(){
-	
+
 	// Select buffers to use
 	glBindBuffer(GL_ARRAY_BUFFER, buffer_vertex);
 	glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0 );
@@ -44,13 +44,13 @@ void ModelBase::Clear(){
 	models.clear();
 }
 
-bool ModelBase::HasModel(std::string id){
+bool ModelBase::HasModel(std::string id) const{
 	if(models.find(id) != models.end()) return true;
 	return false;
 }
 
 
-std::shared_ptr<Model> ModelBase::GetModel(std::string id){
+std::shared_ptr<Model> ModelBase::GetModel(std::string id) const{
 	auto it = models.find(id);
 	if(it != models.end()) return it->second;
 	return nullptr;
