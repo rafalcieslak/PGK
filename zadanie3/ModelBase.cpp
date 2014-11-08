@@ -2,7 +2,7 @@
 #include "Render.h"
 #include <iostream>
 
-Model::Model(unsigned int n, float* v, float* c): size(n){
+Model::Model(unsigned int n, const float* v, const float* c): size(n){
 	if(!Render::inited) Render::Init(); // To avoid problems when object constructor are called before init()
 	vertices = new float[n*6];
 	colors   = new float[n*9];
@@ -35,7 +35,7 @@ void Model::metaDraw(){
 	glDrawArrays(GL_TRIANGLES, 0, 3*size);
 }
 
-void ModelBase::AddModel(std::string id, unsigned int vertices, float* coords, float* colors){
+void ModelBase::AddModel(std::string id, unsigned int vertices, const float* coords, const float* colors){
 	std::shared_ptr<Model> m = std::make_shared<Model>(vertices,coords,colors);
 	models[id] = m;
 }

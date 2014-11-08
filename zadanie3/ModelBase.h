@@ -8,7 +8,7 @@
 
 class Model{
 public:
-	Model(unsigned int vertices, float* v, float* c);
+	Model(unsigned int vertices, const float* v, const float* c);
 	~Model();
 	float *vertices, *colors;
 	unsigned int size;
@@ -27,7 +27,7 @@ public:
 		static ModelBase instance;
 		return instance;
 	}
-	void AddModel(std::string id, unsigned int vertices, float* coords, float* colors);
+	void AddModel(std::string id, unsigned int vertices, const float* coords, const float* colors);
 	bool HasModel(std::string id) const;
 	void Clear();
 	std::shared_ptr<Model> GetModel(std::string id) const;

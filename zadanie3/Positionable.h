@@ -4,6 +4,7 @@
 #define GLM_SWIZZLE
 #include <glm/glm.hpp>
 #include <list>
+#include <memory>
 #include <algorithm>
 
 glm::vec2 Rotate2dVector01(glm::vec2, float);

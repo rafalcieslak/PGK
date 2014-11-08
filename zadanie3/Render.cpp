@@ -1,3 +1,4 @@
+#define GLM_FORCE_RADIANS
 #include "Render.h"
 #include "shader.hpp"
 #include "fonts.hpp"
