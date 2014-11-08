@@ -54,40 +54,38 @@ inline glm::vec2 CheckCollisionCircleRectangle(std::shared_ptr<CollisionShape> c
 //	std::cout << circle_pos.x << " " << circle_pos.y << " " << std::endl;
 
 	// to X axix
-		float xpush = 0.0;
-	{
-		float rx1 = -w_2, rx2 = w_2;
-		float cx1 = circle_pos.x - r, cx2 = circle_pos.x + r;
-		if(cx2 < rx1 || cx1 > rx2) xpush = 0.0;
-		else if(cx1<rx1 && cx2<rx2) xpush = rx1-cx2;
-		else if(cx1>rx1 && cx2>rx2) xpush = rx2-cx1;
-		else if(cx1>rx1 && cx2<rx2) {
-			if (circle_pos.x > 0) xpush = rx2 - cx1;
-			else xpush = rx1 - cx2;
-		}else if(cx1<rx1 && cx2>rx2){
-			if (circle_pos.x > 0) xpush = rx2 - cx1;
-			else xpush = rx1 - cx2;
-		}
+	float xpush = 1.0;
+	float ypush = 1.0;
+	const float rx1 = -w_2, rx2 = w_2;
+	const float cx1 = circle_pos.x - r, cx2 = circle_pos.x + r;
+	const float ry1 = -h_2, ry2 = h_2;
+	const float cy1 = circle_pos.y - r, cy2 = circle_pos.y + r;
+	if(cx2 < rx1 || cx1 > rx2) xpush = 0.0;
+	if(cy2 < ry1 || cy1 > ry2) ypush = 0.0;
+	if(glm::abs(xpush) < 0.0000001 || glm::abs(ypush) < 0.0000001) return glm::vec2(0.0,0.0);
+	;
+	if(cx1<rx1 && cx2<rx2) xpush = rx1-cx2;
+	else if(cx1>rx1 && cx2>rx2) xpush = rx2-cx1;
+	else if(cx1>rx1 && cx2<rx2) {
+		if (circle_pos.x > 0) xpush = rx2 - cx1;
+		else xpush = rx1 - cx2;
+	}else if(cx1<rx1 && cx2>rx2){
+		if (circle_pos.x > 0) xpush = rx2 - cx1;
+		else xpush = rx1 - cx2;
 	}
 	// to Y axix
-		float ypush = 0.0;
-	{
-		float ry1 = -h_2, ry2 = h_2;
-		float cy1 = circle_pos.y - r, cy2 = circle_pos.y + r;
-		if(cy2 < ry1 || cy1 > ry2) ypush = 0.0;
-		else if(cy1<ry1 && cy2<ry2) ypush = ry1-cy2;
-		else if(cy1>ry1 && cy2>ry2) ypush = ry2-cy1;
-		else if(cy1>ry1 && cy2<ry2) {
-			if (circle_pos.x > 0) ypush = ry2 - cy1;
-			else ypush = ry1 - cy2;
-		}else if(cy1<ry1 && cy2>ry2){
-			if (circle_pos.x > 0) ypush = ry2 - cy1;
-			else ypush = ry1 - cy2;
-		}
+	if(cy1<ry1 && cy2<ry2) ypush = ry1-cy2;
+	else if(cy1>ry1 && cy2>ry2) ypush = ry2-cy1;
+	else if(cy1>ry1 && cy2<ry2) {
+		if (circle_pos.x > 0) ypush = ry2 - cy1;
+		else ypush = ry1 - cy2;
+	}else if(cy1<ry1 && cy2>ry2){
+		if (circle_pos.x > 0) ypush = ry2 - cy1;
+		else ypush = ry1 - cy2;
 	}
 	glm::vec2 res;
-	if(xpush < 0.000001 && ypush < 0.000001) res = glm::vec2(0.0,0.0);
-	if(xpush > ypush) res = glm::vec2(xpush,0.0);
+	if(glm::abs(xpush) < 0.0000001 || glm::abs(ypush) < 0.0000001) res = glm::vec2(0.0,0.0);
+	else if(glm::abs(xpush) < glm::abs(ypush)) res = glm::vec2(xpush,0.0);
 	else res = glm::vec2(0.0,ypush);
 
 	return rot_mat * res;

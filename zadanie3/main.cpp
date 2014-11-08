@@ -14,12 +14,13 @@ int main(){
 
 
 	std::shared_ptr<Brick> br = Brick::Create(glm::vec2(0.0,0.5));
+	std::shared_ptr<Brick> br2 = Brick::Create(glm::vec2(0.0,-1.2));
 	std::shared_ptr<Ball> ba = Ball::Create(glm::vec2(-0.5,-0.5));
 	br->SetScale(1.0);
 	ba->SetScale(0.03);
 	br->SetAngle(-0.2);
 	ba->SetAngle(0.0);
-	ba->body->linearVelocity = glm::vec2(0.25,0.25);
+	ba->body->linearVelocity = glm::vec2(0.35,0.35);
 
 	/*
 	std::shared_ptr<Brick> br = Brick::Create(glm::vec2(0.0,0.5));
