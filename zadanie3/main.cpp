@@ -1,6 +1,7 @@
 #include <glm/glm.hpp>
 #include "ModelBase.h"
 #include "Brick.h"
+#include "Ball.h"
 #include "Render.h"
 #include "simplephysics.h"
 
@@ -18,7 +19,8 @@ int main(){
 	*/
 
 	std::shared_ptr<Brick> b = Brick::Create(glm::vec2(0.1,0.3));
-	
+	std::shared_ptr<Ball> ba = Ball::Create(glm::vec2(-0.1,-0.3));
+
 
 	double lasttime = glfwGetTime();
 	// This is the main loop.
