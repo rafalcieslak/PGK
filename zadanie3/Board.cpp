@@ -2,8 +2,6 @@
 #include "ModelBase.h"
 #include <iostream>
 
-#define SQRT3 1.73205080757
-
 Board::BoardDrawable::BoardDrawable() : Drawable(""){
 	if(!ModelBase::GetInstance().HasModel("Board")){
 		ModelBase::GetInstance().AddModel("Board", 6,
@@ -18,7 +16,7 @@ Board::BoardDrawable::BoardDrawable() : Drawable(""){
 						 0.0,0.2,0.9, 0.0,0.2,0.9, 0.0,0.2,0.9,
 						 0.0,0.2,0.9, 0.0,0.2,0.9, 0.0,0.2,0.9,
 						 0.0,0.2,0.9, 0.0,0.2,0.9, 0.0,0.2,0.9,
-						 0.0,0.2,0.6, 0.0,0.2,0.6, 0.0,0.2,0.6,});
+						 0.0,0.05,0.2, 0.0,0.05,0.2, 0.0,0.05,0.2,});
 	}
 	model_id = "Board";
 }

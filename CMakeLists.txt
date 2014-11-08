@@ -110,6 +110,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie3")
 		zadanie3/simplephysics.cpp
 		zadanie3/Ball.cpp
 		zadanie3/Board.cpp
+		zadanie3/Paddle.cpp
 	)
 
 	# Files needed by zadanie3 on runtime.

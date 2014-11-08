@@ -4,6 +4,8 @@
 #include "Drawable.h"
 #include "body.h"
 
+#define SQRT3 1.73205080757
+
 class Board : public PositionableGroup{
 private:
 	class BoardDrawable : public Drawable{

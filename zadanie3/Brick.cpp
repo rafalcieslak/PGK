@@ -25,6 +25,8 @@ Brick::Brick(){
 	bd = std::make_shared<BrickDrawable>();
 	bb = std::make_shared<BrickBody>();
 	bb->init();
+	bb->SetScale(0.1);
+	bd->SetScale(0.1);
 }
 
 void Brick::init(glm::vec2 pos){
