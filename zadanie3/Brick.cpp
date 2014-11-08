@@ -27,7 +27,6 @@ void Brick::init(glm::vec2 pos){
 	SetTop(bb);
 	SetBottom(bd);
 	SetPosRelative(pos);
-	bb->linearVelocity = glm::vec2(-0.2,-0.2);
 }
 
 std::shared_ptr<Brick> Brick::Create(glm::vec2 pos){
