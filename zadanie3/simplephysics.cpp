@@ -7,6 +7,6 @@ void SimplePhysics::PerformIteration(float time_delta){
 
 	// Apply linear velocities
 	for(auto p : dynamic_bodies){
-		p->PosRelative() += p->linearVelocity*time_delta;
+		p->GetPosRelative() += p->linearVelocity*time_delta;
 	}
 }

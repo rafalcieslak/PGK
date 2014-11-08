@@ -11,16 +11,12 @@ int main(){
 
 	if(n) return n;
 	glm::vec4 test;
-	/*
-	std::shared_ptr<BrickBody> bb = std::make_shared<BrickBody>(glm::vec2(-0.2,-0.2));
-	std::shared_ptr<BrickDrawable> bd = std::make_shared<BrickDrawable>(glm::vec2(0.4,0.4));
-	bb->LinkChild(bd);
-	bb->linearVelocity = glm::vec2(-0.1,0.1);
-	*/
 
 	std::shared_ptr<Brick> b = Brick::Create(glm::vec2(0.1,0.3));
 	std::shared_ptr<Ball> ba = Ball::Create(glm::vec2(-0.1,-0.3));
-
+	b->SetScale(glm::vec2(0.4,0.4));
+	ba->SetScale(glm::vec2(0.06,0.06));
+	b->LinkChild(ba);
 
 	double lasttime = glfwGetTime();
 	// This is the main loop.

@@ -111,6 +111,7 @@ void Render::Frame(){
 			continue;
 		}
 		glUniform2fv(uniform_center, 1, glm::value_ptr(d->GetPos()));
+		glUniform2fv(uniform_scale , 1, glm::value_ptr(d->GetScale()));
 		m->metaDraw();
 	}
 
