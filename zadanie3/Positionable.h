@@ -31,6 +31,7 @@ public:
 	void SetAngle(float);
 	virtual void LinkChild(std::shared_ptr<Positionable>);
 	virtual void SetParent(std::shared_ptr<Positionable>);
+	static std::shared_ptr<Positionable> Create(glm::vec2 pos = glm::vec2(0.0,0.0));
 };
 
 class PositionableGroup : public Positionable{

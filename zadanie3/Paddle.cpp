@@ -26,8 +26,7 @@ void Paddle::PaddleBody::init(){
 Paddle::Paddle(){
 	pd = std::make_shared<PaddleDrawable>();
 	pb = std::make_shared<PaddleBody>();
-	pd->SetScale(0.35);
-	pb->SetScale(0.35);
+	pd->SetScale(0.15);
 	pb->init();
 }
 

@@ -21,6 +21,11 @@ int main(){
 	auto paddle = Paddle::Create(glm::vec2(0.0,-SQRT3/2.0));
 	const float paddle_speed = 0.4;
 
+	auto temp_wall = Positionable::Create(glm::vec2(0.0,0.5));
+	auto b1 = Brick::Create(glm::vec2(0.0,0.0));
+	auto b2 = Brick::Create(glm::vec2(0.1,0.0));
+	auto b3 = Brick::Create(glm::vec2(-0.1,0.0));
+
 	double lasttime = glfwGetTime();
 	// This is the main loop.
 	do{
@@ -37,7 +42,7 @@ int main(){
 		if(Render::IsKeyPressed(GLFW_KEY_LEFT)) px += -1.0;
 		if(Render::IsKeyPressed(GLFW_KEY_RIGHT)) px += 1.0;
 		float newx = paddle->GetPosRelative().x + px * paddle_speed * time_delta;
-		newx = glm::clamp(newx, -0.38f, 0.38f);
+		newx = glm::clamp(newx, -0.35f, 0.35f);
 		paddle->SetPosRelative(glm::vec2(newx,-SQRT3/2.0));
 
 

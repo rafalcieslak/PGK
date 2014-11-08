@@ -64,6 +64,10 @@ glm::vec4 Positionable::GetPosScaleAngle() const{
 	return glm::vec4(mypos, myscale, myangle);
 }
 
+std::shared_ptr<Positionable> Positionable::Create(glm::vec2 pos){
+	return std::make_shared<Positionable>(pos);
+}
+
 
 void PositionableGroup::SetTop(std::shared_ptr<Positionable> t){
 	top = t;

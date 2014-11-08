@@ -4,8 +4,8 @@
 Brick::BrickDrawable::BrickDrawable() : Drawable(""){
 	if(!ModelBase::GetInstance().HasModel("brick")){
 		ModelBase::GetInstance().AddModel("brick",2,
-			(const float[]){ -0.5, -0.5, 0.5, -0.5, -0.5, 0.5,
-			                  0.5, -0.5, -0.5, 0.5,  0.5, 0.5},
+			(const float[]){ -1.0, -0.5,  1.0, -0.5, -1.0, 0.5,
+			                  1.0, -0.5, -1.0,  0.5,  1.0, 0.5},
 			(const float[]){ 1.0,0.0,0.0, 1.0,0.0,0.0, 1.0,0.0,0.0,
 			                 1.0,0.0,0.0, 1.0,0.0,0.0, 1.0,0.0,0.0,});
 	}
@@ -26,7 +26,6 @@ Brick::Brick(){
 	bb = std::make_shared<BrickBody>();
 	bb->init();
 	bb->SetScale(0.1);
-	bd->SetScale(0.1);
 }
 
 void Brick::init(glm::vec2 pos){
