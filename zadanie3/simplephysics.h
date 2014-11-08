@@ -10,9 +10,9 @@ class SimplePhysics{
 	friend class StaticBody;
 	friend class DynamicBody;
 	struct CollisionInfo{
-		CollisionInfo(bool c, glm::vec2 n = glm::vec2(0.0,0.0)) : colliding(c), normal(n){};
+		CollisionInfo(bool c, glm::vec2 n = glm::vec2(0.0,0.0)) : colliding(c), push(n){};
 		bool colliding;
-		glm::vec2 normal;
+		glm::vec2 push;
 	};
 	static CollisionInfo CheckForCollision(Body* b1, Body* b2);
 public:

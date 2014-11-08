@@ -11,7 +11,14 @@ void SimplePhysics::PerformIteration(float time_delta){
 
 		// Check for collisions with static bodies
 		for(StaticBody* sb : static_bodies){
-			CheckForCollision(db, sb);
+			CollisionInfo ci = CheckForCollision(db, sb);
+			if(ci.colliding){
+				// Apply push vector
+				//std::cout << "PUSH " << ci.push.x << " " << ci.push.y << std::endl;
+				db->SetPosAbsolute( db->GetPos() + ci.push );
+				// Bounce velocity
+				db->linearVelocity = glm::reflect( db->linearVelocity, glm::normalize(ci.push) );
+			}
 
 		}
 
@@ -28,16 +35,62 @@ void SimplePhysics::PerformIteration(float time_delta){
 	//std::cout << "end iteration" << std::endl;
 }
 
+// returns MPV for the circle
 inline glm::vec2 CheckCollisionCircleRectangle(std::shared_ptr<CollisionShape> circle_, std::shared_ptr<CollisionShape> rectangle_){
 	auto circle    = std::dynamic_pointer_cast<CollisionShapeCircle>(circle_);
 	auto rectangle = std::dynamic_pointer_cast<CollisionShapeRectangle>(rectangle_);
 	if(!circle || !rectangle) return glm::vec2(0.0,0.0);
 
-	//std::cout << "Circle-rectangle" << std::endl;
 
+	glm::vec2 trans = -1.0f* rectangle->GetPos();
+	float angle = rectangle->GetAngle();
+	glm::mat2 rot_mat = glm::mat2(glm::cos(angle*2.0*M_PI), glm::sin(angle*-2.0*M_PI), glm::sin(angle*2.0*M_PI), glm::cos(angle*2.0*M_PI));
+	glm::mat2 rot_mat_r = glm::mat2(glm::cos(angle*2.0*M_PI), glm::sin(angle*2.0*M_PI), glm::sin(angle*-2.0*M_PI), glm::cos(angle*2.0*M_PI));
+	glm::vec2 circle_pos = rot_mat_r * (circle->GetPos() + trans);
+	float w_2 = rectangle->size.x * rectangle->GetScale();
+	float h_2 = rectangle->size.y * rectangle->GetScale();
+	float r = circle->radius * circle->GetScale();
 
+//	std::cout << circle_pos.x << " " << circle_pos.y << " " << std::endl;
 
-	return glm::vec2(0.0,0.0);
+	// to X axix
+		float xpush = 0.0;
+	{
+		float rx1 = -w_2, rx2 = w_2;
+		float cx1 = circle_pos.x - r, cx2 = circle_pos.x + r;
+		if(cx2 < rx1 || cx1 > rx2) xpush = 0.0;
+		else if(cx1<rx1 && cx2<rx2) xpush = rx1-cx2;
+		else if(cx1>rx1 && cx2>rx2) xpush = rx2-cx1;
+		else if(cx1>rx1 && cx2<rx2) {
+			if (circle_pos.x > 0) xpush = rx2 - cx1;
+			else xpush = rx1 - cx2;
+		}else if(cx1<rx1 && cx2>rx2){
+			if (circle_pos.x > 0) xpush = rx2 - cx1;
+			else xpush = rx1 - cx2;
+		}
+	}
+	// to Y axix
+		float ypush = 0.0;
+	{
+		float ry1 = -h_2, ry2 = h_2;
+		float cy1 = circle_pos.y - r, cy2 = circle_pos.y + r;
+		if(cy2 < ry1 || cy1 > ry2) ypush = 0.0;
+		else if(cy1<ry1 && cy2<ry2) ypush = ry1-cy2;
+		else if(cy1>ry1 && cy2>ry2) ypush = ry2-cy1;
+		else if(cy1>ry1 && cy2<ry2) {
+			if (circle_pos.x > 0) ypush = ry2 - cy1;
+			else ypush = ry1 - cy2;
+		}else if(cy1<ry1 && cy2>ry2){
+			if (circle_pos.x > 0) ypush = ry2 - cy1;
+			else ypush = ry1 - cy2;
+		}
+	}
+	glm::vec2 res;
+	if(xpush < 0.000001 && ypush < 0.000001) res = glm::vec2(0.0,0.0);
+	if(xpush > ypush) res = glm::vec2(xpush,0.0);
+	else res = glm::vec2(0.0,ypush);
+
+	return rot_mat * res;
 }
 
 #define CT(type,ptr) std::dynamic_pointer_cast<type>(ptr)
