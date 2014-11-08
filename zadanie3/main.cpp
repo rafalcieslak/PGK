@@ -1,5 +1,6 @@
 #include <glm/glm.hpp>
 #include "ModelBase.h"
+#include "Board.h"
 #include "Brick.h"
 #include "Ball.h"
 #include "Render.h"
@@ -13,6 +14,7 @@ int main(){
 	glm::vec4 test;
 
 
+	std::shared_ptr<Board> board = Board::Create();
 	std::shared_ptr<Brick> br = Brick::Create(glm::vec2(0.0,0.5));
 	std::shared_ptr<Brick> br2 = Brick::Create(glm::vec2(0.0,-1.2));
 	std::shared_ptr<Ball> ba = Ball::Create(glm::vec2(-0.5,-0.5));
