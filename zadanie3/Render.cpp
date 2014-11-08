@@ -115,7 +115,7 @@ void Render::Frame(){
 		glUniform2fv(uniform_center, 1, glm::value_ptr(d->GetPos()));
 		glUniform1f(uniform_scale, d->GetScale());
 		glUniform1f(uniform_angle, d->GetAngle()*2.0*M_PI);
-		m->metaDraw();
+		m->metaDraw(d->variant);
 	}
 
 

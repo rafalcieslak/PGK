@@ -4,10 +4,12 @@
 Brick::BrickDrawable::BrickDrawable() : Drawable(""){
 	if(!ModelBase::GetInstance().HasModel("brick")){
 		ModelBase::GetInstance().AddModel("brick",2,
-			(const float[]){ -1.0, -0.5,  1.0, -0.5, -1.0, 0.5,
+			               { -1.0, -0.5,  1.0, -0.5, -1.0, 0.5,
 			                  1.0, -0.5, -1.0,  0.5,  1.0, 0.5},
-			(const float[]){ 1.0,0.0,0.0, 1.0,0.0,0.0, 1.0,0.0,0.0,
-			                 1.0,0.0,0.0, 1.0,0.0,0.0, 1.0,0.0,0.0,});
+			               {{1.0,0.0,0.0, 1.0,0.0,0.0, 1.0,0.0,0.0,
+			                 1.0,0.0,0.0, 1.0,0.0,0.0, 1.0,0.0,0.0,},
+							{1.0,1.0,0.0, 1.0,1.0,0.0, 1.0,1.0,0.0,
+							 1.0,1.0,0.0, 1.0,1.0,0.0, 1.0,1.0,0.0,}});
 	}
 	model_id = "brick";
 }
@@ -18,7 +20,7 @@ Brick::BrickBody::BrickBody(){
 }
 
 void Brick::BrickBody::init(){
-	AddNewCollisionShape<CollisionShapeRectangle>(glm::vec2(0.0, 0.0), glm::vec2(0.5,0.5));
+	AddNewCollisionShape<CollisionShapeRectangle>(glm::vec2(0.0, 0.0), glm::vec2(1.0,0.5));
 }
 
 Brick::Brick(){
@@ -28,15 +30,16 @@ Brick::Brick(){
 	bb->SetScale(0.1);
 }
 
-void Brick::init(glm::vec2 pos){
+void Brick::init(glm::vec2 pos, unsigned int variant){
 	bb->LinkChild(bd);
 	SetTop(bb);
 	SetBottom(bd);
 	SetPosRelative(pos);
+	bd->variant = variant;
 }
 
-std::shared_ptr<Brick> Brick::Create(glm::vec2 pos){
+std::shared_ptr<Brick> Brick::Create(glm::vec2 pos, unsigned int variant){
 	auto b = std::shared_ptr<Brick>(new Brick());
-	b->init(pos);
+	b->init(pos, variant);
 	return b;
 }

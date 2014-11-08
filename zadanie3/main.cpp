@@ -16,15 +16,18 @@ int main(){
 	std::shared_ptr<Ball> ba = Ball::Create(glm::vec2(0.485,-0.5));
 	ba->SetScale(0.03);
 	ba->SetAngle(0.0);
-	ba->body->linearVelocity = glm::vec2(0.15,0.65);
+	ba->body->linearVelocity = glm::normalize(glm::vec2(-0.45,0.65))*0.7f;
 
 	auto paddle = Paddle::Create(glm::vec2(0.0,-SQRT3/2.0));
 	const float paddle_speed = 0.4;
 
 	auto temp_wall = Positionable::Create(glm::vec2(0.0,0.5));
-	auto b1 = Brick::Create(glm::vec2(0.0,0.0));
-	auto b2 = Brick::Create(glm::vec2(0.1,0.0));
-	auto b3 = Brick::Create(glm::vec2(-0.1,0.0));
+	auto b1 = Brick::Create(glm::vec2(0.0,0.0),1);
+	auto b2 = Brick::Create(glm::vec2(0.2,0.0),0);
+	auto b3 = Brick::Create(glm::vec2(-0.2,0.0),0);
+	temp_wall->LinkChild(b1);
+	temp_wall->LinkChild(b2);
+	temp_wall->LinkChild(b3);
 
 	double lasttime = glfwGetTime();
 	// This is the main loop.
