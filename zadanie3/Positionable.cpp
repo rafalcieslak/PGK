@@ -21,6 +21,14 @@ glm::vec2& Positionable::GetScaleRelative(){
 void Positionable::SetPosRelative(glm::vec2 pos){
 	relative_pos = pos;
 }
+void Positionable::SetPosAbsolute(glm::vec2 pos){
+	glm::vec4 current_posscale = GetPosScale();
+	glm::vec2 diff = pos - current_posscale.xy();
+	diff.x /= current_posscale.z;
+	diff.y /= current_posscale.w;
+	relative_pos += diff;
+}
+
 void Positionable::SetScale(glm::vec2 scale){
 	relative_scale = scale;
 }
