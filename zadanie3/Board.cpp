@@ -30,8 +30,8 @@ void Board::BoardBody::init(){
 	AddNewCollisionShape<CollisionShapeRectangle>(glm::vec2(0.0, 1.0), glm::vec2(0.5,1.0-SQRT3/2.0));
 	AddNewCollisionShape<CollisionShapeRectangle>(glm::vec2(1.5, SQRT3/2.0), glm::vec2(0.5,SQRT3/2.0), 1.0/6.0);
 	AddNewCollisionShape<CollisionShapeRectangle>(glm::vec2(-1.5, SQRT3/2.0), glm::vec2(0.5,SQRT3/2.0), -1.0/6.0);
-	AddNewCollisionShape<CollisionShapeRectangle>(glm::vec2(1.5, -SQRT3/2.0), glm::vec2(0.5,SQRT3/2.0), -1.0/6.0);
-	AddNewCollisionShape<CollisionShapeRectangle>(glm::vec2(-1.5, -SQRT3/2.0), glm::vec2(0.5,SQRT3/2.0), 1.0/6.0);
+	AddNewCollisionShape<CollisionShapeRectangle>(glm::vec2(1.5, -SQRT3/2.0), glm::vec2(0.8,SQRT3/2.0), -1.0/6.0);
+	AddNewCollisionShape<CollisionShapeRectangle>(glm::vec2(-1.5, -SQRT3/2.0), glm::vec2(0.8,SQRT3/2.0), 1.0/6.0);
 }
 
 Board::Board(){
