@@ -1,21 +1,24 @@
 #include "Board.h"
 #include "ModelBase.h"
+#include <iostream>
 
 #define SQRT3 1.73205080757
 
 Board::BoardDrawable::BoardDrawable() : Drawable(""){
 	if(!ModelBase::GetInstance().HasModel("Board")){
-		ModelBase::GetInstance().AddModel("Board", 5,
+		ModelBase::GetInstance().AddModel("Board", 6,
 		(const float[]){ 1.0, 1.0, 1.0, 0.0, 0.0, SQRT3,
 		                -1.0, 1.0,-1.0, 0.0,-0.0, SQRT3,
 		       	  	     0.0, SQRT3, 0.5, SQRT3/2.0, -0.5, SQRT3/2.0,
-						 1.0, 0.0, 1.0,-1.0, 0.5, -SQRT3/2.0,
-						-1.0, 0.0,-1.0,-1.0,-0.5, -SQRT3/2.0,},
+						 1.0, 0.0, 1.0,-1.0, 0.0, -SQRT3,
+						-1.0, 0.0,-1.0,-1.0,-0.0, -SQRT3,
+						 0.0,-SQRT3, 0.5,-SQRT3/2.0, -0.5,-SQRT3/2.0,},
 		(const float[]){ 0.0,0.2,0.9, 0.0,0.2,0.9, 0.0,0.2,0.9,
 		                 0.0,0.2,0.9, 0.0,0.2,0.9, 0.0,0.2,0.9,
 						 0.0,0.2,0.9, 0.0,0.2,0.9, 0.0,0.2,0.9,
 						 0.0,0.2,0.9, 0.0,0.2,0.9, 0.0,0.2,0.9,
-						 0.0,0.2,0.9, 0.0,0.2,0.9, 0.0,0.2,0.9,});
+						 0.0,0.2,0.9, 0.0,0.2,0.9, 0.0,0.2,0.9,
+						 0.0,0.2,0.6, 0.0,0.2,0.6, 0.0,0.2,0.6,});
 	}
 	model_id = "Board";
 }
@@ -26,7 +29,11 @@ Board::BoardBody::BoardBody(){
 }
 
 void Board::BoardBody::init(){
-	//AddNewCollisionShape<CollisionShapeCircle>(glm::vec2(0.0, 0.0), 1.0);
+	AddNewCollisionShape<CollisionShapeRectangle>(glm::vec2(0.0, 1.0), glm::vec2(0.5,1.0-SQRT3/2.0));
+	AddNewCollisionShape<CollisionShapeRectangle>(glm::vec2(1.5, SQRT3/2.0), glm::vec2(0.5,SQRT3/2.0), 1.0/6.0);
+	AddNewCollisionShape<CollisionShapeRectangle>(glm::vec2(-1.5, SQRT3/2.0), glm::vec2(0.5,SQRT3/2.0), -1.0/6.0);
+	AddNewCollisionShape<CollisionShapeRectangle>(glm::vec2(1.5, -SQRT3/2.0), glm::vec2(0.5,SQRT3/2.0), -1.0/6.0);
+	AddNewCollisionShape<CollisionShapeRectangle>(glm::vec2(-1.5, -SQRT3/2.0), glm::vec2(0.5,SQRT3/2.0), 1.0/6.0);
 }
 
 Board::Board(){

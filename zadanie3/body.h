@@ -16,7 +16,7 @@ private:
 };
 
 struct CollisionShapeRectangle : public CollisionShape{
-	CollisionShapeRectangle(glm::vec2 s) : CollisionShape(sqrt(s.x*s.x + s.y*s.y)), size(s) {};
+	CollisionShapeRectangle(glm::vec2 s, float angle = 0.0) : CollisionShape(sqrt(s.x*s.x + s.y*s.y)), size(s) { SetAngle(angle); };
 	glm::vec2 size;
 };
 struct CollisionShapeCircle : public CollisionShape{

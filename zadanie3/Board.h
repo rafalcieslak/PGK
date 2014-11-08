@@ -10,7 +10,7 @@ private:
 	public:
 		BoardDrawable();
 	};
-	class BoardBody : public DynamicBody{
+	class BoardBody : public StaticBody{
 	public:
 		BoardBody();
 		void init();
