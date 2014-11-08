@@ -49,12 +49,12 @@ Ball::BallBody::BallBody(){
 
 Ball::Ball(){
 	bd = std::make_shared<BallDrawable>();
-	bb = std::make_shared<BallBody>();
+	body = std::make_shared<BallBody>();
 }
 
 void Ball::init(glm::vec2 pos){
-	bb->LinkChild(bd);
-	SetTop(bb);
+	body->LinkChild(bd);
+	SetTop(body);
 	SetBottom(bd);
 	SetPosRelative(pos);
 }

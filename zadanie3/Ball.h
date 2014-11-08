@@ -20,10 +20,10 @@ private:
 		BallBody();
 	};
 	std::shared_ptr<BallDrawable> bd;
-	std::shared_ptr<BallBody> bb;
 	Ball();
 	void init(glm::vec2 pos);
 public:
+	std::shared_ptr<BallBody> body;
 	static std::shared_ptr<Ball> Create(glm::vec2 pos = glm::vec2(0.0,0.0));
 };
 
