@@ -13,9 +13,11 @@ make
 
 Running
 ===
-You can run the application from within the `build` or `zadanie2` directory.
+You can run the application from within the `build` or `zadanieN` directory.
 
 <pre>
 cd build
-./zadanie2
+./zadanieN
 </pre>
+
+where N is the task number.
