@@ -40,7 +40,6 @@ Board::Board(){
 }
 
 void Board::init(){
-	Positionable::LinkChild(body);
 	body->LinkChild(bd);
 	SetTop(body);
 	SetBottom(bd);

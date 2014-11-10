@@ -58,7 +58,6 @@ Brick::Brick(){
 }
 
 void Brick::init(glm::vec2 pos, unsigned int variant){
-	Positionable::LinkChild(bb);
 	bb->LinkChild(bd);
 	SetTop(bb);
 	SetBottom(bd);

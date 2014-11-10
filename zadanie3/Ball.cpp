@@ -56,7 +56,6 @@ Ball::Ball(){
 }
 
 void Ball::init(glm::vec2 pos){
-	Positionable::LinkChild(body);
 	body->LinkChild(bd);
 	SetTop(body);
 	SetBottom(bd);

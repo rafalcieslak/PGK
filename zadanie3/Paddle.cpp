@@ -39,7 +39,6 @@ Paddle::Paddle(){
 }
 
 void Paddle::init(glm::vec2 pos){
-	Positionable::LinkChild(pb);
 	pb->LinkChild(pd);
 	SetTop(pb);
 	SetBottom(pd);
