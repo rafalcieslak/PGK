@@ -2,6 +2,7 @@
 #define BODY_H
 
 #include "Positionable.h"
+#include "Signal.h"
 #include <vector>
 #include <cmath>
 
@@ -44,6 +45,7 @@ public:
 		shapes.push_back(n);
 	}
 	std::vector<std::shared_ptr<CollisionShape>> shapes;
+	Signal<std::shared_ptr<Body>> on_collision;
 };
 
 class StaticBody : public Body{
@@ -51,7 +53,6 @@ public:
 	StaticBody();
 	~StaticBody();
 	virtual BodyType GetBodyType() const {return Body::BODY_TYPE_STATIC;}
-	static std::vector<StaticBody *> static_bodies;
 };
 
 class DynamicBody : public Body{
@@ -60,7 +61,6 @@ public:
 	~DynamicBody();
 	glm::vec2 linearVelocity;
 	virtual BodyType GetBodyType() const {return Body::BODY_TYPE_DYNAMIC;}
-	static std::vector<DynamicBody *> dynamic_bodies;
 };
 
 #endif //BODY_H

@@ -1,18 +1,21 @@
 #include "simplephysics.h"
 #include <iostream>
 #include <memory>
-std::vector<StaticBody*> SimplePhysics::static_bodies;
-std::vector<DynamicBody*> SimplePhysics::dynamic_bodies;
+std::set<std::shared_ptr< StaticBody>> SimplePhysics::static_bodies;
+std::set<std::shared_ptr<DynamicBody>> SimplePhysics::dynamic_bodies;
 
 void SimplePhysics::PerformIteration(float time_delta){
 
 	// Detect collisions
-	for(DynamicBody* db : dynamic_bodies){ // Only dynamic bodies can collide
+	for(std::shared_ptr<DynamicBody> db : dynamic_bodies){ // Only dynamic bodies can collide
 
 		// Check for collisions with static bodies
-		for(StaticBody* sb : static_bodies){
+		for(std::shared_ptr<StaticBody> sb : static_bodies){
 			CollisionInfo ci = CheckForCollision(db, sb);
 			if(ci.colliding){
+				// Inform about collision
+				db->on_collision.Happen(sb);
+				sb->on_collision.Happen(db);
 				// Apply push vector
 				//std::cout << "PUSH " << ci.push.x << " " << ci.push.y << std::endl;
 				db->SetPosAbsolute( db->GetPos() + ci.push );
@@ -33,6 +36,45 @@ void SimplePhysics::PerformIteration(float time_delta){
 		p->SetPosAbsolute(new_pos);
 	}
 	//std::cout << "end iteration" << std::endl;
+}
+
+void SimplePhysics::RegisterSubtree(std::shared_ptr<Positionable> root){
+	auto body = std::dynamic_pointer_cast< Body>(root);
+	if(body) RegisterBody(body);
+	for(auto ch : root->children) RegisterSubtree(ch);
+}
+
+void SimplePhysics::RegisterBody(std::shared_ptr<Body> b){
+	auto sb = std::dynamic_pointer_cast< StaticBody>(b);
+	auto db = std::dynamic_pointer_cast<DynamicBody>(b);
+	if(sb) RegisterStaticBody(sb);
+	else if(db) RegisterDynamicBody(db);
+	else ; //????
+}
+void SimplePhysics::RegisterStaticBody(std::shared_ptr<StaticBody> b){
+	if(static_bodies.find(b) == static_bodies.end()) static_bodies.insert(b);
+}
+void SimplePhysics::RegisterDynamicBody(std::shared_ptr<DynamicBody> b){
+	if(dynamic_bodies.find(b) == dynamic_bodies.end()) dynamic_bodies.insert(b);
+}
+void SimplePhysics::UnRegisterBody(std::shared_ptr<Body> b){
+	auto sb = std::dynamic_pointer_cast< StaticBody>(b);
+	auto db = std::dynamic_pointer_cast<DynamicBody>(b);
+	if(sb) RegisterStaticBody(sb);
+	else if(db) RegisterDynamicBody(db);
+	else ; //????
+}
+void SimplePhysics::UnRegisterStaticBody(std::shared_ptr<StaticBody> b){
+	auto it = static_bodies.find(b);
+	if(it != static_bodies.end()) static_bodies.erase(it);
+}
+void SimplePhysics::UnRegisterDynamicBody(std::shared_ptr<DynamicBody> b){
+	auto it = dynamic_bodies.find(b);
+	if(it != dynamic_bodies.end()) dynamic_bodies.erase(it);
+}
+void SimplePhysics::UnregisterAll(){
+	dynamic_bodies.clear();
+	static_bodies.clear();
 }
 
 // returns MPV for the circle
@@ -122,7 +164,7 @@ glm::vec2 CheckCollisionCirclePaddle(std::shared_ptr<CollisionShape> circle_, st
 		}else{
 			float pushy = -cy1;
 			float pushx = hit_pt * pushy * paddle->deviation_ratio;
-			std::cout << "pushx " << pushx << ", hit_pt " << hit_pt << std::endl;
+			//std::cout << "pushx " << pushx << ", hit_pt " << hit_pt << std::endl;
 			result = glm::vec2(pushx,pushy);
 		}
 	}
@@ -133,7 +175,7 @@ glm::vec2 CheckCollisionCirclePaddle(std::shared_ptr<CollisionShape> circle_, st
 
 #define CT(type,ptr) (std::dynamic_pointer_cast<type>(ptr)!=nullptr)
 
-SimplePhysics::CollisionInfo SimplePhysics::CheckForCollision(Body* b1, Body* b2){
+SimplePhysics::CollisionInfo SimplePhysics::CheckForCollision(std::shared_ptr<Body> b1, std::shared_ptr<Body> b2){
 	glm::vec2 normal_sum = glm::vec2(0.0,0.0);
 	for(auto shape1 : b1->shapes){
 		for(auto shape2 : b2->shapes){

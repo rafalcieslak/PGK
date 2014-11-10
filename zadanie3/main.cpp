@@ -12,22 +12,30 @@ int main(){
 	int n = Render::Init();
 	if(n) return n;
 
+	auto root = Positionable::Create(glm::vec2(0.0,0.0));
+
 	std::shared_ptr<Board> board = Board::Create();
-	std::shared_ptr<Ball> ba = Ball::Create(glm::vec2(0.0,0.0));
-	ba->SetScale(0.03);
-	ba->SetAngle(0.0);
-	ba->body->linearVelocity = glm::normalize(glm::vec2(0.0,-1.0))*0.7f;
+	std::shared_ptr<Ball> ball = Ball::Create(glm::vec2(0.0,0.0));
+	ball->SetScale(0.03);
+	ball->SetAngle(0.0);
+	ball->body->linearVelocity = glm::normalize(glm::vec2(0.0,-1.0))*0.7f;
 
 	auto paddle = Paddle::Create(glm::vec2(0.0,-SQRT3/2.0));
 	const float paddle_speed = 0.4;
 
 	auto temp_wall = Positionable::Create(glm::vec2(0.0,0.5));
-	auto b1 = Brick::Create(glm::vec2(0.0,0.0),1);
-	auto b2 = Brick::Create(glm::vec2(0.2,0.0),0);
-	auto b3 = Brick::Create(glm::vec2(-0.2,0.0),2);
-	temp_wall->LinkChild(b1);
-	temp_wall->LinkChild(b2);
-	temp_wall->LinkChild(b3);
+	auto b1 = Brick::Create(glm::vec2(-0.4,0.0),0); temp_wall->LinkChild(b1);
+	auto b2 = Brick::Create(glm::vec2(-0.2,0.0),2); temp_wall->LinkChild(b2);
+	auto b3 = Brick::Create(glm::vec2( 0.0,0.0),1); temp_wall->LinkChild(b3);
+	auto b4 = Brick::Create(glm::vec2( 0.2,0.0),0); temp_wall->LinkChild(b4);
+	auto b5 = Brick::Create(glm::vec2( 0.4,0.0),1); temp_wall->LinkChild(b5);
+
+	root->LinkChild(board);
+	root->LinkChild(paddle);
+	root->LinkChild(ball);
+	root->LinkChild(temp_wall);
+
+	SimplePhysics::RegisterSubtree(root);
 
 	double lasttime = glfwGetTime();
 	// This is the main loop.

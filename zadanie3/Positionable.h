@@ -11,7 +11,6 @@ glm::vec2 Rotate2dVector01(glm::vec2, float);
 
 class Positionable : public std::enable_shared_from_this<Positionable>{
 protected:
-	std::list<std::shared_ptr<Positionable>> children;
 	std::shared_ptr<Positionable> parent = nullptr;
 	glm::vec2 relative_pos;
 	float relative_scale = 1.0;
@@ -20,6 +19,8 @@ protected:
 public:
 	Positionable() {};
 	Positionable(glm::vec2 relative_pos);
+	std::list<std::shared_ptr<Positionable>> children;
+	
 	glm::vec2 GetPos() const;
 	float GetScale() const;
 	float GetAngle() const;
