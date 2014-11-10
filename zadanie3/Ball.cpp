@@ -1,8 +1,6 @@
-#include "Ball.h"
-#include "ModelBase.h"
-#include <array>
+#include "Ball.hpp"
+#include "../engine/ModelBase.hpp"
 #include <cmath>
-#include <iostream>
 
 std::array<float,BALL_PTS*6> prepare_ball_vertices(){
 	std::array<float,BALL_PTS*6> p;

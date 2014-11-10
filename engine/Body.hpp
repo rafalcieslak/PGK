@@ -1,8 +1,8 @@
 #ifndef BODY_H
 #define BODY_H
 
-#include "Positionable.h"
-#include "Signal.h"
+#include "Positionable.hpp"
+#include "Signal.hpp"
 #include <vector>
 #include <cmath>
 #include <string>

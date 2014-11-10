@@ -1,8 +1,8 @@
 #ifndef BRICK_H
 #define BRICK_H
 
-#include "Drawable.h"
-#include "body.h"
+#include "../engine/Drawable.hpp"
+#include "../engine/Body.hpp"
 
 
 class Brick : public PositionableGroup{

@@ -7,7 +7,7 @@
 
 #include <GL/glew.h>
 
-#include "shader.hpp"
+#include "Shader.hpp"
 
 GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path){
 

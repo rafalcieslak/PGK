@@ -1,11 +1,10 @@
 #include <glm/glm.hpp>
-#include "ModelBase.h"
-#include "Board.h"
-#include "Brick.h"
-#include "Ball.h"
-#include "Paddle.h"
-#include "Render.h"
-#include "simplephysics.h"
+#include "Board.hpp"
+#include "Brick.hpp"
+#include "Ball.hpp"
+#include "Paddle.hpp"
+#include "../engine/Render.hpp"
+#include "../engine/SimplePhysics.hpp"
 
 int main(){
 	// Prepare the renderer.

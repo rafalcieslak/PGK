@@ -1,9 +1,10 @@
-#include "fonts.hpp"
 #include <GL/glew.h>
 #include <iostream>
 #include <ft2build.h>
 #include FT_FREETYPE_H
-#include "shader.hpp"
+#include "Shader.hpp"
+#include "Fonts.hpp"
+
 /*
 This code is mildly inspired by
 http://en.wikibooks.org/wiki/OpenGL_Programming/Modern_OpenGL_Tutorial_Text_Rendering_01

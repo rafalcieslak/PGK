@@ -1,5 +1,5 @@
-#include "ModelBase.h"
-#include "Render.h"
+#include "ModelBase.hpp"
+#include "Render.hpp"
 
 Model::Model(unsigned int n, std::initializer_list<float> v, std::initializer_list<std::initializer_list<float>> c): size(n){
 	variants = c.size();

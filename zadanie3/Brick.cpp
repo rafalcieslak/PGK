@@ -1,5 +1,5 @@
-#include "Brick.h"
-#include "ModelBase.h"
+#include "Brick.hpp"
+#include "../engine/ModelBase.hpp"
 
 #define rgb(x,y,z)	x/255.0, y/255.0, z/255.0
 #define C_BLUE_A rgb(58, 92, 226)

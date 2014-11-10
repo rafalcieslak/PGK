@@ -98,28 +98,28 @@ endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie2")
 # ZADANIE3
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie3")
 	add_executable(zadanie3
-		zadanie3/main.cpp
-		zadanie3/Brick.cpp
-		zadanie3/ModelBase.cpp
-		zadanie3/Drawable.cpp
-		zadanie3/fonts.cpp
-		zadanie3/Render.cpp
-		zadanie3/shader.cpp
-		zadanie3/Positionable.cpp
-		zadanie3/body.cpp
-		zadanie3/simplephysics.cpp
+		engine/ModelBase.cpp
+		engine/Drawable.cpp
+		engine/Fonts.cpp
+		engine/Render.cpp
+		engine/Shader.cpp
+		engine/Positionable.cpp
+		engine/Body.cpp
+		engine/SimplePhysics.cpp
 		zadanie3/Ball.cpp
 		zadanie3/Board.cpp
 		zadanie3/Paddle.cpp
+		zadanie3/Brick.cpp
+		zadanie3/main.cpp
 	)
 
 	# Files needed by zadanie3 on runtime.
 	set( ZAD3_RUNTIME_FILES
-		zadanie3/MainFragmentShader.fragmentshader
-		zadanie3/MainVertexShader.vertexshader
-		zadanie3/TextFragmentShader.fragmentshader
-		zadanie3/TextVertexShader.vertexshader
-		zadanie3/Ubuntu.ttf
+		engine/MainFragmentShader.fragmentshader
+		engine/MainVertexShader.vertexshader
+		engine/TextFragmentShader.fragmentshader
+		engine/TextVertexShader.vertexshader
+		engine/Ubuntu.ttf
 	)
 
 	add_dependencies(zadanie3 Freetype GLFW_303 GLFW GLEW GLM)

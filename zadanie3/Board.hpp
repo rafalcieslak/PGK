@@ -1,8 +1,8 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#include "Drawable.h"
-#include "body.h"
+#include "../engine/Drawable.hpp"
+#include "../engine/Body.hpp"
 
 #define SQRT3 1.73205080757
 

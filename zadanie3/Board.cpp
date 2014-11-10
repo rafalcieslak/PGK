@@ -1,6 +1,5 @@
-#include "Board.h"
-#include "ModelBase.h"
-#include <iostream>
+#include "Board.hpp"
+#include "../engine/ModelBase.hpp"
 
 Board::BoardDrawable::BoardDrawable() : Drawable(""){
 	if(!ModelBase::GetInstance().HasModel("Board")){

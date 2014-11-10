@@ -1,8 +1,8 @@
 #ifndef BALL_H
 #define BALL_H
 
-#include "Drawable.h"
-#include "body.h"
+#include "../engine/Drawable.hpp"
+#include "../engine/Body.hpp"
 #include <array>
 
 #define BALL_PTS 30

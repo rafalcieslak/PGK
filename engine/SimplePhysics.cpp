@@ -1,4 +1,4 @@
-#include "simplephysics.h"
+#include "SimplePhysics.hpp"
 #include <iostream>
 #include <memory>
 std::set<std::shared_ptr< StaticBody>> SimplePhysics::static_bodies;

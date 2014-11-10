@@ -1,9 +1,9 @@
 #define GLM_FORCE_RADIANS
-#include "Render.h"
-#include "shader.hpp"
-#include "fonts.hpp"
-#include "ModelBase.h"
-#include "Drawable.h"
+#include "Render.hpp"
+#include "Shader.hpp"
+#include "Fonts.hpp"
+#include "ModelBase.hpp"
+#include "Drawable.hpp"
 #include <iostream>
 #include <glm/gtc/type_ptr.hpp>
 

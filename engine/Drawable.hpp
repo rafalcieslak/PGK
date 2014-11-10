@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include <string>
-#include "Positionable.h"
+#include "Positionable.hpp"
 
 class Drawable : public Positionable{
 public:

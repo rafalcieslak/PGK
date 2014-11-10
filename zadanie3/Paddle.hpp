@@ -1,8 +1,8 @@
 #ifndef PADDLE_H
 #define PADDLE_H
 
-#include "Drawable.h"
-#include "body.h"
+#include "../engine/Drawable.hpp"
+#include "../engine/Body.hpp"
 
 
 class Paddle : public PositionableGroup{

@@ -2,7 +2,7 @@
 #define SIMPLEPHYSICS_H
 #include <memory>
 #include <set>
-#include "body.h"
+#include "Body.hpp"
 
 class SimplePhysics{
 	SimplePhysics() = delete;
