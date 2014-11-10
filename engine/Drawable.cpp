@@ -1,6 +1,5 @@
 #include "Drawable.hpp"
-#include <algorithm>
-#include <iostream>
+#include "Render.hpp"
 
 std::vector<Drawable*> Drawable::drawables;
 Drawable::Drawable(std::string id, glm::vec2 relative_pos, unsigned int v):
@@ -13,4 +12,10 @@ Drawable::~Drawable(){
 	auto p = std::find(drawables.begin(), drawables.end(), this);
 	if (p != drawables.end())
 	    drawables.erase(p);
+}
+
+void Drawable::StartAnimation(unsigned int mode, double len){
+	anim_mode = mode;
+	anim_length = len;
+	anim_start = Render::GetTime();
 }

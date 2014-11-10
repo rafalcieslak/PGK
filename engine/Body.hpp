@@ -47,6 +47,7 @@ public:
 		LinkChild(n);
 		shapes.push_back(n);
 	}
+	bool colliding = true;
 };
 
 class StaticBody : public Body{

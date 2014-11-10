@@ -72,5 +72,9 @@ std::shared_ptr<Brick> Brick::Create(glm::vec2 pos, unsigned int variant, float 
 }
 
 void Brick::Break(){
-	SetActive(false);
+	bb->colliding = false;
+	bd->StartAnimation(1,0.3);
+	bd->on_animation_finished.Subscribe([this](int i){
+		if(i == 0) this->SetActive(false);
+	});
 }

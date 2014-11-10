@@ -11,6 +11,7 @@ GLFWwindow* window;
 
 // All the static members of Render class.
 GLint Render::uniform_scale, Render::uniform_center, Render::uniform_angle;
+GLint Render::uniform_anim_mode, Render::uniform_anim_phase;
 GLuint Render::VertexArrayID;
 float Render::pxsizex, Render::pxsizey;
 GLuint Render::shader_program_id;
@@ -77,6 +78,8 @@ int Render::Init(){
 	uniform_scale = glGetUniformLocation(shader_program_id,"scale");
 	uniform_center = glGetUniformLocation(shader_program_id,"center");
 	uniform_angle = glGetUniformLocation(shader_program_id,"angle");
+	uniform_anim_mode = glGetUniformLocation(shader_program_id,"anim_mode");
+	uniform_anim_phase = glGetUniformLocation(shader_program_id,"anim_phase");
 	if(uniform_scale == -1 || uniform_center == -1 || uniform_angle == -1){
 		std::cerr << "A uniform is missing from the shader." << std::endl;
 		glfwTerminate();
@@ -117,6 +120,13 @@ void Render::Frame(){
 		glUniform2fv(uniform_center, 1, glm::value_ptr(d->GetPos()));
 		glUniform1f(uniform_scale, d->GetScale());
 		glUniform1f(uniform_angle, d->GetAngle()*2.0*M_PI);
+		glUniform1i(uniform_anim_mode, d->anim_mode);
+		if(d->anim_mode != 0){
+			float anim_phase = (GetTime() - d->anim_start)/d->anim_length;
+			glUniform1f(uniform_anim_phase, anim_phase);
+			if(anim_phase >= 1.0) d->on_animation_finished.Happen(d->anim_mode);
+
+		}
 		m->metaDraw(d->variant);
 	}
 

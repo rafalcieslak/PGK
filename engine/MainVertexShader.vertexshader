@@ -6,14 +6,15 @@ layout(location = 1) in vec3 vertexColor;
 uniform float scale = 1.0;
 uniform float angle = 0.0;
 uniform vec2 center;
+uniform int anim_mode = 0;
+uniform float anim_phase;
 
-out vec3 fragmentColor;
+out vec4 fragmentColor;
 
 void main(){
     vec3 color = vertexColor;
 
     mat2 rot = mat2( cos(angle), -sin(angle), sin(angle), cos(angle) );
-    //mat2 ro2 = mat2( cos(0.5) ,sin(0.5),-sin(0.5),cos(0.5) );
 
     gl_Position.x = vertexPosition_board.x * scale;
     gl_Position.y = vertexPosition_board.y * scale;
@@ -26,7 +27,9 @@ void main(){
     // Translate to card's position on board
     gl_Position += vec4(center, 0.0, 0.0);
 
-    //fragmentColor = vec4(color, 1.0);
+    float alpha = 1.0;
+    if(anim_mode == 1) alpha = 1.0 - anim_phase; // fadeout
 
-    fragmentColor = vertexColor;
+    fragmentColor = vec4(vertexColor, alpha);
+
 }

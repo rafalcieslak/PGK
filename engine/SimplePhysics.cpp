@@ -8,11 +8,11 @@ void SimplePhysics::PerformIteration(float time_delta){
 
 	// Detect collisions
 	for(std::shared_ptr<DynamicBody> db : dynamic_bodies){ // Only dynamic bodies can collide
-		if(!db->GetActiveAbsolute()) continue;
+		if(!db->GetActiveAbsolute() || !db->colliding) continue;
 
 		// Check for collisions with static bodies
 		for(std::shared_ptr<StaticBody> sb : static_bodies){
-			if(!sb->GetActiveAbsolute()) continue;
+			if(!sb->GetActiveAbsolute() || !sb->colliding) continue;
 			CollisionInfo ci = CheckForCollision(db, sb);
 			if(ci.colliding){
 				// Inform about collision

@@ -14,7 +14,7 @@ private:
 	// The vertex array's ID.
 	static GLuint VertexArrayID;
 	// Uniform IDs.
-	static GLint uniform_scale, uniform_center, uniform_angle;
+	static GLint uniform_scale, uniform_center, uniform_angle, uniform_anim_mode, uniform_anim_phase;
 	// Pixel sizes. Needed for perfect text alignment.
 	static float pxsizex, pxsizey;
 public:
