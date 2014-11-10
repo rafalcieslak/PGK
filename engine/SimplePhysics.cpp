@@ -50,7 +50,9 @@ void SimplePhysics::RegisterBody(std::shared_ptr<Body> b){
 	auto db = std::dynamic_pointer_cast<DynamicBody>(b);
 	if(sb) RegisterStaticBody(sb);
 	else if(db) RegisterDynamicBody(db);
-	else ; //????
+	else{
+		//????
+	};
 }
 void SimplePhysics::RegisterStaticBody(std::shared_ptr<StaticBody> b){
 	if(static_bodies.find(b) == static_bodies.end()) static_bodies.insert(b);
@@ -63,7 +65,9 @@ void SimplePhysics::UnRegisterBody(std::shared_ptr<Body> b){
 	auto db = std::dynamic_pointer_cast<DynamicBody>(b);
 	if(sb) RegisterStaticBody(sb);
 	else if(db) RegisterDynamicBody(db);
-	else ; //????
+	else{
+		//????
+	};
 }
 void SimplePhysics::UnRegisterStaticBody(std::shared_ptr<StaticBody> b){
 	auto it = static_bodies.find(b);
