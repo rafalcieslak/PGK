@@ -105,6 +105,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie3")
 		engine/Shader.cpp
 		engine/Positionable.cpp
 		engine/Body.cpp
+		engine/Text.cpp
 		engine/SimplePhysics.cpp
 		zadanie3/Ball.cpp
 		zadanie3/Board.cpp

@@ -4,6 +4,7 @@
 #include "Ball.hpp"
 #include "Background.hpp"
 #include "Paddle.hpp"
+#include "../engine/Text.hpp"
 #include "../engine/Render.hpp"
 #include "../engine/SimplePhysics.hpp"
 #include <ctime>
@@ -35,6 +36,7 @@ std::shared_ptr<Positionable> create_level(){
 }
 
 std::shared_ptr<Ball> ball;
+std::shared_ptr<Positionable> root;
 
 void SpawnNewBall(){
 	if(ball) ball->DetachFromParent();
@@ -42,6 +44,7 @@ void SpawnNewBall(){
 	ball->SetScale(0.03);
 	ball->SetAngle(0.0);
 	ball->body->linearVelocity = glm::normalize(glm::vec2(0.0,-1.0))*BALL_VELOCITY;
+	root->LinkChild(ball);
 	SimplePhysics::RegisterSubtree(ball);
 }
 
@@ -60,7 +63,7 @@ int main(){
 	if(n) return n;
 
 	// This is the root object.
-	auto root = Positionable::Create(glm::vec2(0.0,0.0));
+	root = Positionable::Create(glm::vec2(0.0,0.0));
 
 	// Create background
 	auto bg = Background::Create(0.1,8,12);
@@ -82,7 +85,9 @@ int main(){
 	level->SetPosRelative(glm::vec2(0.0,0.3));
 	root->LinkChild(level);
 
-	root->LinkChild(ball);
+
+	auto balls_txt = Text::Create("Balls left: ?/3", glm::vec2(0,36), 36, glm::vec3(1.0,0.0,0.0),glm::vec2(-1.0,1.0));
+	root->LinkChild(balls_txt);
 
 	SimplePhysics::RegisterSubtree(root);
 

@@ -4,6 +4,7 @@
 #include "Fonts.hpp"
 #include "ModelBase.hpp"
 #include "Drawable.hpp"
+#include "Text.hpp"
 #include <iostream>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -44,8 +45,8 @@ int Render::Init(){
 
 	// Open a window and create its OpenGL context
 	window = glfwCreateWindow( 1000, 1000, "Arcanoid", NULL, NULL);
-	pxsizex = 2.0 / 1024;
-	pxsizey = 2.0 / 768;
+	pxsizex = 2.0 / 1000;
+	pxsizey = 2.0 / 1000;
 	if( window == NULL ){
 		std::cerr << "Failed to open GLFW window." << std::endl;
 		glfwTerminate();
@@ -129,7 +130,16 @@ void Render::Frame(){
 		}
 		m->metaDraw(d->variant);
 	}
+	for(auto t : Text::texts){
+		if(!t->GetActiveAbsolute()) continue;
 
+		glm::vec2 pos = t->GetPos();
+		glm::vec2 off = t->px_offset;
+		glm::vec3 color = t->color;
+		float scale = t->GetScale();
+
+		render_text(t->text.c_str(), pos.x + off.x*pxsizex, pos.y - off.y*pxsizey, color.r, color.g, color.b, t->size*scale, pxsizex, pxsizey);
+	}
 
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(0);
