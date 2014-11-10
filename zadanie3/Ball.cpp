@@ -35,7 +35,7 @@ std::array<float,BALL_PTS*9> Ball::BallDrawable::ball_colors = prepare_ball_colo
 
 Ball::BallDrawable::BallDrawable() : Drawable(""){
 	if(!ModelBase::GetInstance().HasModel("ball")){
-		ModelBase::GetInstance().AddModel("ball",BALL_PTS, ball_vertices.data(), ball_colors.data());
+		ModelBase::GetInstance().AddModelTriangles("ball",BALL_PTS, ball_vertices.data(), ball_colors.data());
 	}
 	model_id = "ball";
 }

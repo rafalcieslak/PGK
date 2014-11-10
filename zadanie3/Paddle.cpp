@@ -5,7 +5,7 @@
 
 Paddle::PaddleDrawable::PaddleDrawable() : Drawable(""){
 	if(!ModelBase::GetInstance().HasModel("Paddle")){
-		ModelBase::GetInstance().AddModel("Paddle",3,
+		ModelBase::GetInstance().AddModelTriangles("Paddle",3,
 			               {  1.0, 0.0, 2.0/3.0, -1.0/3.0, 0.0, 0.0,
 							 -1.0, 0.0,-2.0/3.0, -1.0/3.0, 0.0, 0.0,
 							  2.0/3.0, -1.0/3.0, -2.0/3.0, -1.0/3.0, 0.0, 0.0,},

@@ -3,7 +3,7 @@
 
 Board::BoardDrawable::BoardDrawable() : Drawable(""){
 	if(!ModelBase::GetInstance().HasModel("Board")){
-		ModelBase::GetInstance().AddModel("Board", 6,
+		ModelBase::GetInstance().AddModelTriangles("Board", 6,
 		               { 1.0, 1.0, 1.0, 0.0, 0.0, SQRT3,
 		                -1.0, 1.0,-1.0, 0.0,-0.0, SQRT3,
 		       	  	     0.0, SQRT3, 0.5, SQRT3/2.0, -0.5, SQRT3/2.0,

@@ -14,7 +14,7 @@
 
 Brick::BrickDrawable::BrickDrawable() : Drawable(""){
 	if(!ModelBase::GetInstance().HasModel("brick")){
-		ModelBase::GetInstance().AddModel("brick",4,
+		ModelBase::GetInstance().AddModelTriangles("brick",4,
 		{ -1.0, -0.5,  1.0, -0.5, -1.0, 0.5,
 		   1.0, -0.5, -1.0,  0.5,  1.0, 0.5,
 		  -0.8, -0.4,  0.8, -0.4, -0.8, 0.4,
