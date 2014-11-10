@@ -6,38 +6,66 @@
 #include "Paddle.hpp"
 #include "../engine/Render.hpp"
 #include "../engine/SimplePhysics.hpp"
+#include <ctime>
+#include <cstdlib>
 
 #define PADDLE_SIZE 0.12f
+#define BRICK_HEIGHT 0.09
+#define BRICK_WIDTH 2.0*BRICK_HEIGHT
+#define BALL_VELOCITY 0.7f
+#define PADDLE_SPEED 0.4f
+
+void AddBrick(int x, int y, int variant, std::shared_ptr<Positionable> parent){
+	float xoffset = 0.0;
+	if((y>0?y:-y)%2) xoffset = BRICK_WIDTH/2.0;
+	auto brick = Brick::Create(glm::vec2(x*BRICK_WIDTH + xoffset, y*BRICK_HEIGHT),variant,BRICK_HEIGHT);
+	parent->LinkChild(brick);
+}
+
+std::shared_ptr<Positionable> create_level(){
+	auto level = Positionable::Create();
+	for(int y = 0; y < 5; y++){
+		for(int x = -4+y/2; x <= 4-y/2; x++){
+			if(y%2!=1 || x<4-y/2)
+				AddBrick(x,y,rand()%3,level);
+		}
+	}
+	return level;
+}
 
 int main(){
+	srand(time(nullptr));
+
 	// Prepare the renderer.
 	int n = Render::Init();
 	if(n) return n;
 
+	// This is the root object.
 	auto root = Positionable::Create(glm::vec2(0.0,0.0));
 
+	// Create background
 	auto bg = Background::Create(0.1,8,12);
-
+	root->LinkChild(bg);
+	// Create board
 	std::shared_ptr<Board> board = Board::Create();
+	root->LinkChild(board);
+
+	// Prepare the ball
 	std::shared_ptr<Ball> ball = Ball::Create(glm::vec2(0.0,0.0));
 	ball->SetScale(0.03);
 	ball->SetAngle(0.0);
-	ball->body->linearVelocity = glm::normalize(glm::vec2(0.0,-1.0))*0.7f;
+	ball->body->linearVelocity = glm::normalize(glm::vec2(0.0,-1.0))*BALL_VELOCITY;
 
+	// Prepare the paddle
 	auto paddle = Paddle::Create(glm::vec2(0.0,-SQRT3/2.0), PADDLE_SIZE);
-	const float paddle_speed = 0.4;
-
-	auto temp_wall = Positionable::Create(glm::vec2(0.0,0.5));
-	auto b1 = Brick::Create(glm::vec2(-0.4,0.0),0); temp_wall->LinkChild(b1);
-	auto b2 = Brick::Create(glm::vec2(-0.2,0.0),2); temp_wall->LinkChild(b2);
-	auto b3 = Brick::Create(glm::vec2( 0.0,0.0),1); temp_wall->LinkChild(b3);
-	auto b4 = Brick::Create(glm::vec2( 0.2,0.0),0); temp_wall->LinkChild(b4);
-	auto b5 = Brick::Create(glm::vec2( 0.4,0.0),1); temp_wall->LinkChild(b5);
-
-	root->LinkChild(board);
 	root->LinkChild(paddle);
+
+	// Create the level
+	auto level = create_level();
+	level->SetPosRelative(glm::vec2(0.0,0.3));
+	root->LinkChild(level);
+
 	root->LinkChild(ball);
-	root->LinkChild(temp_wall);
 
 	SimplePhysics::RegisterSubtree(root);
 
@@ -56,7 +84,7 @@ int main(){
 		float px = 0.0;
 		if(Render::IsKeyPressed(GLFW_KEY_LEFT)) px += -1.0;
 		if(Render::IsKeyPressed(GLFW_KEY_RIGHT)) px += 1.0;
-		float newx = paddle->GetPosRelative().x + px * paddle_speed * time_delta;
+		float newx = paddle->GetPosRelative().x + px * PADDLE_SPEED * time_delta;
 		newx = glm::clamp(newx, -0.5f + PADDLE_SIZE, 0.5f - PADDLE_SIZE);
 		paddle->SetPosRelative(glm::vec2(newx,-SQRT3/2.0));
 

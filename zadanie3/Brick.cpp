@@ -44,11 +44,11 @@ void Brick::BrickBody::init(){
 	AddNewCollisionShape<CollisionShapeRectangle>(glm::vec2(0.0, 0.0), glm::vec2(1.0,0.5));
 }
 
-Brick::Brick(){
+Brick::Brick(float size){
 	bd = std::make_shared<BrickDrawable>();
 	bb = std::make_shared<BrickBody>();
 	bb->init();
-	bb->SetScale(0.1);
+	bb->SetScale(size);
 	bb->on_collision.Subscribe( [this](std::shared_ptr<Body> body){
 		if(body->id == "ball"){
 			this->on_ball_collision.Happen();
@@ -65,8 +65,8 @@ void Brick::init(glm::vec2 pos, unsigned int variant){
 	bd->variant = variant;
 }
 
-std::shared_ptr<Brick> Brick::Create(glm::vec2 pos, unsigned int variant){
-	auto b = std::shared_ptr<Brick>(new Brick());
+std::shared_ptr<Brick> Brick::Create(glm::vec2 pos, unsigned int variant, float size){
+	auto b = std::shared_ptr<Brick>(new Brick(size));
 	b->init(pos, variant);
 	return b;
 }
