@@ -19,8 +19,8 @@ private:
 	std::shared_ptr<PaddleDrawable> pd;
 	std::shared_ptr<PaddleBody> pb;
 	Paddle();
-	void init(glm::vec2 pos);
+	void init(glm::vec2 pos, float size);
 public:
-	static std::shared_ptr<Paddle> Create(glm::vec2 pos = glm::vec2(0.0,0.0));
+	static std::shared_ptr<Paddle> Create(glm::vec2 pos = glm::vec2(0.0,0.0), float size = 0.15);
 };
 #endif //PADDLE_H

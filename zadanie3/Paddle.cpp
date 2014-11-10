@@ -34,19 +34,19 @@ void Paddle::PaddleBody::init(){
 Paddle::Paddle(){
 	pd = std::make_shared<PaddleDrawable>();
 	pb = std::make_shared<PaddleBody>();
-	pb->SetScale(0.12);
 	pb->init();
 }
 
-void Paddle::init(glm::vec2 pos){
+void Paddle::init(glm::vec2 pos, float size){
 	pb->LinkChild(pd);
+	pb->SetScale(size);
 	SetTop(pb);
 	SetBottom(pd);
 	SetPosRelative(pos);
 }
 
-std::shared_ptr<Paddle> Paddle::Create(glm::vec2 pos){
+std::shared_ptr<Paddle> Paddle::Create(glm::vec2 pos, float size){
 	auto b = std::shared_ptr<Paddle>(new Paddle());
-	b->init(pos);
+	b->init(pos, size);
 	return b;
 }
