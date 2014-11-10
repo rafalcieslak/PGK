@@ -24,7 +24,7 @@ int main(){
 	auto temp_wall = Positionable::Create(glm::vec2(0.0,0.5));
 	auto b1 = Brick::Create(glm::vec2(0.0,0.0),1);
 	auto b2 = Brick::Create(glm::vec2(0.2,0.0),0);
-	auto b3 = Brick::Create(glm::vec2(-0.2,0.0),0);
+	auto b3 = Brick::Create(glm::vec2(-0.2,0.0),2);
 	temp_wall->LinkChild(b1);
 	temp_wall->LinkChild(b2);
 	temp_wall->LinkChild(b3);
