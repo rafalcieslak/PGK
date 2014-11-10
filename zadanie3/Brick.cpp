@@ -11,6 +11,16 @@
 #define C_GREEN_A rgb(45, 199, 81)
 #define C_GREEN_B rgb(91, 239, 126)
 #define C_GREEN_D rgb(20, 86, 35)
+#define C_YELLOW_A rgb(219, 188, 35)
+#define C_YELLOW_B rgb(234, 232, 91)
+#define C_YELLOW_D rgb(171, 158, 42)
+#define C_PURPLE_A rgb(232, 27, 225)
+#define C_PURPLE_B rgb(247, 120, 242)
+#define C_PURPLE_D rgb(101, 31, 99)
+#define C_GRAY_A rgb(132, 132, 132)
+#define C_GRAY_B rgb(204, 204, 204)
+#define C_GRAY_D rgb(71, 71, 71)
+;
 
 Brick::BrickDrawable::BrickDrawable() : Drawable(""){
 	if(!ModelBase::GetInstance().HasModel("brick")){
@@ -30,7 +40,19 @@ Brick::BrickDrawable::BrickDrawable() : Drawable(""){
 		{ C_GREEN_D, C_GREEN_D, C_GREEN_D,
 		  C_GREEN_D, C_GREEN_D, C_GREEN_A,
 		  C_GREEN_D, C_GREEN_A, C_GREEN_A,
-		  C_GREEN_A, C_GREEN_A, C_GREEN_B,},});
+		  C_GREEN_A, C_GREEN_A, C_GREEN_B,},
+		{ C_YELLOW_D, C_YELLOW_D, C_YELLOW_D,
+		  C_YELLOW_D, C_YELLOW_D, C_YELLOW_A,
+		  C_YELLOW_D, C_YELLOW_A, C_YELLOW_A,
+		  C_YELLOW_A, C_YELLOW_A, C_YELLOW_B,},
+		{ C_PURPLE_D, C_PURPLE_D, C_PURPLE_D,
+		  C_PURPLE_D, C_PURPLE_D, C_PURPLE_A,
+		  C_PURPLE_D, C_PURPLE_A, C_PURPLE_A,
+		  C_PURPLE_A, C_PURPLE_A, C_PURPLE_B,},
+		{ C_GRAY_D, C_GRAY_D, C_GRAY_D,
+		  C_GRAY_D, C_GRAY_D, C_GRAY_A,
+		  C_GRAY_D, C_GRAY_A, C_GRAY_A,
+		  C_GRAY_A, C_GRAY_A, C_GRAY_B,}});
 	}
 	model_id = "brick";
 }

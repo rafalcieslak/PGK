@@ -27,7 +27,7 @@ std::shared_ptr<Positionable> create_level(){
 	for(int y = 0; y < 5; y++){
 		for(int x = -4+y/2; x <= 4-y/2; x++){
 			if(y%2!=1 || x<4-y/2)
-				AddBrick(x,y,rand()%3,level);
+				AddBrick(x,y,rand()%6,level);
 		}
 	}
 	return level;
