@@ -36,7 +36,7 @@ void SimplePhysics::PerformIteration(float time_delta){
 }
 
 // returns MPV for the circle
-inline glm::vec2 CheckCollisionCircleRectangle(std::shared_ptr<CollisionShape> circle_, std::shared_ptr<CollisionShape> rectangle_){
+glm::vec2 CheckCollisionCircleRectangle(std::shared_ptr<CollisionShape> circle_, std::shared_ptr<CollisionShape> rectangle_){
 	auto circle    = std::dynamic_pointer_cast<CollisionShapeCircle>(circle_);
 	auto rectangle = std::dynamic_pointer_cast<CollisionShapeRectangle>(rectangle_);
 	if(!circle || !rectangle) return glm::vec2(0.0,0.0);
@@ -51,8 +51,6 @@ inline glm::vec2 CheckCollisionCircleRectangle(std::shared_ptr<CollisionShape> c
 	float h_2 = rectangle->size.y * rectangle->GetScale();
 	float r = circle->radius * circle->GetScale();
 
-//	std::cout << circle_pos.x << " " << circle_pos.y << " " << std::endl;
-
 	// to X axix
 	float xpush = 1.0;
 	float ypush = 1.0;
@@ -60,10 +58,8 @@ inline glm::vec2 CheckCollisionCircleRectangle(std::shared_ptr<CollisionShape> c
 	const float cx1 = circle_pos.x - r, cx2 = circle_pos.x + r;
 	const float ry1 = -h_2, ry2 = h_2;
 	const float cy1 = circle_pos.y - r, cy2 = circle_pos.y + r;
-	if(cx2 < rx1 || cx1 > rx2) xpush = 0.0;
-	if(cy2 < ry1 || cy1 > ry2) ypush = 0.0;
-	if(glm::abs(xpush) < 0.0000001 || glm::abs(ypush) < 0.0000001) return glm::vec2(0.0,0.0);
-	;
+	if(cx2 < rx1 || cx1 > rx2 || cy2 < ry1 || cy1 > ry2) return glm::vec2(0.0,0.0);
+
 	if(cx1<rx1 && cx2<rx2) xpush = rx1-cx2;
 	else if(cx1>rx1 && cx2>rx2) xpush = rx2-cx1;
 	else if(cx1>rx1 && cx2<rx2) {
@@ -91,7 +87,51 @@ inline glm::vec2 CheckCollisionCircleRectangle(std::shared_ptr<CollisionShape> c
 	return rot_mat * res;
 }
 
-#define CT(type,ptr) std::dynamic_pointer_cast<type>(ptr)
+glm::vec2 CheckCollisionCirclePaddle(std::shared_ptr<CollisionShape> circle_, std::shared_ptr<CollisionShape> paddle_){
+	auto circle = std::dynamic_pointer_cast<CollisionShapeCircle>(circle_);
+	auto paddle = std::dynamic_pointer_cast<CollisionShapePaddle>(paddle_);
+	if(!circle || !paddle) return glm::vec2(0.0,0.0);
+
+	glm::vec2 trans = -1.0f* paddle->GetPos();
+	float angle = paddle->GetAngle();
+	glm::mat2 rot_mat = glm::mat2(glm::cos(angle*2.0*M_PI), glm::sin(angle*-2.0*M_PI), glm::sin(angle*2.0*M_PI), glm::cos(angle*2.0*M_PI));
+	glm::mat2 rot_mat_r = glm::mat2(glm::cos(angle*2.0*M_PI), glm::sin(angle*2.0*M_PI), glm::sin(angle*-2.0*M_PI), glm::cos(angle*2.0*M_PI));
+	glm::vec2 circle_pos = rot_mat_r * (circle->GetPos() + trans);
+
+	float w = paddle->width * paddle->GetScale();
+	float r = circle->radius * circle->GetScale();
+	float cy1 = circle_pos.y-r, cy2 = circle_pos.y+r;
+	float cx1 = circle_pos.x-r, cx2 = circle_pos.x+r;
+
+	if(cy1 > 0.0 || cy2 < 0.0 || cx2 < -w || cx1 > w) return glm::vec2(0.0,0.0);
+	glm::vec2 result;
+	float hit_pt = circle_pos.x / w;
+	if(hit_pt > 1.0){ // right paddle edge hit
+		glm::vec2 direction = circle_pos - glm::vec2(w,0.0);
+		float dist = glm::max(0.0f, glm::length(direction)-r);
+		result = glm::normalize(direction)*dist;
+	}else if(hit_pt < -1.0){ // left padle edge hit
+		glm::vec2 direction = circle_pos - glm::vec2(-w,0.0);
+		float dist = glm::max(0.0f, glm::length(direction)-r);
+		result = glm::normalize(direction)*dist;
+	}
+	else{ // main paddle area hit
+		if(circle_pos.y <= 0.001){
+			// paddle hit from bottom
+			result = glm::vec2(0.0,-cy2);
+		}else{
+			float pushy = -cy1;
+			float pushx = hit_pt * pushy * paddle->deviation_ratio;
+			std::cout << "pushx " << pushx << ", hit_pt " << hit_pt << std::endl;
+			result = glm::vec2(pushx,pushy);
+		}
+	}
+
+	return rot_mat * result;
+
+}
+
+#define CT(type,ptr) (std::dynamic_pointer_cast<type>(ptr)!=nullptr)
 
 SimplePhysics::CollisionInfo SimplePhysics::CheckForCollision(Body* b1, Body* b2){
 	glm::vec2 normal_sum = glm::vec2(0.0,0.0);
@@ -103,12 +143,14 @@ SimplePhysics::CollisionInfo SimplePhysics::CheckForCollision(Body* b1, Body* b2
 				continue; //too far away
 			if(CT(CollisionShapeCircle,shape1) && CT(CollisionShapeRectangle,shape2)) normal_sum += CheckCollisionCircleRectangle(shape1,shape2);
 			else if(CT(CollisionShapeCircle,shape2) && CT(CollisionShapeRectangle,shape1)) normal_sum += CheckCollisionCircleRectangle(shape2,shape1);
+			else if(CT(CollisionShapeCircle,shape1) && CT(CollisionShapePaddle,shape2)) normal_sum += CheckCollisionCirclePaddle(shape1,shape2);
+			else if(CT(CollisionShapeCircle,shape2) && CT(CollisionShapePaddle,shape1)) normal_sum += CheckCollisionCirclePaddle(shape2,shape1);
 			else{
 				std::cout << "This collision type is not implemented!" << std::endl;
 			}
 		}
 	}
 
-	if(glm::length(normal_sum) < 0.001) return CollisionInfo(false); // no collision
+	if(glm::length(normal_sum) < 0.00001) return CollisionInfo(false); // no collision
 	else return CollisionInfo(true,normal_sum);
 }

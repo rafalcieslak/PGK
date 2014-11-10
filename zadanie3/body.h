@@ -23,6 +23,11 @@ struct CollisionShapeCircle : public CollisionShape{
 	CollisionShapeCircle(float r) : CollisionShape(r), radius(r) {};
 	float radius;
 };
+struct CollisionShapePaddle : public CollisionShape{
+	CollisionShapePaddle(float w, float d) : CollisionShape(w), width(w), deviation_ratio(d) {};
+	float width;
+	float deviation_ratio;
+};
 
 
 class Body : public Positionable{

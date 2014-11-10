@@ -1,6 +1,8 @@
 #include "Paddle.h"
 #include "ModelBase.h"
 
+#define SQRT2 1.41421356237
+
 Paddle::PaddleDrawable::PaddleDrawable() : Drawable(""){
 	if(!ModelBase::GetInstance().HasModel("Paddle")){
 		ModelBase::GetInstance().AddModel("Paddle",3,
@@ -20,13 +22,19 @@ Paddle::PaddleBody::PaddleBody(){
 }
 
 void Paddle::PaddleBody::init(){
-	AddNewCollisionShape<CollisionShapeRectangle>(glm::vec2(0.0, -1.0/6.0), glm::vec2(1.0,1.0/6.0));
+	// Upper side
+	AddNewCollisionShape<CollisionShapePaddle>(glm::vec2(0.0, 0.0), 1.0, 0.3);
+	// Bottom
+	AddNewCollisionShape<CollisionShapeRectangle>(glm::vec2(0.0, -1.0/4.0), glm::vec2(2.0/3.0,1.0/12.0));
+	// Sides
+	AddNewCollisionShape<CollisionShapeRectangle>(glm::vec2( 19.0/24.0, -1.0/6.0), glm::vec2(5.0*SQRT2/96.0, SQRT2/48.0),  1.0/8.0);
+	AddNewCollisionShape<CollisionShapeRectangle>(glm::vec2(-19.0/24.0, -1.0/6.0), glm::vec2(5.0*SQRT2/96.0, SQRT2/48.0), -1.0/8.0);
 }
 
 Paddle::Paddle(){
 	pd = std::make_shared<PaddleDrawable>();
 	pb = std::make_shared<PaddleBody>();
-	pb->SetScale(0.15);
+	pb->SetScale(0.12);
 	pb->init();
 }
 
