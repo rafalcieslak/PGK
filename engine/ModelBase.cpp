@@ -68,9 +68,9 @@ void Model::metaDraw(unsigned int variant){
 	variant %= variants;
 	// Select buffers to use
 	glBindBuffer(GL_ARRAY_BUFFER, buffer_vertex);
-	glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0 );
+	glVertexAttribPointer( 0, MODEL_DIMEN, GL_FLOAT, GL_FALSE, 0, (void*)0 );
 	glBindBuffer(GL_ARRAY_BUFFER, buffers_color[variant]);
-	glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0 );
+	glVertexAttribPointer( 1, MODEL_COLOR_SIZE, GL_FLOAT, GL_FALSE, 0, (void*)0 );
 	// Draw the model
 	glDrawArrays(mode, 0, ppp*size);
 }

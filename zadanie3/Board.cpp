@@ -2,7 +2,7 @@
 #include "../engine/ModelBase.hpp"
 #include <iostream>
 
-#define BOARD_COLOR 0.0, 0.0, 0.7
+#define BOARD_COLOR 0.0, 0.0, 0.7, 1.0
 
 Board::BoardDrawable::BoardDrawable() : Drawable(""){
 	if(!ModelBase::GetInstance().HasModel("Board")){

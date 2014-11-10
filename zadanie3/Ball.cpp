@@ -14,24 +14,27 @@ std::array<float,BALL_PTS*6> prepare_ball_vertices(){
 	}
 	return p;
 }
-std::array<float,BALL_PTS*9> prepare_ball_colors(){
-	std::array<float,BALL_PTS*9> p;
+std::array<float,BALL_PTS*12> prepare_ball_colors(){
+	std::array<float,BALL_PTS*12> p;
 	for(int i = 0; i < BALL_PTS; i++){
-		p[i*9 + 0] = 0.7;
-		p[i*9 + 1] = 0.2;
-		p[i*9 + 2] = 0.0;
-		p[i*9 + 3] = 1.0;
-		p[i*9 + 4] = 0.7;
-		p[i*9 + 5] = 0.7;
-		p[i*9 + 6] = 0.7;
-		p[i*9 + 7] = 0.2;
-		p[i*9 + 8] = 0.0;
+		p[i*12 + 0] = 0.7;
+		p[i*12 + 1] = 0.2;
+		p[i*12 + 2] = 0.0;
+		p[i*12 + 3] = 1.0;
+		p[i*12 + 4] = 1.0;
+		p[i*12 + 5] = 0.7;
+		p[i*12 + 6] = 0.7;
+		p[i*12 + 7] = 1.0;
+		p[i*12 + 8] = 0.7;
+		p[i*12 + 9] = 0.2;
+		p[i*12 +10] = 0.0;
+		p[i*12 +11] = 1.0;
 	}
 	return p;
 }
 
 std::array<float,BALL_PTS*6> Ball::BallDrawable::ball_vertices = prepare_ball_vertices();
-std::array<float,BALL_PTS*9> Ball::BallDrawable::ball_colors = prepare_ball_colors();
+std::array<float,BALL_PTS*12> Ball::BallDrawable::ball_colors = prepare_ball_colors();
 
 Ball::BallDrawable::BallDrawable() : Drawable(""){
 	if(!ModelBase::GetInstance().HasModel("ball")){

@@ -37,32 +37,34 @@ std::vector<float> prepare_tile_l_vertices(){
 }
 
 
-#define rgb(x,y,z)	x/255.0, y/255.0, z/255.0
+#define rgb(x,y,z)	x/255.0, y/255.0, z/255.0, 1.0
 #define C_DBLUE_A rgb(58, 92, 226)
 #define C_DBLUE_B rgb(48, 108, 248)
 #define C_DBLUE_D rgb(37, 50, 90)
 
-float trig_colors[9] = {
+float trig_colors[12] = {
 	C_DBLUE_A,
 	C_DBLUE_B,
 	C_DBLUE_D,
 };
 std::vector<float> prepare_tile_colors(){
-	std::vector<float> p(6*9);
+	std::vector<float> p(6*12);
 	for(int i = 0; i < 6; i++)
-		for (int k = 0; k < 9; k++)
-			p[i*9 + k] = trig_colors[k];
+		for (int k = 0; k < 12; k++)
+			p[i*12 + k] = trig_colors[k];
 	return p;
 }
 std::vector<float> prepare_tile_l_colors(){
-	std::vector<float> p(6*6);
+	std::vector<float> p(6*8);
 	for(int i = 0; i < 6; i++){
-		p[i*6 + 0] = 0.0;
-		p[i*6 + 1] = 0.0;
-		p[i*6 + 2] = 0.7;
-		p[i*6 + 3] = 0.0;
-		p[i*6 + 4] = 0.0;
-		p[i*6 + 5] = 0.7;
+		p[i*8 + 0] = 0.0;
+		p[i*8 + 1] = 0.0;
+		p[i*8 + 2] = 0.7;
+		p[i*8 + 3] = 1.0;
+		p[i*8 + 4] = 0.0;
+		p[i*8 + 5] = 0.0;
+		p[i*8 + 6] = 0.7;
+		p[i*8 + 7] = 1.0;
 	}
 	return p;
 }

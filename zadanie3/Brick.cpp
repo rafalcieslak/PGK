@@ -1,7 +1,7 @@
 #include "Brick.hpp"
 #include "../engine/ModelBase.hpp"
 
-#define rgb(x,y,z)	x/255.0, y/255.0, z/255.0
+#define rgb(x,y,z)	x/255.0, y/255.0, z/255.0, 1.0
 #define C_BLUE_A rgb(58, 92, 226)
 #define C_BLUE_B rgb(133, 156, 248)
 #define C_BLUE_D rgb(42, 58, 120)
