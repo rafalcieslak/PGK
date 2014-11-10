@@ -5,6 +5,7 @@
 #include "Signal.h"
 #include <vector>
 #include <cmath>
+#include <string>
 
 
 struct CollisionShape : Positionable{
@@ -32,35 +33,33 @@ struct CollisionShapePaddle : public CollisionShape{
 
 
 class Body : public Positionable{
+protected:
+	Body() {};
+	Body(std::string id_) : id(id_) {};
 public:
-	typedef enum{
-		BODY_TYPE_STATIC,
-		BODY_TYPE_DYNAMIC
-	} BodyType;
-	virtual BodyType GetBodyType() const = 0;
+	std::vector<std::shared_ptr<CollisionShape>> shapes;
+	Signal<std::shared_ptr<Body>> on_collision;
+	std::string id;
+
 	template<typename T, typename... Args> void AddNewCollisionShape(glm::vec2 offset, Args... args){
 		auto n = std::make_shared<T>(args...);
 		n->SetPosRelative(offset);
 		LinkChild(n);
 		shapes.push_back(n);
 	}
-	std::vector<std::shared_ptr<CollisionShape>> shapes;
-	Signal<std::shared_ptr<Body>> on_collision;
 };
 
 class StaticBody : public Body{
 public:
-	StaticBody();
-	~StaticBody();
-	virtual BodyType GetBodyType() const {return Body::BODY_TYPE_STATIC;}
+	StaticBody() {};
+	StaticBody(std::string id) : Body(id) {};
 };
 
 class DynamicBody : public Body{
 public:
-	DynamicBody();
-	~DynamicBody();
+	DynamicBody() {};
+	DynamicBody(std::string id) : Body(id) {};
 	glm::vec2 linearVelocity;
-	virtual BodyType GetBodyType() const {return Body::BODY_TYPE_DYNAMIC;}
 };
 
 #endif //BODY_H

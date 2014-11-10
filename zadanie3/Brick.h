@@ -22,5 +22,7 @@ private:
 	void init(glm::vec2 pos, unsigned int variant);
 public:
 	static std::shared_ptr<Brick> Create(glm::vec2 pos = glm::vec2(0.0,0.0), unsigned int variant = 0);
+	Signal<> on_ball_collision;
+	void Break();
 };
 #endif //BRICK_H

@@ -49,6 +49,12 @@ Brick::Brick(){
 	bb = std::make_shared<BrickBody>();
 	bb->init();
 	bb->SetScale(0.1);
+	bb->on_collision.Subscribe( [this](std::shared_ptr<Body> body){
+		if(body->id == "ball"){
+			this->on_ball_collision.Happen();
+			this->Break();
+		}
+	});
 }
 
 void Brick::init(glm::vec2 pos, unsigned int variant){
@@ -63,4 +69,8 @@ std::shared_ptr<Brick> Brick::Create(glm::vec2 pos, unsigned int variant){
 	auto b = std::shared_ptr<Brick>(new Brick());
 	b->init(pos, variant);
 	return b;
+}
+
+void Brick::Break(){
+	
 }
