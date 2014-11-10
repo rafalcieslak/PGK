@@ -36,6 +36,7 @@ public:
 	void SetActive(bool);
 	virtual void LinkChild(std::shared_ptr<Positionable>);
 	virtual void SetParent(std::shared_ptr<Positionable>);
+	void DetachFromParent();
 	static std::shared_ptr<Positionable> Create(glm::vec2 pos = glm::vec2(0.0,0.0));
 };
 

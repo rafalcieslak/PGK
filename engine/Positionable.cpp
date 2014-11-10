@@ -1,4 +1,5 @@
 #include "Positionable.hpp"
+#include <iostream>
 
 glm::vec2 Rotate2dVector01(glm::vec2 v, float angle){
 	glm::mat2 m(glm::cos(angle*2.0*M_PI), glm::sin(angle*-2.0*M_PI),
@@ -15,6 +16,17 @@ void Positionable::LinkChild(std::shared_ptr<Positionable> ch){
 }
 void Positionable::SetParent(std::shared_ptr<Positionable> p){
 	parent = p;
+}
+void Positionable::DetachFromParent(){
+	std::shared_ptr<Positionable> pt = parent.lock();
+	if(!pt) return;
+	for(auto it = pt->children.begin(); it != pt->children.end(); it++){
+		if((*it).get() == this){
+			pt->children.erase(it);
+			return;
+		}
+	}
+	std::cerr << "Warning: child not detached from parent, because it is missing from parent children list" << std::endl;
 }
 
 glm::vec2& Positionable::GetPosRelative(){

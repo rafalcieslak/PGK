@@ -7,6 +7,7 @@
 #include "../engine/Render.hpp"
 #include "../engine/SimplePhysics.hpp"
 #include <ctime>
+#include <iostream>
 #include <cstdlib>
 
 #define PADDLE_SIZE 0.12f
@@ -33,6 +34,24 @@ std::shared_ptr<Positionable> create_level(){
 	return level;
 }
 
+std::shared_ptr<Ball> ball;
+
+void SpawnNewBall(){
+	if(ball) ball->DetachFromParent();
+	ball = Ball::Create(glm::vec2(0.0,0.0));
+	ball->SetScale(0.03);
+	ball->SetAngle(0.0);
+	ball->body->linearVelocity = glm::normalize(glm::vec2(0.0,-1.0))*BALL_VELOCITY;
+	SimplePhysics::RegisterSubtree(ball);
+}
+
+void BallLost(){
+	std::cout << "BALL LOST" << std::endl;
+	// spawn a new ball
+	SpawnNewBall();
+}
+
+
 int main(){
 	srand(time(nullptr));
 
@@ -49,12 +68,10 @@ int main(){
 	// Create board
 	std::shared_ptr<Board> board = Board::Create();
 	root->LinkChild(board);
+	board->on_ball_lost.Subscribe( [](){BallLost();} );
 
 	// Prepare the ball
-	std::shared_ptr<Ball> ball = Ball::Create(glm::vec2(0.0,0.0));
-	ball->SetScale(0.03);
-	ball->SetAngle(0.0);
-	ball->body->linearVelocity = glm::normalize(glm::vec2(0.0,-1.0))*BALL_VELOCITY;
+	SpawnNewBall();
 
 	// Prepare the paddle
 	auto paddle = Paddle::Create(glm::vec2(0.0,-SQRT3/2.0), PADDLE_SIZE);
