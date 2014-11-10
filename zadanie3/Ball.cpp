@@ -44,7 +44,7 @@ Ball::BallDrawable::BallDrawable() : Drawable(""){
 
 Ball::BallBody::BallBody() : DynamicBody("ball"){
 	SetPosRelative(relative_pos);
-	if(parent) parent->LinkChild(Positionable::shared_from_this());
+	//if(parent) parent->LinkChild(Positionable::shared_from_this());
 }
 
 void Ball::BallBody::init(){
@@ -58,6 +58,7 @@ Ball::Ball(){
 }
 
 void Ball::init(glm::vec2 pos){
+	Positionable::LinkChild(body);
 	body->LinkChild(bd);
 	SetTop(body);
 	SetBottom(bd);

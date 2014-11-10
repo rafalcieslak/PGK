@@ -23,7 +23,7 @@ Board::BoardDrawable::BoardDrawable() : Drawable(""){
 
 Board::BoardBody::BoardBody(){
 	SetPosRelative(relative_pos);
-	if(parent) parent->LinkChild(Positionable::shared_from_this());
+	//if(parent) parent->LinkChild(Positionable::shared_from_this());
 }
 
 void Board::BoardBody::init(){
@@ -41,6 +41,7 @@ Board::Board(){
 }
 
 void Board::init(){
+	Positionable::LinkChild(body);
 	body->LinkChild(bd);
 	SetTop(body);
 	SetBottom(bd);

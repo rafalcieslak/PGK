@@ -18,7 +18,7 @@ Paddle::PaddleDrawable::PaddleDrawable() : Drawable(""){
 
 Paddle::PaddleBody::PaddleBody(){
 	SetPosRelative(relative_pos);
-	if(parent) parent->LinkChild(Positionable::shared_from_this());
+	//if(parent) parent->LinkChild(Positionable::shared_from_this());
 }
 
 void Paddle::PaddleBody::init(){
@@ -39,6 +39,7 @@ Paddle::Paddle(){
 }
 
 void Paddle::init(glm::vec2 pos){
+	Positionable::LinkChild(pb);
 	pb->LinkChild(pd);
 	SetTop(pb);
 	SetBottom(pd);

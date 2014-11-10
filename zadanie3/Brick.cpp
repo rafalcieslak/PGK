@@ -37,7 +37,7 @@ Brick::BrickDrawable::BrickDrawable() : Drawable(""){
 
 Brick::BrickBody::BrickBody(){
 	SetPosRelative(relative_pos);
-	if(parent) parent->LinkChild(Positionable::shared_from_this());
+	//if(parent) parent->LinkChild(Positionable::shared_from_this());
 }
 
 void Brick::BrickBody::init(){
@@ -58,6 +58,7 @@ Brick::Brick(){
 }
 
 void Brick::init(glm::vec2 pos, unsigned int variant){
+	Positionable::LinkChild(bb);
 	bb->LinkChild(bd);
 	SetTop(bb);
 	SetBottom(bd);

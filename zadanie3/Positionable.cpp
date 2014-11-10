@@ -28,9 +28,10 @@ bool& Positionable::GetActiveRelative(){
 	return active;
 }
 bool Positionable::GetActiveAbsolute(){
-	if(parent == nullptr) return active;
+	if(parent.expired()) return active;
 	if(!active) return false;
-	if(!parent->GetActiveAbsolute()) return false;
+	auto p2 = parent.lock();
+	if(!p2->GetActiveAbsolute()) return false;
 	return active;
 }
 
@@ -70,8 +71,9 @@ float Positionable::GetAngle() const{
 }
 
 glm::vec4 Positionable::GetPosScaleAngle() const{
-	if(parent == nullptr) return glm::vec4(relative_pos,relative_scale,relative_angle);
-	glm::vec4 base = parent->GetPosScaleAngle();
+	if(parent.expired()) return glm::vec4(relative_pos,relative_scale,relative_angle);
+	auto p2 = parent.lock();
+	glm::vec4 base = p2->GetPosScaleAngle();
 	glm::vec2 mypos = base.xy() + base.z * Rotate2dVector01(relative_pos, base.w);
 	float myscale = base.z * relative_scale;
 	float myangle = base.w + relative_angle;
