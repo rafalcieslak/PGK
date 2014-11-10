@@ -24,6 +24,20 @@ float& Positionable::GetScaleRelative(){
 	return relative_scale;
 }
 
+bool& Positionable::GetActiveRelative(){
+	return active;
+}
+bool Positionable::GetActiveAbsolute(){
+	if(parent == nullptr) return active;
+	if(!active) return false;
+	if(!parent->GetActiveAbsolute()) return false;
+	return active;
+}
+
+void Positionable::SetActive(bool a){
+	active = a;
+}
+
 void Positionable::SetPosRelative(glm::vec2 pos){
 	relative_pos = pos;
 }

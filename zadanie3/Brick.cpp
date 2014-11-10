@@ -72,5 +72,5 @@ std::shared_ptr<Brick> Brick::Create(glm::vec2 pos, unsigned int variant){
 }
 
 void Brick::Break(){
-	
+	SetActive(false);
 }

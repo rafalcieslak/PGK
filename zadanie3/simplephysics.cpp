@@ -8,9 +8,11 @@ void SimplePhysics::PerformIteration(float time_delta){
 
 	// Detect collisions
 	for(std::shared_ptr<DynamicBody> db : dynamic_bodies){ // Only dynamic bodies can collide
+		if(!db->GetActiveAbsolute()) continue;
 
 		// Check for collisions with static bodies
 		for(std::shared_ptr<StaticBody> sb : static_bodies){
+			if(!sb->GetActiveAbsolute()) continue;
 			CollisionInfo ci = CheckForCollision(db, sb);
 			if(ci.colliding){
 				// Inform about collision
@@ -35,7 +37,6 @@ void SimplePhysics::PerformIteration(float time_delta){
 		glm::vec2 new_pos = current_pos + p->linearVelocity*time_delta;
 		p->SetPosAbsolute(new_pos);
 	}
-	//std::cout << "end iteration" << std::endl;
 }
 
 void SimplePhysics::RegisterSubtree(std::shared_ptr<Positionable> root){

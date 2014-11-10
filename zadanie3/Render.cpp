@@ -107,6 +107,8 @@ void Render::Frame(){
 
 
 	for(auto d : Drawable::drawables){
+		if(!d->GetActiveAbsolute()) continue;
+
 		std::shared_ptr<Model> m = ModelBase::GetInstance().GetModel(d->model_id);
 		if(!m){
 			std::cerr << "Warning: A drawable has no model in base (" << d->model_id << ")" << std::endl;

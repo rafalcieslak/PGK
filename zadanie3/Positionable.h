@@ -16,20 +16,24 @@ protected:
 	float relative_scale = 1.0;
 	float relative_angle = 0.0;
 	glm::vec4 GetPosScaleAngle() const;
+	bool active = true;
 public:
 	Positionable() {};
 	Positionable(glm::vec2 relative_pos);
 	std::list<std::shared_ptr<Positionable>> children;
-	
+
 	glm::vec2 GetPos() const;
 	float GetScale() const;
 	float GetAngle() const;
 	glm::vec2& GetPosRelative();
 	float& GetScaleRelative();
+	bool& GetActiveRelative();
+	bool GetActiveAbsolute();
 	void SetPosRelative(glm::vec2);
 	void SetPosAbsolute(glm::vec2);
 	void SetScale(float);
 	void SetAngle(float);
+	void SetActive(bool);
 	virtual void LinkChild(std::shared_ptr<Positionable>);
 	virtual void SetParent(std::shared_ptr<Positionable>);
 	static std::shared_ptr<Positionable> Create(glm::vec2 pos = glm::vec2(0.0,0.0));
