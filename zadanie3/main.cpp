@@ -2,6 +2,7 @@
 #include "Board.hpp"
 #include "Brick.hpp"
 #include "Ball.hpp"
+#include "Background.hpp"
 #include "Paddle.hpp"
 #include "../engine/Render.hpp"
 #include "../engine/SimplePhysics.hpp"
@@ -12,6 +13,8 @@ int main(){
 	if(n) return n;
 
 	auto root = Positionable::Create(glm::vec2(0.0,0.0));
+
+	auto bg = Background::Create(0.1,8,12);
 
 	std::shared_ptr<Board> board = Board::Create();
 	std::shared_ptr<Ball> ball = Ball::Create(glm::vec2(0.0,0.0));
