@@ -58,8 +58,7 @@ Brick::BrickDrawable::BrickDrawable() : Drawable(""){
 }
 
 Brick::BrickBody::BrickBody(){
-	SetPosRelative(relative_pos);
-	//if(parent) parent->LinkChild(Positionable::shared_from_this());
+	
 }
 
 void Brick::BrickBody::init(){

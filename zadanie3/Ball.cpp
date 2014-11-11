@@ -44,8 +44,7 @@ Ball::BallDrawable::BallDrawable() : Drawable(""){
 }
 
 Ball::BallBody::BallBody() : DynamicBody("ball"){
-	SetPosRelative(relative_pos);
-	//if(parent) parent->LinkChild(Positionable::shared_from_this());
+	
 }
 
 void Ball::BallBody::init(){

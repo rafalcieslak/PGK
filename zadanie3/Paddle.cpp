@@ -25,8 +25,7 @@ Paddle::BounceHighlight::BounceHighlight() : Drawable(""){
 }
 
 Paddle::PaddleBody::PaddleBody(){
-	SetPosRelative(relative_pos);
-	//if(parent) parent->LinkChild(Positionable::shared_from_this());
+	
 }
 
 void Paddle::PaddleBody::init(){

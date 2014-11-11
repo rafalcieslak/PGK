@@ -18,7 +18,7 @@
 #define BALL_VELOCITY 0.7f
 #define PADDLE_SPEED 0.4f
 #define BALLS_MAX 3
-#define LEVEL_SIZE 1
+#define LEVEL_SIZE 6
 
 typedef enum GameState{
 	GAME_STATE_NONE,
@@ -52,7 +52,7 @@ void AddBrick(int x, int y, int variant, std::shared_ptr<Positionable> parent){
 	brick_count++;
 }
 
-
+// Prepares the level for playing. Spawns new bricks.
 void CreateLevel(){
 	if(level){
 		level->DetachFromParent();
@@ -72,6 +72,7 @@ void CreateLevel(){
 	SimplePhysics::RegisterSubtree(level);
 }
 
+// Resets the ball, updagin counter.
 void SpawnNewBall(){
 	if(ball){
 		ball->DetachFromParent();
@@ -86,11 +87,13 @@ void SpawnNewBall(){
 	balls_left--;
 }
 
+// Updates text of the UI
 void UpdateStatusTexts(){
 	balls_txt->SetText("Balls left: " + std::to_string(balls_left) + "/" + std::to_string(BALLS_MAX));
 	bricks_txt->SetText("Bricks left: " + std::to_string(brick_count) + "/" + std::to_string(bricks_max));
 }
 
+// Prepares for a new game, resets counters etc.
 void NewGame(){
 	if(game_state == GAME_STATE_NOT_STARTED) return;
 	balls_left = BALLS_MAX;
@@ -105,12 +108,14 @@ void NewGame(){
 	game_restart_txt->SetActive(false);
 }
 
+// Processing for a lost game.
 void LooseGame(){
 	game_state = GAME_STATE_LOST;
 	overlay->SetActive(true);
 	game_lost_txt->SetActive(true);
 	game_restart_txt->SetActive(true);
 }
+// Called when the player needs some congrats.
 void GameWon(){
 	game_state = GAME_STATE_WON;
 	overlay->SetActive(true);
@@ -118,6 +123,7 @@ void GameWon(){
 	game_restart_txt->SetActive(true);
 }
 
+// Handler for ball leaving the game area
 void BallLost(){
 	if(game_state == GAME_STATE_WON) return;
 	if(balls_left){
@@ -129,6 +135,7 @@ void BallLost(){
 	}
 }
 
+// Begins a new game, once it has been prepared with NewGame()
 void StartGame(){
 	game_start_txt->SetActive(false);
 	overlay->SetActive(false);
@@ -142,7 +149,7 @@ int main(){
 	int n = Render::Init();
 	if(n) return n;
 
-	// This is the root object.
+	// This is the root node.
 	root = Positionable::Create(glm::vec2(0.0,0.0));
 
 	// Create background
@@ -160,6 +167,7 @@ int main(){
 	auto paddle = Paddle::Create(glm::vec2(0.0,-SQRT3/2.0), PADDLE_SIZE);
 	root->LinkChild(paddle);
 
+	// Create UI
 	balls_txt = Text::Create("", glm::vec2(0,36), 36, glm::vec3(1.0,0.0,0.0),glm::vec2(-1.0,1.0));
 	bricks_txt = Text::Create("", glm::vec2(0,36), 36, glm::vec3(1.0,0.4,0.0),glm::vec2(0.0,1.0));
 	game_won_txt = Text::Create("You have won!!!", glm::vec2(0,36), 52,glm::vec3(0.0,0.9,0.0) ,glm::vec2(-0.35,-0.0));
@@ -171,6 +179,7 @@ int main(){
 	root->LinkChild(game_lost_txt);
 	root->LinkChild(game_won_txt);
 
+	// Prepare for physics processing
 	SimplePhysics::RegisterSubtree(root);
 
 	// Reset balls count, re
@@ -183,8 +192,9 @@ int main(){
 		double time_delta = newtime-lasttime;
 		lasttime = newtime;
 		if(game_state == GAME_STATE_IN_PROGRESS || game_state == GAME_STATE_WON){
+			// Calculate physics
 			SimplePhysics::PerformIteration(time_delta);
-			// Paddle movement
+			// Move the paddle
 			float px = 0.0;
 			if(Render::IsKeyPressed(GLFW_KEY_LEFT)) px += -1.0;
 			if(Render::IsKeyPressed(GLFW_KEY_RIGHT)) px += 1.0;
