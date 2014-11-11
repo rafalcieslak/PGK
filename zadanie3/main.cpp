@@ -17,6 +17,7 @@
 #define BALL_VELOCITY 0.7f
 #define PADDLE_SPEED 0.4f
 #define BALLS_MAX 3
+#define LEVEL_SIZE 1
 
 typedef enum GameState{
 	GAME_STATE_NOT_STARTED,
@@ -27,31 +28,43 @@ typedef enum GameState{
 
 std::shared_ptr<Ball> ball;
 std::shared_ptr<Positionable> root, level;
-std::shared_ptr<Text> balls_txt;
-unsigned int balls_left;
+std::shared_ptr<Text> balls_txt, bricks_txt;
+std::shared_ptr<Text> game_start_txt, game_won_txt, game_lost_txt, game_restart_txt;
+unsigned int balls_left, brick_count, bricks_max;
 GameState game_state;
+
+void UpdateStatusTexts();
+void GameWon();
 
 void AddBrick(int x, int y, int variant, std::shared_ptr<Positionable> parent){
 	float xoffset = 0.0;
 	if((y>0?y:-y)%2) xoffset = BRICK_WIDTH/2.0;
 	auto brick = Brick::Create(glm::vec2(x*BRICK_WIDTH + xoffset, y*BRICK_HEIGHT),variant,BRICK_HEIGHT);
+	brick->on_ball_collision.Subscribe([&](){
+		brick_count--;
+		if(brick_count == 0) GameWon();
+		else UpdateStatusTexts();
+	});
 	parent->LinkChild(brick);
+	brick_count++;
 }
 
 
 void CreateLevel(){
+	if(level) level->DetachFromParent();
 	level = Positionable::Create();
-	for(int y = 0; y < 5; y++){
+	brick_count = 0;
+	for(int y = 0; y < LEVEL_SIZE; y++){
 		for(int x = -4+y/2; x <= 4-y/2; x++){
 			if(y%2!=1 || x<4-y/2)
 				AddBrick(x,y,rand()%6,level);
 		}
 	}
+	bricks_max = brick_count;
 	level->SetPosRelative(glm::vec2(0.0,0.3));
 	root->LinkChild(level);
 	SimplePhysics::RegisterSubtree(level);
 }
-
 
 void SpawnNewBall(){
 	if(ball) ball->DetachFromParent();
@@ -64,32 +77,48 @@ void SpawnNewBall(){
 	balls_left--;
 }
 
-
-void UpdateBallsText(){
-	balls_txt->SetText("Balls left " + std::to_string(balls_left) + "/" + std::to_string(BALLS_MAX));
+void UpdateStatusTexts(){
+	balls_txt->SetText("Balls left: " + std::to_string(balls_left) + "/" + std::to_string(BALLS_MAX));
+	bricks_txt->SetText("Bricks left: " + std::to_string(brick_count) + "/" + std::to_string(bricks_max));
 }
 
 void NewGame(){
 	balls_left = BALLS_MAX;
+	CreateLevel();
 	SpawnNewBall();
-	UpdateBallsText();
+	UpdateStatusTexts();
 	game_state = GAME_STATE_NOT_STARTED;
+	game_start_txt->SetActive(true);
+	game_lost_txt->SetActive(false);
+	game_won_txt->SetActive(false);
+	game_restart_txt->SetActive(false);
 }
 
 void LooseGame(){
-	std::cout << "GAME LOST" << std::endl;
-	NewGame();
+	game_state = GAME_STATE_LOST;
+	game_lost_txt->SetActive(true);
+	game_restart_txt->SetActive(true);
+}
+void GameWon(){
+	game_state = GAME_STATE_WON;
+	game_won_txt->SetActive(true);
+	game_restart_txt->SetActive(true);
 }
 
 void BallLost(){
-	std::cout << "BALL LOST" << std::endl;
+	if(game_state == GAME_STATE_WON) return;
 	if(balls_left){
 		// spawn a new ball
 		SpawnNewBall();
-		UpdateBallsText();
+		UpdateStatusTexts();
 	}else{
 		LooseGame();
 	}
+}
+
+void StartGame(){
+	game_start_txt->SetActive(false);
+	game_state = GAME_STATE_IN_PROGRESS;
 }
 
 int main(){
@@ -115,13 +144,17 @@ int main(){
 	root->LinkChild(paddle);
 
 	balls_txt = Text::Create("", glm::vec2(0,36), 36, glm::vec3(1.0,0.0,0.0),glm::vec2(-1.0,1.0));
+	bricks_txt = Text::Create("", glm::vec2(0,36), 36, glm::vec3(1.0,0.4,0.0),glm::vec2(0.0,1.0));
+	game_won_txt = Text::Create("You have won!!!", glm::vec2(0,36), 52,glm::vec3(0.0,0.9,0.0) ,glm::vec2(-0.35,-0.0));
+	game_lost_txt = Text::Create("You have lost!", glm::vec2(0,36), 52,glm::vec3(0.9,0.0,0.0) ,glm::vec2(-0.33,-0.0));
+	game_start_txt = Text::Create("Use arrow keys to start.", glm::vec2(0,36), 52,glm::vec3(0.9,0.7,0.0) ,glm::vec2(-0.55,-0.2));
+	game_restart_txt = Text::Create("Press N to start a new game.", glm::vec2(0,36), 52,glm::vec3(0.9,0.7,0.0) ,glm::vec2(-0.6,-0.2));
 	root->LinkChild(balls_txt);
+	root->LinkChild(game_start_txt);
+	root->LinkChild(game_lost_txt);
+	root->LinkChild(game_won_txt);
 
 	SimplePhysics::RegisterSubtree(root);
-
-
-	// Create the level
-	CreateLevel();
 
 	// Reset balls count, re
 	NewGame();
@@ -141,6 +174,13 @@ int main(){
 			float newx = paddle->GetPosRelative().x + px * PADDLE_SPEED * time_delta;
 			newx = glm::clamp(newx, -0.5f + PADDLE_SIZE, 0.5f - PADDLE_SIZE);
 			paddle->SetPosRelative(glm::vec2(newx,-SQRT3/2.0));
+		}else if(game_state == GAME_STATE_NOT_STARTED){
+			if(Render::IsKeyPressed(GLFW_KEY_RIGHT) || Render::IsKeyPressed(GLFW_KEY_LEFT) || Render::IsKeyPressed(GLFW_KEY_DOWN) || Render::IsKeyPressed(GLFW_KEY_UP))
+				StartGame();
+		}
+		if(game_state == GAME_STATE_WON || game_state == GAME_STATE_LOST){
+			if(Render::IsKeyPressed(GLFW_KEY_N))
+				NewGame();
 		}
 
 		// Draw a single frame.
