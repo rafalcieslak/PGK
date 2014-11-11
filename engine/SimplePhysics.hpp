@@ -32,6 +32,7 @@ public:
 	static void UnRegisterBody(std::shared_ptr<Body> b);
 	static void UnRegisterDynamicBody(std::shared_ptr<DynamicBody> b);
 	static void UnRegisterStaticBody(std::shared_ptr<StaticBody> b);
+	static void UnRegisterSubtree(std::shared_ptr<Positionable> root);
 	static void UnregisterAll();
 };
 

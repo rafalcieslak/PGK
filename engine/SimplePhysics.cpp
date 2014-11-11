@@ -51,7 +51,7 @@ void SimplePhysics::RegisterBody(std::shared_ptr<Body> b){
 	if(sb) RegisterStaticBody(sb);
 	else if(db) RegisterDynamicBody(db);
 	else{
-		//????
+		std::cout << "Tryging to gerister a body which is of neither type!" << std::endl;
 	};
 }
 void SimplePhysics::RegisterStaticBody(std::shared_ptr<StaticBody> b){
@@ -60,13 +60,20 @@ void SimplePhysics::RegisterStaticBody(std::shared_ptr<StaticBody> b){
 void SimplePhysics::RegisterDynamicBody(std::shared_ptr<DynamicBody> b){
 	if(dynamic_bodies.find(b) == dynamic_bodies.end()) dynamic_bodies.insert(b);
 }
+void SimplePhysics::UnRegisterSubtree(std::shared_ptr<Positionable> root){
+	auto body = std::dynamic_pointer_cast< Body>(root);
+	if(body) UnRegisterBody(body);
+	for(auto ch : root->children) UnRegisterSubtree(ch);
+}
+
+
 void SimplePhysics::UnRegisterBody(std::shared_ptr<Body> b){
 	auto sb = std::dynamic_pointer_cast< StaticBody>(b);
 	auto db = std::dynamic_pointer_cast<DynamicBody>(b);
-	if(sb) RegisterStaticBody(sb);
-	else if(db) RegisterDynamicBody(db);
+	if(sb) UnRegisterStaticBody(sb);
+	else if(db) UnRegisterDynamicBody(db);
 	else{
-		//????
+		std::cout << "Tryging to ungerister a body which is of neither type!" << std::endl;
 	};
 }
 void SimplePhysics::UnRegisterStaticBody(std::shared_ptr<StaticBody> b){

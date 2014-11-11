@@ -112,6 +112,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie3")
 		zadanie3/Paddle.cpp
 		zadanie3/Brick.cpp
 		zadanie3/Background.cpp
+		zadanie3/Overlay.cpp
 		zadanie3/main.cpp
 	)
 

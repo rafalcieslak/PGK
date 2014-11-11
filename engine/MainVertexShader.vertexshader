@@ -1,7 +1,7 @@
 #version 330 core
 
 layout(location = 0) in vec2 vertexPosition_board;
-layout(location = 1) in vec3 vertexColor;
+layout(location = 1) in vec4 vertexColor;
 
 uniform float scale = 1.0;
 uniform float angle = 0.0;
@@ -12,7 +12,7 @@ uniform float anim_phase;
 out vec4 fragmentColor;
 
 void main(){
-    vec3 color = vertexColor;
+    vec4 color = vertexColor;
 
     mat2 rot = mat2( cos(angle), -sin(angle), sin(angle), cos(angle) );
 
@@ -29,7 +29,8 @@ void main(){
 
     float alpha = 1.0;
     if(anim_mode == 1) alpha = 1.0 - anim_phase; // fadeout
+    color.a *= alpha;
 
-    fragmentColor = vec4(vertexColor, alpha);
+    fragmentColor = color;
 
 }

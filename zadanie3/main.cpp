@@ -4,6 +4,7 @@
 #include "Ball.hpp"
 #include "Background.hpp"
 #include "Paddle.hpp"
+#include "Overlay.hpp"
 #include "../engine/Text.hpp"
 #include "../engine/Render.hpp"
 #include "../engine/SimplePhysics.hpp"
@@ -30,6 +31,7 @@ std::shared_ptr<Ball> ball;
 std::shared_ptr<Positionable> root, level;
 std::shared_ptr<Text> balls_txt, bricks_txt;
 std::shared_ptr<Text> game_start_txt, game_won_txt, game_lost_txt, game_restart_txt;
+std::shared_ptr<Overlay> overlay;
 unsigned int balls_left, brick_count, bricks_max;
 GameState game_state;
 
@@ -51,7 +53,10 @@ void AddBrick(int x, int y, int variant, std::shared_ptr<Positionable> parent){
 
 
 void CreateLevel(){
-	if(level) level->DetachFromParent();
+	if(level){
+		level->DetachFromParent();
+		SimplePhysics::UnRegisterSubtree(level);
+	}
 	level = Positionable::Create();
 	brick_count = 0;
 	for(int y = 0; y < LEVEL_SIZE; y++){
@@ -67,7 +72,10 @@ void CreateLevel(){
 }
 
 void SpawnNewBall(){
-	if(ball) ball->DetachFromParent();
+	if(ball){
+		ball->DetachFromParent();
+		//SimplePhysics::UnRegisterSubtree(ball);
+	}
 	ball = Ball::Create(glm::vec2(0.0,0.0));
 	ball->SetScale(0.03);
 	ball->SetAngle(0.0);
@@ -88,6 +96,7 @@ void NewGame(){
 	SpawnNewBall();
 	UpdateStatusTexts();
 	game_state = GAME_STATE_NOT_STARTED;
+	overlay->SetActive(true);
 	game_start_txt->SetActive(true);
 	game_lost_txt->SetActive(false);
 	game_won_txt->SetActive(false);
@@ -96,11 +105,13 @@ void NewGame(){
 
 void LooseGame(){
 	game_state = GAME_STATE_LOST;
+	overlay->SetActive(true);
 	game_lost_txt->SetActive(true);
 	game_restart_txt->SetActive(true);
 }
 void GameWon(){
 	game_state = GAME_STATE_WON;
+	overlay->SetActive(true);
 	game_won_txt->SetActive(true);
 	game_restart_txt->SetActive(true);
 }
@@ -118,6 +129,7 @@ void BallLost(){
 
 void StartGame(){
 	game_start_txt->SetActive(false);
+	overlay->SetActive(false);
 	game_state = GAME_STATE_IN_PROGRESS;
 }
 
@@ -138,6 +150,9 @@ int main(){
 	std::shared_ptr<Board> board = Board::Create();
 	root->LinkChild(board);
 	board->on_ball_lost.Subscribe( [](){BallLost();} );
+	// Create overlay
+	overlay = Overlay::Create();
+	root->LinkChild(overlay);
 
 	// Prepare the paddle
 	auto paddle = Paddle::Create(glm::vec2(0.0,-SQRT3/2.0), PADDLE_SIZE);
@@ -178,7 +193,7 @@ int main(){
 			if(Render::IsKeyPressed(GLFW_KEY_RIGHT) || Render::IsKeyPressed(GLFW_KEY_LEFT) || Render::IsKeyPressed(GLFW_KEY_DOWN) || Render::IsKeyPressed(GLFW_KEY_UP))
 				StartGame();
 		}
-		if(game_state == GAME_STATE_WON || game_state == GAME_STATE_LOST){
+		if(game_state == GAME_STATE_WON || game_state == GAME_STATE_LOST || game_state == GAME_STATE_IN_PROGRESS){
 			if(Render::IsKeyPressed(GLFW_KEY_N))
 				NewGame();
 		}
