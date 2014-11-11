@@ -15,6 +15,14 @@ Paddle::PaddleDrawable::PaddleDrawable() : Drawable(""){
 	}
 	model_id = "Paddle";
 }
+Paddle::BounceHighlight::BounceHighlight() : Drawable(""){
+	if(!ModelBase::GetInstance().HasModel("Paddle-bounce")){
+		ModelBase::GetInstance().AddModelTriangles("Paddle-bounce",1,
+		{  1.0, 0.0, 0.0, -1.0/10.0, -1.0, 0.0,},
+		{ 0.0,1.0,0.2,1.0, 0.0,1.0,0.2,1.0, 0.0,1.0,0.2,1.0,});
+	}
+	model_id = "Paddle-bounce";
+}
 
 Paddle::PaddleBody::PaddleBody(){
 	SetPosRelative(relative_pos);
@@ -34,15 +42,29 @@ void Paddle::PaddleBody::init(){
 Paddle::Paddle(){
 	pd = std::make_shared<PaddleDrawable>();
 	pb = std::make_shared<PaddleBody>();
+	bh = std::make_shared<BounceHighlight>();
 	pb->init();
 }
 
 void Paddle::init(glm::vec2 pos, float size){
 	pb->LinkChild(pd);
+	pb->LinkChild(bh);
 	pb->SetScale(size);
 	SetTop(pb);
 	SetBottom(pd);
 	SetPosRelative(pos);
+	bh->SetActive(false);
+	// When the ball touches the paddle, animate the highlight.
+	pb->on_collision.Subscribe( [this](std::shared_ptr<Body> body){
+		if(body->id == "ball"){
+			this->bh->SetActive(true);
+			this->bh->StartAnimation(1,0.15);
+		}
+	});
+	// When animation is completed, disable the highlight.
+	bh->on_animation_finished.Subscribe( [this](int){
+		this->bh->SetActive(false);
+	});
 }
 
 std::shared_ptr<Paddle> Paddle::Create(glm::vec2 pos, float size){

@@ -11,6 +11,10 @@ private:
 	public:
 		PaddleDrawable();
 	};
+	class BounceHighlight : public Drawable{
+	public:
+		BounceHighlight();
+	};
 	class PaddleBody : public StaticBody{
 	public:
 		PaddleBody();
@@ -18,6 +22,7 @@ private:
 	};
 	std::shared_ptr<PaddleDrawable> pd;
 	std::shared_ptr<PaddleBody> pb;
+	std::shared_ptr<BounceHighlight> bh;
 	Paddle();
 	void init(glm::vec2 pos, float size);
 public:
