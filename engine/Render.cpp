@@ -62,8 +62,7 @@ int Render::Init(){
 		return -1;
 	}
 
-	// Ensure we can capture the escape key being pressed
-	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
+	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_FALSE);
 
 	// Black background
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);

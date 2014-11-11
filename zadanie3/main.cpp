@@ -21,6 +21,7 @@
 #define LEVEL_SIZE 1
 
 typedef enum GameState{
+	GAME_STATE_NONE,
 	GAME_STATE_NOT_STARTED,
 	GAME_STATE_IN_PROGRESS,
 	GAME_STATE_WON,
@@ -33,7 +34,7 @@ std::shared_ptr<Text> balls_txt, bricks_txt;
 std::shared_ptr<Text> game_start_txt, game_won_txt, game_lost_txt, game_restart_txt;
 std::shared_ptr<Overlay> overlay;
 unsigned int balls_left, brick_count, bricks_max;
-GameState game_state;
+GameState game_state = GAME_STATE_NONE;
 
 void UpdateStatusTexts();
 void GameWon();
@@ -74,7 +75,7 @@ void CreateLevel(){
 void SpawnNewBall(){
 	if(ball){
 		ball->DetachFromParent();
-		//SimplePhysics::UnRegisterSubtree(ball);
+		SimplePhysics::UnRegisterSubtree(ball);
 	}
 	ball = Ball::Create(glm::vec2(0.0,0.0));
 	ball->SetScale(0.03);
@@ -91,6 +92,7 @@ void UpdateStatusTexts(){
 }
 
 void NewGame(){
+	if(game_state == GAME_STATE_NOT_STARTED) return;
 	balls_left = BALLS_MAX;
 	CreateLevel();
 	SpawnNewBall();
@@ -189,11 +191,12 @@ int main(){
 			float newx = paddle->GetPosRelative().x + px * PADDLE_SPEED * time_delta;
 			newx = glm::clamp(newx, -0.5f + PADDLE_SIZE, 0.5f - PADDLE_SIZE);
 			paddle->SetPosRelative(glm::vec2(newx,-SQRT3/2.0));
-		}else if(game_state == GAME_STATE_NOT_STARTED){
+		}
+		if(game_state == GAME_STATE_NOT_STARTED){
 			if(Render::IsKeyPressed(GLFW_KEY_RIGHT) || Render::IsKeyPressed(GLFW_KEY_LEFT) || Render::IsKeyPressed(GLFW_KEY_DOWN) || Render::IsKeyPressed(GLFW_KEY_UP))
 				StartGame();
 		}
-		if(game_state == GAME_STATE_WON || game_state == GAME_STATE_LOST || game_state == GAME_STATE_IN_PROGRESS){
+		else if(game_state == GAME_STATE_WON || game_state == GAME_STATE_LOST || game_state == GAME_STATE_IN_PROGRESS){
 			if(Render::IsKeyPressed(GLFW_KEY_N))
 				NewGame();
 		}
