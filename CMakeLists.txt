@@ -7,6 +7,9 @@ find_package(OpenGL REQUIRED)
 # Compile external dependencies
 add_subdirectory (external)
 
+set(LIB_DEPS "${GLFW_DEPS}${GLM_DEPS}${FREETYPE_DEPS}")
+message("LIB DEPS = ${LIB_DEPS}") 
+
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
 	message(STATUS "Using clang.")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
@@ -24,6 +27,10 @@ add_definitions(
 	-Wextra
 	-Werror
 )
+
+if(APPLE)
+	SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -framework QuartzCore -framework IOKit -framework Cocoa" )
+endif()
 
 include_directories(
 	${GLFW_GLEW_INCLUDE_DIRS}
@@ -69,7 +76,9 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie2")
 		zadanie2/Ubuntu.ttf
 	)
 
-	add_dependencies(zadanie2 Freetype GLFW_303 GLFW GLEW)
+	if(LIB_DEPS)
+	add_dependencies(zadanie2 ${LIB_DEPS})
+	endif(LIB_DEPS)
 
 	target_link_libraries(zadanie2
 		${GLFW_GLEW_LIBRARIES}
@@ -125,7 +134,9 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie3")
 		engine/Ubuntu.ttf
 	)
 
-	add_dependencies(zadanie3 Freetype GLFW_303 GLFW GLEW GLM)
+	if(LIB_DEPS)
+	add_dependencies(zadanie3 ${LIB_DEPS})
+	endif(LIB_DEPS)
 
 	target_link_libraries(zadanie3
 		${GLFW_GLEW_LIBRARIES}
