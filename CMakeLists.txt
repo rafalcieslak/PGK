@@ -72,7 +72,9 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie2")
 		zadanie2/Ubuntu.ttf
 	)
 
+	if(LIB_DEPS)
 	add_dependencies(zadanie2 ${LIB_DEPS})
+	endif(LIB_DEPS)
 
 	target_link_libraries(zadanie2
 		${GLFW_GLEW_LIBRARIES}
@@ -128,7 +130,9 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie3")
 		engine/Ubuntu.ttf
 	)
 
+	if(LIB_DEPS)
 	add_dependencies(zadanie3 ${LIB_DEPS})
+	endif(LIB_DEPS)
 
 	target_link_libraries(zadanie3
 		${GLFW_GLEW_LIBRARIES}
