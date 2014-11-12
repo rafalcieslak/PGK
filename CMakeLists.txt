@@ -7,7 +7,7 @@ find_package(OpenGL REQUIRED)
 # Compile external dependencies
 add_subdirectory (external)
 
-set(LIB_DEPS "${GLFW_DEPS} ${GLM_DEPS} ${FREETYPE_DEPS}")
+set(LIB_DEPS "${GLFW_DEPS}${GLM_DEPS}${FREETYPE_DEPS}")
 message("LIB DEPS = ${LIB_DEPS}") 
 
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
