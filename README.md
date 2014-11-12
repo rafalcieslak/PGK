@@ -11,6 +11,9 @@ cmake ..
 make
 </pre>
 
+To speed up the process, use: `make -jN`
+where N is twice then number of your CPU cores.
+
 Running
 ===
 You can run the application from within the `build` or `zadanieN` directory.
