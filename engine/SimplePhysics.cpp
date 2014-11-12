@@ -1,12 +1,13 @@
 #include "SimplePhysics.hpp"
 #include <iostream>
 #include <memory>
-std::set<std::shared_ptr< StaticBody>> SimplePhysics::static_bodies;
-std::set<std::shared_ptr<DynamicBody>> SimplePhysics::dynamic_bodies;
+std::vector<std::shared_ptr< StaticBody>> SimplePhysics::static_bodies;
+std::vector<std::shared_ptr<DynamicBody>> SimplePhysics::dynamic_bodies;
 
 void SimplePhysics::PerformIteration(float time_delta){
 
 	// Detect collisions
+	///std::cout << "size = " << dynamic_bodies.size() << std::endl;
 	for(std::shared_ptr<DynamicBody> db : dynamic_bodies){ // Only dynamic bodies can collide
 		if(!db->GetActiveAbsolute() || !db->colliding) continue;
 
@@ -55,10 +56,10 @@ void SimplePhysics::RegisterBody(std::shared_ptr<Body> b){
 	};
 }
 void SimplePhysics::RegisterStaticBody(std::shared_ptr<StaticBody> b){
-	if(static_bodies.find(b) == static_bodies.end()) static_bodies.insert(b);
+	if(std::find(static_bodies.begin(), static_bodies.end(), b) == static_bodies.end()) static_bodies.push_back(b);
 }
 void SimplePhysics::RegisterDynamicBody(std::shared_ptr<DynamicBody> b){
-	if(dynamic_bodies.find(b) == dynamic_bodies.end()) dynamic_bodies.insert(b);
+	if(std::find(dynamic_bodies.begin(), dynamic_bodies.end(), b) == dynamic_bodies.end()) dynamic_bodies.push_back(b);
 }
 void SimplePhysics::UnRegisterSubtree(std::shared_ptr<Positionable> root){
 	auto body = std::dynamic_pointer_cast< Body>(root);
@@ -77,11 +78,11 @@ void SimplePhysics::UnRegisterBody(std::shared_ptr<Body> b){
 	};
 }
 void SimplePhysics::UnRegisterStaticBody(std::shared_ptr<StaticBody> b){
-	auto it = static_bodies.find(b);
+	auto it = std::find(static_bodies.begin(), static_bodies.end(), b);
 	if(it != static_bodies.end()) static_bodies.erase(it);
 }
 void SimplePhysics::UnRegisterDynamicBody(std::shared_ptr<DynamicBody> b){
-	auto it = dynamic_bodies.find(b);
+	auto it = std::find(dynamic_bodies.begin(), dynamic_bodies.end(), b);
 	if(it != dynamic_bodies.end()) dynamic_bodies.erase(it);
 }
 void SimplePhysics::UnregisterAll(){

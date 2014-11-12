@@ -1,7 +1,7 @@
 #ifndef SIMPLEPHYSICS_H
 #define SIMPLEPHYSICS_H
 #include <memory>
-#include <set>
+#include <vector>
 #include "Body.hpp"
 
 /* This static class performs all calculations that simulate physics.
@@ -9,8 +9,8 @@
 class SimplePhysics{
 	SimplePhysics() = delete;
 	// Lists of bodies that need processing each iteration.
-	static std::set<std::shared_ptr<StaticBody>> static_bodies;
-	static std::set<std::shared_ptr<DynamicBody>> dynamic_bodies;
+	static std::vector<std::shared_ptr<StaticBody>> static_bodies;
+	static std::vector<std::shared_ptr<DynamicBody>> dynamic_bodies;
 	friend class StaticBody;
 	friend class DynamicBody;
 	struct CollisionInfo{
