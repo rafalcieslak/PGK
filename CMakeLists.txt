@@ -7,9 +7,6 @@ find_package(OpenGL REQUIRED)
 # Compile external dependencies
 add_subdirectory (external)
 
-set(LIB_DEPS "${GLFW_DEPS}${GLM_DEPS}${FREETYPE_DEPS}")
-message("LIB DEPS = ${LIB_DEPS}") 
-
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
 	message(STATUS "Using clang.")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
@@ -76,9 +73,16 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie2")
 		zadanie2/Ubuntu.ttf
 	)
 
-	if(LIB_DEPS)
-	add_dependencies(zadanie2 ${LIB_DEPS})
-	endif(LIB_DEPS)
+	if(GLFW_DEPS)
+	add_dependencies(zadanie2 GLEW GLFW_303)
+	endif()
+	if(GLM_DEPS)
+	add_dependencies(zadanie2 GLM)
+	endif()
+	if(FREETYPE_DEPS)
+	add_dependencies(zadanie2 Freetype)
+	endif()
+
 
 	target_link_libraries(zadanie2
 		${GLFW_GLEW_LIBRARIES}
@@ -134,9 +138,15 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie3")
 		engine/Ubuntu.ttf
 	)
 
-	if(LIB_DEPS)
-	add_dependencies(zadanie3 ${LIB_DEPS})
-	endif(LIB_DEPS)
+	if(GLFW_DEPS)
+	add_dependencies(zadanie3 GLEW GLFW_303)
+	endif()
+	if(GLM_DEPS)
+	add_dependencies(zadanie3 GLM)
+	endif()
+	if(FREETYPE_DEPS)
+	add_dependencies(zadanie3 Freetype)
+	endif()
 
 	target_link_libraries(zadanie3
 		${GLFW_GLEW_LIBRARIES}
