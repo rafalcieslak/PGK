@@ -7,12 +7,8 @@ find_package(OpenGL REQUIRED)
 # Compile external dependencies
 add_subdirectory (external)
 
-set(LIB_DEPS "Freetype GLFW_303 GLFW GLEW GLM")
-if(Freetype)
-	message("Freetyyyyype!")
-else(Freetype)
-	message("kein Freetyyyyype!")
-endif(Freetype)
+set(LIB_DEPS "${GLFW_DEPS} ${GLM_DEPS} ${FREETYPE_DEPS}")
+message("LIB DEPS = ${LIB_DEPS}") 
 
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
 	message(STATUS "Using clang.")
