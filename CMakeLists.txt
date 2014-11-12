@@ -28,6 +28,10 @@ add_definitions(
 	-Werror
 )
 
+if(APPLE)
+	SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -framework QuartzCore -framework IOKit -framework Cocoa" )
+endif()
+
 include_directories(
 	${GLFW_GLEW_INCLUDE_DIRS}
 	${GLM_INCLUDE_DIRS}
