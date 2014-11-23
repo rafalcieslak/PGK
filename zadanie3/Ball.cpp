@@ -1,5 +1,5 @@
 #include "Ball.hpp"
-#include "../engine/ModelBase.hpp"
+#include "../engine-old/ModelBase.hpp"
 #include <cmath>
 
 std::array<float,BALL_PTS*6> prepare_ball_vertices(){
@@ -44,7 +44,7 @@ Ball::BallDrawable::BallDrawable() : Drawable(""){
 }
 
 Ball::BallBody::BallBody() : DynamicBody("ball"){
-	
+
 }
 
 void Ball::BallBody::init(){

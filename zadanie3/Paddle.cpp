@@ -1,5 +1,5 @@
 #include "Paddle.hpp"
-#include "../engine/ModelBase.hpp"
+#include "../engine-old/ModelBase.hpp"
 
 #define SQRT2 1.41421356237
 
@@ -25,7 +25,7 @@ Paddle::BounceHighlight::BounceHighlight() : Drawable(""){
 }
 
 Paddle::PaddleBody::PaddleBody(){
-	
+
 }
 
 void Paddle::PaddleBody::init(){

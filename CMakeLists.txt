@@ -111,15 +111,15 @@ endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie2")
 # ZADANIE3
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie3")
 	add_executable(zadanie3
-		engine/ModelBase.cpp
-		engine/Drawable.cpp
-		engine/Fonts.cpp
-		engine/Render.cpp
-		engine/Shader.cpp
-		engine/Positionable.cpp
-		engine/Body.cpp
-		engine/Text.cpp
-		engine/SimplePhysics.cpp
+		engine-old/ModelBase.cpp
+		engine-old/Drawable.cpp
+		engine-old/Fonts.cpp
+		engine-old/Render.cpp
+		engine-old/Shader.cpp
+		engine-old/Positionable.cpp
+		engine-old/Body.cpp
+		engine-old/Text.cpp
+		engine-old/SimplePhysics.cpp
 		zadanie3/Ball.cpp
 		zadanie3/Board.cpp
 		zadanie3/Paddle.cpp
@@ -131,11 +131,11 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie3")
 
 	# Files needed by zadanie3 on runtime.
 	set( ZAD3_RUNTIME_FILES
-		engine/MainFragmentShader.fragmentshader
-		engine/MainVertexShader.vertexshader
-		engine/TextFragmentShader.fragmentshader
-		engine/TextVertexShader.vertexshader
-		engine/Ubuntu.ttf
+		engine-old/MainFragmentShader.fragmentshader
+		engine-old/MainVertexShader.vertexshader
+		engine-old/TextFragmentShader.fragmentshader
+		engine-old/TextVertexShader.vertexshader
+		engine-old/Ubuntu.ttf
 	)
 
 	if(GLFW_DEPS)
