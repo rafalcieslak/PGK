@@ -170,3 +170,61 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie3")
 	)
 	endforeach( file )
 endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie3")
+
+# ZADANIE4
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie4")
+	add_executable(zadanie4
+		engine/ModelBase.cpp
+		engine/Drawable.cpp
+		engine/Fonts.cpp
+		engine/Render.cpp
+		engine/Shader.cpp
+		engine/Node.cpp
+		engine/Body.cpp
+		engine/Text.cpp
+		engine/SimplePhysics.cpp
+		zadanie4/Cube.cpp
+		zadanie4/main.cpp
+	)
+
+	# Files needed by zadanie3 on runtime.
+	set( ZAD4_RUNTIME_FILES
+		engine/FragmentShaderA.fragmentshader
+		engine/VertexShaderA.vertexshader
+		engine/TextFragmentShader.fragmentshader
+		engine/TextVertexShader.vertexshader
+		engine/Ubuntu.ttf
+	)
+
+	if(GLFW_DEPS)
+	add_dependencies(zadanie4 GLEW GLFW_303)
+	endif()
+	if(GLM_DEPS)
+	add_dependencies(zadanie4 GLM)
+	endif()
+	if(FREETYPE_DEPS)
+	add_dependencies(zadanie4 Freetype)
+	endif()
+
+	target_link_libraries(zadanie4
+		${GLFW_GLEW_LIBRARIES}
+		${FREETYPE_LIBRARIES}
+		${OPENGL_LIBRARY}
+		${CMAKE_DL_LIBS}
+	)
+
+	# Copy the binary
+	add_custom_command(
+		TARGET zadanie4 POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/zadanie4${CMAKE_EXECUTABLE_SUFFIX}" "${CMAKE_CURRENT_SOURCE_DIR}/zadanie4/"
+	)
+
+	# Copy runtime files
+	foreach( file ${ZAD4_RUNTIME_FILES})
+		add_custom_command(
+			TARGET zadanie4 POST_BUILD
+			COMMAND ${CMAKE_COMMAND}
+			ARGS -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${file}" "${CMAKE_CURRENT_BINARY_DIR}"
+	)
+	endforeach( file )
+endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie4")

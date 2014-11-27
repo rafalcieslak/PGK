@@ -6,7 +6,7 @@
 #include <string>
 #include <memory>
 
-#define MODEL_DIMEN 2
+#define MODEL_DIMEN 3
 #define MODEL_COLOR_SIZE 4
 
 /* A model represents a set of vertices and colors that is present in a VBO

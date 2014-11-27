@@ -1,7 +1,7 @@
 #ifndef BODY_H
 #define BODY_H
 
-#include "Positionable.hpp"
+#include "Node.hpp"
 #include "Signal.hpp"
 #include <vector>
 #include <cmath>
@@ -10,9 +10,9 @@
 /* These classes represent different shapes used for collision detection.
  * They only store shape paramenters.
  * The only place such instances are stored should be Body::shapes.
- * It is a Positionable, so it can be arranged in a tree, and is located at a relative position.
+ * It is a Node, so it can be arranged in a tree, and is located at a relative position.
 */
-struct CollisionShape : Positionable{
+struct CollisionShape : Node{
 	// The bounding radius is used to quickly check whether two shapes can possibly collide.
 	CollisionShape(float br) : bounding_radius(br) {}
 	float GetBoundingRadius() {
@@ -23,7 +23,7 @@ private:
 };
 // This shape is a rectangle. It stores half of width and height as size.
 struct CollisionShapeRectangle : public CollisionShape{
-	CollisionShapeRectangle(glm::vec2 s, float angle = 0.0) : CollisionShape(sqrt(s.x*s.x + s.y*s.y)), size(s) { SetAngle(angle); };
+	CollisionShapeRectangle(glm::vec2 s) : CollisionShape(sqrt(s.x*s.x + s.y*s.y)), size(s) {  };
 	glm::vec2 size;
 };
 // A circle is represented by it's radius.
@@ -40,11 +40,11 @@ struct CollisionShapePaddle : public CollisionShape{
 
 /* A Body is an elemental object for physics processing. It represents a singular rigid body.
  * A body may be subject to collisions and velocity.
- * It is a Positionable, so it can be arranged in a tree, and is located at a relative position.
+ * It is a Node, so it can be arranged in a tree, and is located at a relative position.
  * It may be particularly useful to attach a Drawable as a child of a Body, so that it gets dragged
  * around as the Body (DynamicBody) moves.
 */
-class Body : public Positionable{
+class Body : public Node{
 protected:
 	// Constructs a body. This shoul be considered an abstarct class,
 	// please construct a StaticBody or a DynamicBody instead.

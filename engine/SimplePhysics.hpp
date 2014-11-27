@@ -6,6 +6,9 @@
 
 /* This static class performs all calculations that simulate physics.
 */
+
+
+/* Temporarily disabled
 class SimplePhysics{
 	SimplePhysics() = delete;
 	// Lists of bodies that need processing each iteration.
@@ -24,7 +27,7 @@ public:
 	// slice.
 	static void PerformIteration(float time_delta);
 	// Functions for registering bodies in the physics engine.
-	static void RegisterSubtree(std::shared_ptr<Positionable> root);
+	static void RegisterSubtree(std::shared_ptr<Node> root);
 	static void RegisterBody(std::shared_ptr<Body> b);
 	static void RegisterDynamicBody(std::shared_ptr<DynamicBody> b);
 	static void RegisterStaticBody(std::shared_ptr<StaticBody> b);
@@ -32,8 +35,9 @@ public:
 	static void UnRegisterBody(std::shared_ptr<Body> b);
 	static void UnRegisterDynamicBody(std::shared_ptr<DynamicBody> b);
 	static void UnRegisterStaticBody(std::shared_ptr<StaticBody> b);
-	static void UnRegisterSubtree(std::shared_ptr<Positionable> root);
+	static void UnRegisterSubtree(std::shared_ptr<Node> root);
 	static void UnregisterAll();
 };
+*/
 
 #endif //SIMPLEPHYSICS_H

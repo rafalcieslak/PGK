@@ -1,6 +1,9 @@
 #include "SimplePhysics.hpp"
 #include <iostream>
 #include <memory>
+
+
+/* Temporarily disabled
 std::vector<std::shared_ptr< StaticBody>> SimplePhysics::static_bodies;
 std::vector<std::shared_ptr<DynamicBody>> SimplePhysics::dynamic_bodies;
 
@@ -40,7 +43,7 @@ void SimplePhysics::PerformIteration(float time_delta){
 	}
 }
 
-void SimplePhysics::RegisterSubtree(std::shared_ptr<Positionable> root){
+void SimplePhysics::RegisterSubtree(std::shared_ptr<Node> root){
 	auto body = std::dynamic_pointer_cast< Body>(root);
 	if(body) RegisterBody(body);
 	for(auto ch : root->children) RegisterSubtree(ch);
@@ -61,7 +64,7 @@ void SimplePhysics::RegisterStaticBody(std::shared_ptr<StaticBody> b){
 void SimplePhysics::RegisterDynamicBody(std::shared_ptr<DynamicBody> b){
 	if(std::find(dynamic_bodies.begin(), dynamic_bodies.end(), b) == dynamic_bodies.end()) dynamic_bodies.push_back(b);
 }
-void SimplePhysics::UnRegisterSubtree(std::shared_ptr<Positionable> root){
+void SimplePhysics::UnRegisterSubtree(std::shared_ptr<Node> root){
 	auto body = std::dynamic_pointer_cast< Body>(root);
 	if(body) UnRegisterBody(body);
 	for(auto ch : root->children) UnRegisterSubtree(ch);
@@ -209,3 +212,5 @@ SimplePhysics::CollisionInfo SimplePhysics::CheckForCollision(std::shared_ptr<Bo
 	if(glm::length(normal_sum) < 0.00001) return CollisionInfo(false); // no collision
 	else return CollisionInfo(true,normal_sum);
 }
+
+*/

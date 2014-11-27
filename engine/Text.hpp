@@ -4,13 +4,15 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include <string>
-#include "Positionable.hpp"
+#include "Node.hpp"
 #include "Signal.hpp"
 
-/* This Positionable is similar to a Drawable, but instead of representing a VBO
+/* This Node is similar to a Drawable, but instead of representing a VBO
  * model, it is used to render text.
 */
-class Text : public Positionable{
+
+/* Temporarily disabled
+class Text : public Node{
 public:
 	Text(std::string text, glm::vec2 px_offset, unsigned int size = 24, glm::vec3 color = glm::vec3(0.0,0.0,0.0), glm::vec2 relative_pos = glm::vec2(0.0,0.0));
 	~Text();
@@ -31,5 +33,6 @@ private:
 	// The list of all texts that need to be rendered, for easier iteration.
 	static std::vector<Text *> texts;
 };
+*/
 
 #endif //TEXT_HPP
