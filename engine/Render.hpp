@@ -15,7 +15,7 @@ private:
 	// The vertex array's ID.
 	static GLuint VertexArrayID;
 	// Uniform IDs.
-	static GLint uniform_model_transform, uniform_camera_transform, uniform_perspective_transform , uniform_anim_mode, uniform_anim_phase;
+	static GLint uniform_model_transform, uniform_camera_transform, uniform_perspective_transform , uniform_anim_mode, uniform_anim_phase, uniform_lightpos;
 	// Pixel sizes. Needed for perfect text alignment.
 	static float pxsizex, pxsizey;
 	// The root node for drawing.

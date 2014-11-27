@@ -184,6 +184,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie4")
 		engine/Text.cpp
 		engine/SimplePhysics.cpp
 		engine/Viewpoint.cpp
+		engine/Light.cpp
 		zadanie4/Cube.cpp
 		zadanie4/main.cpp
 	)
@@ -207,6 +208,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie4")
 	add_dependencies(zadanie4 Freetype)
 	endif()
 
+
 	target_link_libraries(zadanie4
 		${GLFW_GLEW_LIBRARIES}
 		${FREETYPE_LIBRARIES}
@@ -228,4 +230,5 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie4")
 			ARGS -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${file}" "${CMAKE_CURRENT_BINARY_DIR}"
 	)
 	endforeach( file )
+
 endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie4")

@@ -2,6 +2,7 @@
 #include "../engine/Render.hpp"
 #include "../engine/Viewpoint.hpp"
 #include "Cube.hpp"
+#include "../engine/Light.hpp"
 
 int main(){
 	srand(time(nullptr));
@@ -24,6 +25,9 @@ int main(){
 	camera->SetAsActive();
 
 	root->AddChild(camera);
+
+	auto light = std::make_shared<Light>(glm::vec3(-1.5,0.9,1.5));
+	root->AddChild(light);
 
 	Render::SetRootNode(root);
 

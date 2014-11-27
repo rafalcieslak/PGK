@@ -25,9 +25,11 @@ public:
 	// c - list of colors for vertices, in the same format as v. It can be a
 	//     two-dimentional initializer_list, so that the model could faciliate
 	//     multiple color variants.
+	Model(unsigned int ppp, GLenum mode, unsigned int vertices, std::initializer_list<float> v, std::initializer_list<float> n, std::initializer_list<std::initializer_list<float>> c);
 	Model(unsigned int ppp, GLenum mode, unsigned int vertices, std::initializer_list<float> v, std::initializer_list<std::initializer_list<float>> c);
+	Model(unsigned int ppp, GLenum mode, unsigned int vertices, std::initializer_list<float> v, std::initializer_list<float> n, std::initializer_list<float> c);
 	Model(unsigned int ppp, GLenum mode, unsigned int vertices, std::initializer_list<float> v, std::initializer_list<float> c);
-	Model(unsigned int ppp, GLenum mode, unsigned int vertices, const float* v, const float* c);
+	Model(unsigned int ppp, GLenum mode, unsigned int vertices, const float* v, const float* n, const float* c);
 	// Never implicitly copy a model, because it needs a VBO, and it allocates
 	// memory, too.
 	Model(const Model& other) = delete;
@@ -37,11 +39,11 @@ public:
 	void metaDraw(unsigned int variant = 0);
 private:
 	// Data copies in memory.
-	float *vertices = nullptr, **colors = nullptr;
+	float *vertices = nullptr, *normals = nullptr, **colors = nullptr;
 	// Number of vertices and color variants.
 	unsigned int size, variants;
 	// VBO indices.
-	GLuint buffer_vertex, *buffers_color = nullptr;
+	GLuint buffer_vertex, *buffers_color = nullptr, buffer_normals;
 	// Helper functions for initialization.
 	void init_buffers();
 	void init_arrays();
@@ -54,24 +56,28 @@ private:
 // Specialized Model for models that are made up of triangles.
 class ModelTriangles : public Model{
 public:
+	ModelTriangles(unsigned int vertices, std::initializer_list<float> v, std::initializer_list<float> n, std::initializer_list<std::initializer_list<float>> c) :
+		Model(3, GL_TRIANGLES, vertices, v, n, c) {};
 	ModelTriangles(unsigned int vertices, std::initializer_list<float> v, std::initializer_list<std::initializer_list<float>> c) :
 		Model(3, GL_TRIANGLES, vertices, v, c) {};
+	ModelTriangles(unsigned int vertices, std::initializer_list<float> v, std::initializer_list<float> n, std::initializer_list<float> c):
+		Model(3, GL_TRIANGLES, vertices, v, n, c) {};
 	ModelTriangles(unsigned int vertices, std::initializer_list<float> v, std::initializer_list<float> c):
 		Model(3, GL_TRIANGLES, vertices, v, c) {};
-	ModelTriangles(unsigned int vertices, const float* v, const float* c):
-		Model(3, GL_TRIANGLES, vertices, v, c) {};
+	ModelTriangles(unsigned int vertices, const float* v, const float* n, const float* c):
+		Model(3, GL_TRIANGLES, vertices, v, n, c) {};
 
 };
 
 // Specialized Model for models that are made up of lines.
 class ModelLines : public Model{
 public:
-	ModelLines(unsigned int vertices, std::initializer_list<float> v, std::initializer_list<std::initializer_list<float>> c) :
-		Model(2, GL_LINES, vertices, v, c) {};
-	ModelLines(unsigned int vertices, std::initializer_list<float> v, std::initializer_list<float> c):
-		Model(2, GL_LINES, vertices, v, c) {};
-	ModelLines(unsigned int vertices, const float* v, const float* c):
-		Model(2, GL_LINES, vertices, v, c) {};
+	ModelLines(unsigned int vertices, std::initializer_list<float> v, std::initializer_list<float> n, std::initializer_list<std::initializer_list<float>> c) :
+		Model(2, GL_LINES, vertices, v, n, c) {};
+	ModelLines(unsigned int vertices, std::initializer_list<float> v, std::initializer_list<float> n, std::initializer_list<float> c):
+		Model(2, GL_LINES, vertices, v, n, c) {};
+	ModelLines(unsigned int vertices, const float* v, const float* n, const float* c):
+		Model(2, GL_LINES, vertices, v, n, c) {};
 };
 
 /* The singleton catalogue of all models, organised by their unique names.
@@ -90,12 +96,14 @@ public:
 		return instance;
 	}
 	// Create and append a new model. See Model constructors.
+	void AddModelTriangles(std::string id, unsigned int vertices, std::initializer_list<float> coords, std::initializer_list<float> normals, std::initializer_list<std::initializer_list<float>> colors);
 	void AddModelTriangles(std::string id, unsigned int vertices, std::initializer_list<float> coords, std::initializer_list<std::initializer_list<float>> colors);
+	void AddModelTriangles(std::string id, unsigned int vertices, std::initializer_list<float> coords, std::initializer_list<float> normals, std::initializer_list<float> colors);
 	void AddModelTriangles(std::string id, unsigned int vertices, std::initializer_list<float> coords, std::initializer_list<float> colors);
-	void AddModelTriangles(std::string id, unsigned int vertices, const float *coords, const float* colors);
-	void AddModelLines(std::string id, unsigned int vertices, std::initializer_list<float> coords, std::initializer_list<std::initializer_list<float>> colors);
-	void AddModelLines(std::string id, unsigned int vertices, std::initializer_list<float> coords, std::initializer_list<float> colors);
-	void AddModelLines(std::string id, unsigned int vertices, const float *coords, const float* colors);
+	void AddModelTriangles(std::string id, unsigned int vertices, const float *coords, const float* normals, const float* colors);
+	void AddModelLines(std::string id, unsigned int vertices, std::initializer_list<float> coords, std::initializer_list<float> normals, std::initializer_list<std::initializer_list<float>> colors);
+	void AddModelLines(std::string id, unsigned int vertices, std::initializer_list<float> coords, std::initializer_list<float> normals, std::initializer_list<float> colors);
+	void AddModelLines(std::string id, unsigned int vertices, const float *coords, const float* normals, const float* colors);
 	// Remove all models, cleanup.
 	void Clear();
 	// Search for a model.

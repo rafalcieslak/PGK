@@ -6,6 +6,7 @@
 #include "Drawable.hpp"
 #include "Text.hpp"
 #include "Viewpoint.hpp"
+#include "Light.hpp"
 #include <iostream>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/transform.hpp>
@@ -15,6 +16,7 @@ GLFWwindow* window;
 
 // All the static members of Render class.
 GLint Render::uniform_model_transform, Render::uniform_camera_transform, Render::uniform_perspective_transform;
+GLint Render::uniform_lightpos;
 GLint Render::uniform_anim_mode, Render::uniform_anim_phase;
 GLuint Render::VertexArrayID;
 float Render::pxsizex, Render::pxsizey;
@@ -86,9 +88,10 @@ int Render::Init(){
 	uniform_model_transform = glGetUniformLocation(shader_program_id, "model_transform");
 	uniform_camera_transform = glGetUniformLocation(shader_program_id, "camera_transform");
 	uniform_perspective_transform = glGetUniformLocation(shader_program_id, "perspective_transform");
+	uniform_lightpos = glGetUniformLocation(shader_program_id, "lightpos_global");
 	uniform_anim_mode = glGetUniformLocation(shader_program_id,"anim_mode");
 	uniform_anim_phase = glGetUniformLocation(shader_program_id,"anim_phase");
-	if(uniform_model_transform == -1 || uniform_anim_mode == -1 || uniform_anim_phase == -1 || uniform_camera_transform == -1 || uniform_perspective_transform == -1){
+	if(uniform_model_transform == -1 || uniform_anim_mode == -1 || uniform_anim_phase == -1 || uniform_camera_transform == -1 || uniform_perspective_transform == -1 || uniform_lightpos == -1){
 		std::cerr << "A uniform is missing from the shader." << std::endl;
 		glfwTerminate();
 		return -1;
@@ -145,7 +148,13 @@ void Render::Frame(){
 
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
 
+	if(Light::lights.size() > 0){
+		Light* l = Light::lights[0];
+		glm::vec3 lightpos(l->GetGlobalTransform()[3]);
+		glUniform3f(uniform_lightpos,lightpos.x,lightpos.y,lightpos.z);
+	}
 	if(Viewpoint::active_viewpoint){
 		glm::mat4 cameraview =  glm::lookAt(glm::vec3(0.0) , 1.0f* Viewpoint::active_viewpoint->GetDirection(), glm::vec3(0.0,1.0,0.0)) * glm::inverse(Viewpoint::active_viewpoint->GetGlobalTransform());
 		glm::mat4 perspective = glm::perspective(Viewpoint::active_viewpoint->GetFOV(), 1.0f, 0.1f, 50.0f);
@@ -169,6 +178,7 @@ void Render::Frame(){
 	}
 */
 
+	glDisableVertexAttribArray(2);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(0);
 
