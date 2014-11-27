@@ -30,7 +30,7 @@ private:
 	// 3D position of this Node - relative to parent.
 	glm::vec3 position;
 	// Scale and rotation of this Node.
-	float scale;
+	float scale = 1.0;
 	glm::quat rotation;
 	// Transform matrices for this node.
 	glm::mat4 transform;
@@ -61,6 +61,7 @@ public:
 	//void SetPosAbsolute(glm::vec2);
 	// This function returns a relative transformation matrix.
 	glm::mat4 GetTransform() const;
+	glm::mat4 GetGlobalTransform() const;
 	// Creates a parent-children relationship. Adds a child node, and set's
 	// its parent to this node.
 	virtual void AddChild(std::shared_ptr<Node>);

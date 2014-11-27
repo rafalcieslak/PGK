@@ -5,14 +5,16 @@
 #include "ModelBase.hpp"
 #include "Drawable.hpp"
 #include "Text.hpp"
+#include "Viewpoint.hpp"
 #include <iostream>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 GLFWwindow* window;
 
 // All the static members of Render class.
-GLint Render::uniform_model_transform;
+GLint Render::uniform_model_transform, Render::uniform_camera_transform, Render::uniform_perspective_transform;
 GLint Render::uniform_anim_mode, Render::uniform_anim_phase;
 GLuint Render::VertexArrayID;
 float Render::pxsizex, Render::pxsizey;
@@ -82,9 +84,11 @@ int Render::Init(){
 
 	// Prepare uniforms of the vertex shader
 	uniform_model_transform = glGetUniformLocation(shader_program_id, "model_transform");
+	uniform_camera_transform = glGetUniformLocation(shader_program_id, "camera_transform");
+	uniform_perspective_transform = glGetUniformLocation(shader_program_id, "perspective_transform");
 	uniform_anim_mode = glGetUniformLocation(shader_program_id,"anim_mode");
 	uniform_anim_phase = glGetUniformLocation(shader_program_id,"anim_phase");
-	if(uniform_model_transform == -1 || uniform_anim_mode == -1 || uniform_anim_phase == -1){
+	if(uniform_model_transform == -1 || uniform_anim_mode == -1 || uniform_anim_phase == -1 || uniform_camera_transform == -1 || uniform_perspective_transform == -1){
 		std::cerr << "A uniform is missing from the shader." << std::endl;
 		glfwTerminate();
 		return -1;
@@ -107,17 +111,11 @@ int Render::Init(){
 	return 0;
 }
 
-void Render::RecursivellyProcessNode(std::shared_ptr<Node> n, glm::vec3 current_tranlation, glm::quat current_rotation, float current_scale){
+void Render::RecursivellyProcessNode(std::shared_ptr<Node> n, glm::mat4 current_transform){
 	if(!n) return; // ignore null nodes
 	if(!n->GetActive()) return;
-	glm::vec3 new_translation = current_tranlation + glm::rotate(current_rotation, n->GetPosition());
-	float new_scale = current_scale * n->GetScale();
-	glm::quat new_rotation = current_rotation * n->GetRotation();
 
-	glm::mat4 sc = glm::scale(glm::mat4(1.0),glm::vec3(new_scale));
-	glm::mat4 tr = glm::translate(glm::mat4(1.0),new_translation);
-	glm::mat4 ro = glm::toMat4(new_rotation);
-	glm::mat4 transform = tr* ro * sc;
+	glm::mat4 transform = current_transform * n->GetTransform();
 
 	std::shared_ptr<Drawable> d = std::dynamic_pointer_cast<Drawable>(n);
 	if(d){ // skip, if this node is not drawable
@@ -135,7 +133,7 @@ void Render::RecursivellyProcessNode(std::shared_ptr<Node> n, glm::vec3 current_
 			std::cerr << "Warning: A drawable has no model in base (" << d->model_id << ")" << std::endl;
 		}
 	}
-	for(auto ch : n->children) RecursivellyProcessNode(ch, new_translation, new_rotation, new_scale);
+	for(auto ch : n->children) RecursivellyProcessNode(ch, transform);
 }
 
 void Render::Frame(){
@@ -148,8 +146,15 @@ void Render::Frame(){
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 
+	if(Viewpoint::active_viewpoint){
+		glm::mat4 cameraview =  glm::lookAt(glm::vec3(0.0) , 1.0f* Viewpoint::active_viewpoint->GetDirection(), glm::vec3(0.0,1.0,0.0)) * glm::inverse(Viewpoint::active_viewpoint->GetGlobalTransform());
+		glm::mat4 perspective = glm::perspective(Viewpoint::active_viewpoint->GetFOV(), 1.0f, 0.1f, 50.0f);
+		glUniformMatrix4fv(uniform_camera_transform, 1, GL_FALSE, &cameraview[0][0]);
+		glUniformMatrix4fv(uniform_perspective_transform, 1, GL_FALSE, &perspective[0][0]);
+	}
+
 	//std::cout << "starting render" << std::endl;
-	RecursivellyProcessNode(root, glm::vec3(0.0), glm::quat(), 1.0);
+	RecursivellyProcessNode(root, glm::mat4(1.0));
 
 /* Temporarily disabled
 	for(auto t : Text::texts){

@@ -1,5 +1,6 @@
 #include <glm/glm.hpp>
 #include "../engine/Render.hpp"
+#include "../engine/Viewpoint.hpp"
 #include "Cube.hpp"
 
 int main(){
@@ -9,14 +10,24 @@ int main(){
 	int n = Render::Init();
 	if(n) return n;
 
-	auto cube = std::make_shared<Cube>(0.5);
-	auto cube2 = std::make_shared<Cube>(0.42);
-	cube2->SetPosition(glm::vec3(0.5,0.3,0.0));
+	auto root = std::make_shared<Node>();
+
+	auto cube = std::make_shared<Cube>(0.4);
+	auto cube2 = std::make_shared<Cube>(0.2);
+	cube2->SetPosition(glm::vec3(1.0,1.0,0.0));
 	cube2->variant = 1;
-	cube->variant = 0;
 	cube->AddChild(cube2);
-	cube2->SetActive(true);
-	Render::SetRootNode(cube);
+	root->AddChild(cube);
+
+	auto camera = std::make_shared<Viewpoint>(glm::vec3(0.0,0.8,2.0));
+	camera->LookAt(glm::vec3(0.0,0.0,0.0));
+	camera->SetAsActive();
+
+	root->AddChild(camera);
+
+	Render::SetRootNode(root);
+
+
 	double lasttime = Render::GetTime();
 	// This is the main loop.
 	double p = 0.0;
@@ -25,7 +36,7 @@ int main(){
 		double time_delta = newtime-lasttime;
 		lasttime = newtime;
 
-		p += 1.5 * time_delta;
+		p += 0.7 * time_delta;
 
 		cube->SetRotation(glm::quat(glm::vec3(0.0,p,0.0)));
 

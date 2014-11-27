@@ -63,6 +63,11 @@ glm::quat Node::GetRotation() const{
 glm::mat4 Node::GetTransform() const{
 	return transform;
 }
+glm::mat4 Node::GetGlobalTransform() const{
+	auto sp = parent.lock();
+ 	if(!sp) return GetTransform();
+	return sp->GetGlobalTransform() * transform;
+}
 
 void Node::UpdateTransform(){
 	glm::mat4 sc = glm::scale(glm::mat4(1.0),glm::vec3(scale));

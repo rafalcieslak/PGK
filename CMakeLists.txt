@@ -183,6 +183,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie4")
 		engine/Body.cpp
 		engine/Text.cpp
 		engine/SimplePhysics.cpp
+		engine/Viewpoint.cpp
 		zadanie4/Cube.cpp
 		zadanie4/main.cpp
 	)

@@ -4,15 +4,17 @@ layout(location = 0) in vec3 vertexPosition_board;
 layout(location = 1) in vec4 vertexColor;
 
 uniform mat4 model_transform;
+uniform mat4 camera_transform;
+uniform mat4 perspective_transform;
 uniform int anim_mode = 0;
 uniform float anim_phase;
 
 out vec4 fragmentColor;
 
 void main(){
-    vec4 color = vertexColor;
+    vec4 color = vertexColor + perspective_transform*0.000001*vertexColor;
 
-    gl_Position = model_transform * vec4(vertexPosition_board,1.0);
+    gl_Position = perspective_transform * camera_transform * model_transform * vec4(vertexPosition_board,1.0);
 
     float alpha = 1.0;
     if(anim_mode == 1) alpha = 1.0 - anim_phase; // fadeout
