@@ -3,6 +3,7 @@
 #include "../engine/Viewpoint.hpp"
 #include "Cube.hpp"
 #include "Ball.hpp"
+#include "Plane.hpp"
 #include "Player.hpp"
 #include "../engine/Light.hpp"
 #include <iostream>
@@ -50,6 +51,10 @@ int main(){
 	cube3->variant = 1;
 	ball->AddChild(cube3);
 	root->AddChild(ball);
+
+	auto plane = std::make_shared<Plane>(5.0);
+	plane->SetPosition(glm::vec3(0.0,0.0,-2.0));
+	root->AddChild(plane);
 
 	auto camera = std::make_shared<Viewpoint>(glm::vec3(0.0,2.0,0.8));
 	camera->LookAt(glm::vec3(0.0,0.0,0.0));
