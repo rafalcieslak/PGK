@@ -7,6 +7,30 @@
 #include "../engine/Light.hpp"
 #include <iostream>
 
+typedef enum viewModes{
+	VIEW_MODE_THIRD_PERSON = 0,
+	VIEW_MODE_FIRST_PERSON,
+	VIEW_MODE_MAX
+} viewModes;
+viewModes view_mode = VIEW_MODE_THIRD_PERSON;
+
+std::shared_ptr<Player> player;
+
+void SwitchViewMode(){
+	switch(view_mode){
+		case VIEW_MODE_THIRD_PERSON:
+			view_mode = VIEW_MODE_FIRST_PERSON;
+			player->SwitchToFP();
+			break;
+		case VIEW_MODE_FIRST_PERSON:
+			view_mode = VIEW_MODE_THIRD_PERSON;
+			player->SwitchToTP();
+			break;
+		case VIEW_MODE_MAX:
+			break;
+	};
+}
+
 int main(){
 	srand(time(nullptr));
 
@@ -36,7 +60,7 @@ int main(){
 	auto light = std::make_shared<Light>(glm::vec3(-1.5,1.5,0.9));
 	root->AddChild(light);
 
-	auto player = Player::Create();
+	player = Player::Create();
 	player->SetPosition(glm::vec3(-1.0,2.0,0.0));
 	player->SwitchToTP();
 	root->AddChild(player);
@@ -45,6 +69,7 @@ int main(){
 
 
 	double lasttime = Render::GetTime();
+	bool F_key_down = false;
 	// This is the main loop.
 	double p = 0.0;
 	do{
@@ -53,6 +78,12 @@ int main(){
 		lasttime = newtime;
 
 		p += 0.7 * time_delta;
+
+		if(!Render::IsKeyPressed(GLFW_KEY_F)) F_key_down = false;
+		else if(Render::IsKeyPressed(GLFW_KEY_F) && F_key_down == false){
+			F_key_down = true;
+			SwitchViewMode();
+		}
 
 		cube2->SetRotation(glm::quat(glm::vec3(p,0.0,0.0)));
 		if(Render::IsKeyPressed(GLFW_KEY_W)) player->MoveForward(time_delta);

@@ -17,8 +17,8 @@ class Player : public NodeGroup{
 	void UpdateRotation();
 	static glm::vec3 front,left,up;
 public:
-	void SwitchToFP() {first_person_view->SetAsActive();}
-	void SwitchToTP() {third_person_view->SetAsActive();}
+	void SwitchToFP();
+	void SwitchToTP();
 	static std::shared_ptr<Player> Create();
 	void MoveForward(float delta);
 	void MoveBackward(float delta);

@@ -60,3 +60,11 @@ void Player::UpdateRotation(){
 	glm::quat yaw_quat = glm::angleAxis(yaw,glm::rotate(pitch_quat,glm::vec3(1.0f,0.0f,0.0f)));
 	player_cube->SetRotation( yaw_quat * pitch_quat);
 }
+void Player::SwitchToFP(){
+	player_cube->SetActive(false);
+	first_person_view->SetAsActive();
+}
+void Player::SwitchToTP(){
+	player_cube->SetActive(true);
+	third_person_view->SetAsActive();
+}
