@@ -6,7 +6,7 @@ in vec3 normal_cameraspace;
 in vec3 vector_to_light_cameraspace;
 in vec3 vector_to_camera_cameraspace;
 in float lightdistance;
-
+in float cameradistance;
 void main()
 {
 
@@ -17,5 +17,10 @@ void main()
  	vec3 diffuse_color = baseColor.xyz * max( 0.0f, dot(N,L));
 	vec3 spatial_color = baseColor.xyz * pow( max( 0.0f, dot(V,R)) ,10) / pow(lightdistance, 0.4);
 	vec3 ambient_color = baseColor.xyz*vec3(0.15,0.15,0.15);
-	color = vec4(min(1.1*diffuse_color + 1.1*spatial_color + ambient_color, vec3(1.0)), 1.0f);
+	vec3 c1 = min(1.1*diffuse_color + 1.1*spatial_color + ambient_color, vec3(1.0));
+	float ratio = smoothstep(13.0, 50.0, cameradistance);
+	ratio = pow(ratio,1.5);
+	c1 = mix(c1, vec3(30/255.0,144.0/255.0,1.0), ratio*0.7);
+	//c1 = c1*0.00001f + vec3(0.0f, 0.0f, ratio);
+	color = vec4(c1,1.0f);
 }

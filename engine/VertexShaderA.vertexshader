@@ -18,6 +18,7 @@ out vec3 normal_cameraspace;
 out vec3 vector_to_light_cameraspace;
 out vec3 vector_to_camera_cameraspace;
 out float lightdistance;
+out float cameradistance;
 
 void main(){
     vec4 color = vertexColor;
@@ -30,6 +31,7 @@ void main(){
 
     vec3 lightpos_cameraspace = ( camera_transform * vec4(lightpos_global,1.0f)).xyz;
     lightdistance = distance(vertexPosition_cameraspace.xyz, lightpos_cameraspace);
+    cameradistance = distance(vertexPosition_cameraspace.xyz, camerapos_cameraspace);
     vector_to_light_cameraspace = lightpos_cameraspace + vector_to_camera_cameraspace;
 
     normal_cameraspace = normalize( camera_transform * model_transform * vec4(vertexNormal_model,0.0f)).xyz;
