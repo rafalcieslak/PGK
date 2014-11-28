@@ -9,7 +9,7 @@ class Viewpoint : public Node{
 	float fov = 100.0;
 	bool active = false;
 public:
-	Viewpoint(glm::vec3 position = glm::vec3(0.0), glm::vec3 direction = glm::vec3(0.0,0.0,0.1));
+	Viewpoint(glm::vec3 position = glm::vec3(0.0), glm::vec3 direction = glm::vec3(0.0,0.1,0.0));
 	glm::vec3 GetDirection() const;
 	void SetDirection(glm::vec3);
 	void SetAsActive();

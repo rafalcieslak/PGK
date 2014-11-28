@@ -38,6 +38,8 @@ public:
 	static bool IsWindowClosed();
 	// Sets the root node.
 	static void SetRootNode(std::shared_ptr<Node>);
+	// Resets the mouse to window center and returns it's previous position, scaled to -1,1
+	static glm::vec2 ProbeMouse();
 };
 
 

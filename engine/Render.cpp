@@ -54,7 +54,7 @@ int Render::Init(){
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 	// Open a window and create its OpenGL context
-	window = glfwCreateWindow( 1000, 1000, "Arcanoid", NULL, NULL);
+	window = glfwCreateWindow( 1000, 1000, "Bubbles", NULL, NULL);
 	pxsizex = 2.0 / 1000;
 	pxsizey = 2.0 / 1000;
 	if( window == NULL ){
@@ -114,6 +114,13 @@ int Render::Init(){
 	return 0;
 }
 
+glm::vec2 Render::ProbeMouse(){
+	double x,y;
+	glfwGetCursorPos(window,&x,&y);
+	glfwSetCursorPos(window,500.0,500.0);
+	return glm::vec2((x-500)/500,(y-500)/500);
+}
+
 void Render::RecursivellyProcessNode(std::shared_ptr<Node> n, glm::mat4 current_transform){
 	if(!n) return; // ignore null nodes
 	if(!n->GetActive()) return;
@@ -156,7 +163,7 @@ void Render::Frame(){
 		glUniform3f(uniform_lightpos,lightpos.x,lightpos.y,lightpos.z);
 	}
 	if(Viewpoint::active_viewpoint){
-		glm::mat4 cameraview =  glm::lookAt(glm::vec3(0.0) , 1.0f* Viewpoint::active_viewpoint->GetDirection(), glm::vec3(0.0,1.0,0.0)) * glm::inverse(Viewpoint::active_viewpoint->GetGlobalTransform());
+		glm::mat4 cameraview =  glm::lookAt(glm::vec3(0.0) , 1.0f* Viewpoint::active_viewpoint->GetDirection(), glm::vec3(0.0,0.0,1.0)) * glm::inverse(Viewpoint::active_viewpoint->GetGlobalTransform());
 		glm::mat4 perspective = glm::perspective(Viewpoint::active_viewpoint->GetFOV(), 1.0f, 0.1f, 50.0f);
 		glUniformMatrix4fv(uniform_camera_transform, 1, GL_FALSE, &cameraview[0][0]);
 		glUniformMatrix4fv(uniform_perspective_transform, 1, GL_FALSE, &perspective[0][0]);
