@@ -2,6 +2,7 @@
 #include "../engine/Render.hpp"
 #include "../engine/Viewpoint.hpp"
 #include "Cube.hpp"
+#include "Ball.hpp"
 #include "../engine/Light.hpp"
 
 int main(){
@@ -13,12 +14,12 @@ int main(){
 
 	auto root = std::make_shared<Node>();
 
-	auto cube = std::make_shared<Cube>(0.4);
+	auto ball = std::make_shared<Ball>(0.9);
 	auto cube2 = std::make_shared<Cube>(0.2);
 	cube2->SetPosition(glm::vec3(1.0,1.0,0.0));
 	cube2->variant = 1;
-	cube->AddChild(cube2);
-	root->AddChild(cube);
+	ball->AddChild(cube2);
+	root->AddChild(ball);
 
 	auto camera = std::make_shared<Viewpoint>(glm::vec3(0.0,0.8,2.0));
 	camera->LookAt(glm::vec3(0.0,0.0,0.0));
@@ -42,7 +43,7 @@ int main(){
 
 		p += 0.7 * time_delta;
 
-		cube->SetRotation(glm::quat(glm::vec3(0.0,p,0.0)));
+		ball->SetRotation(glm::quat(glm::vec3(0.0,p,0.0)));
 
 		Render::Frame();
 	}while( !Render::IsKeyPressed(GLFW_KEY_ESCAPE ) && !Render::IsWindowClosed() );
