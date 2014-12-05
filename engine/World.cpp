@@ -1,8 +1,4 @@
 #include "World.hpp"
-#define GLM_FORCE_RADIANS
-#include <glm/glm.hpp>
-#include <glm/gtc/quaternion.hpp>
-#include <glm/gtx/quaternion.hpp>
 
 const glm::vec3 World::front(0.0,-1.0,0.0);
 const glm::vec3 World::left(1.0, 0.0,0.0);
