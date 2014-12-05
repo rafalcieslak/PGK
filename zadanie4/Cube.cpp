@@ -29,6 +29,7 @@ Cube::Cube(float scale){
     //      x3b(0.0f, 0.0f, -1.0f),},
 		{ { x4(x3(C_BLUE),x3(C_GREEN),x3(C_RED)),},
           { x4(x3(C_GREEN),x3(C_RED),x3(C_BLUE)),},
+          { x4(x3(C_RED),x3(C_RED),x3(C_RED)),},
 			}
 		);
 	}

@@ -53,10 +53,6 @@ int main(){
 	ball->AddChild(cube3);
 	root->AddChild(ball);
 
-	auto plane = std::make_shared<Plane>(5.0);
-	plane->SetPosition(0.0,0.0,-2.0);
-	root->AddChild(plane);
-
 	auto camera = std::make_shared<Viewpoint>(glm::vec3(0.0,2.0,0.8));
 	camera->LookAt(0.0,0.0,0.0);
 	camera->SetAsActive();
@@ -70,6 +66,10 @@ int main(){
 	player->SetPosition(-1.0,2.0,0.0);
 	player->SwitchToTP();
 	root->AddChild(player);
+
+	auto fishtank = std::make_shared<Cube>(1.0);
+	fishtank->SetScale(3.0,8.0,3.0);
+	root->AddChild(fishtank);
 
 	Render::SetRootNode(root);
 
