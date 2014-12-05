@@ -2,7 +2,6 @@
 #include "../engine/Viewpoint.hpp"
 #include "Cube.hpp"
 #include "Bubble.hpp"
-#include "Plane.hpp"
 #include "Player.hpp"
 #include "../engine/Light.hpp"
 #include "../engine/World.hpp"
