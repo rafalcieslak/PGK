@@ -21,6 +21,11 @@ void main()
 	vec3 c1 = min(1.1*diffuse_color + 1.1*spatial_color + ambient_color, vec3(1.0));
 	ratio = pow(10.0,ratio) / 10.0;
 	c1 = mix(c1, vec3(30/255.0,144.0/255.0,1.0), ratio*0.7);
-	//c1 = c1*0.00001f + vec3(0.0f, 0.0f, ratio);
-	color = vec4(c1,baseColor.a);
+
+	float angleratio = length(cross(N,V));
+	angleratio = pow(angleratio,2);
+	float alpha = baseColor.a;
+	if(alpha < 0.9) alpha *= (1+angleratio);
+
+	color = vec4(c1,alpha);
 }

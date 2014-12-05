@@ -64,6 +64,10 @@ public:
 	// This function returns a relative transformation matrix.
 	glm::mat4 GetTransform() const;
 	glm::mat4 GetGlobalTransform() const;
+	glm::vec3 GetGlobalPos() const {
+		glm::vec4 v = GetGlobalTransform() * glm::vec4(0.0,0.0,0.0,1.0);
+		return glm::vec3(v.x,v.y,v.z);
+	}
 	// Creates a parent-children relationship. Adds a child node, and set's
 	// its parent to this node.
 	virtual void AddChild(std::shared_ptr<Node>);

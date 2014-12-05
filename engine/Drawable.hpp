@@ -1,7 +1,6 @@
 #ifndef DRAWABLE_H
 #define DRAWABLE_H
 
-#include <glm/glm.hpp>
 #include <vector>
 #include <string>
 #include "Node.hpp"

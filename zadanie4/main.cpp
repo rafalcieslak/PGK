@@ -1,4 +1,3 @@
-#include <glm/glm.hpp>
 #include "../engine/Render.hpp"
 #include "../engine/Viewpoint.hpp"
 #include "Cube.hpp"
@@ -6,6 +5,7 @@
 #include "Plane.hpp"
 #include "Player.hpp"
 #include "../engine/Light.hpp"
+#include "../engine/World.hpp"
 #include <iostream>
 
 typedef enum viewModes{
@@ -32,6 +32,8 @@ void SwitchViewMode(){
 	};
 }
 
+
+
 int main(){
 	srand(time(nullptr));
 
@@ -41,18 +43,21 @@ int main(){
 
 	auto root = std::make_shared<Node>();
 
-	auto ball = std::make_shared<Ball>(0.9);
-	ball->culling = 1;
+	auto fishtank = std::make_shared<Cube>(1.0);
+	fishtank->SetScale(3.0,8.0,3.0);
+	fishtank->culling = 2;
+	root->AddChild(fishtank);
+
+
 	auto cube2 = std::make_shared<Cube>(0.2);
 	cube2->SetPosition(1.0,0.0,1.0);
 	cube2->variant = 1;
-	ball->AddChild(cube2);
+	root->AddChild(cube2);
 	auto cube3 = std::make_shared<Cube>(0.3);
 	cube3->SetScale(0.3,0.1,0.5);
 	cube3->SetPosition(0.0,0.0,1.0);
 	cube3->variant = 1;
-	ball->AddChild(cube3);
-	root->AddChild(ball);
+	root->AddChild(cube3);
 
 	auto camera = std::make_shared<Viewpoint>(glm::vec3(0.0,2.0,0.8));
 	camera->LookAt(0.0,0.0,0.0);
@@ -68,13 +73,11 @@ int main(){
 	player->SwitchToTP();
 	root->AddChild(player);
 
-	auto fishtank = std::make_shared<Cube>(1.0);
-	fishtank->SetScale(3.0,8.0,3.0);
-	fishtank->culling = 2;
-	root->AddChild(fishtank);
+	auto ball = std::make_shared<Ball>(0.9);
+	//ball->culling = 1;
+	root->AddChild(ball);
 
 	Render::SetRootNode(root);
-
 
 	double lasttime = Render::GetTime();
 	bool F_key_down = false;
@@ -92,6 +95,8 @@ int main(){
 			F_key_down = true;
 			SwitchViewMode();
 		}
+
+		ball->RotateTowards(Viewpoint::active_viewpoint->GetGlobalPos());
 
 		cube2->SetRotation(glm::quat(glm::vec3(p,0.0,0.0)));
 		if(Render::IsKeyPressed(GLFW_KEY_W)) player->MoveForward(time_delta);

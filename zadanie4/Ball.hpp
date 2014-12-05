@@ -6,6 +6,7 @@
 class Ball : public Drawable{
 public:
 	Ball(float scale = 1.0);
+	void RotateTowards(glm::vec3);
 };
 
 #endif //BALL_HPP
