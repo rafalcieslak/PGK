@@ -14,8 +14,6 @@ class Player : public NodeGroup{
 	float speed = 1.2f;
 	float pitch = 0.0f;
 	float yaw = 0.0f;
-	void UpdateRotation();
-	static glm::vec3 front,left,up;
 public:
 	void SwitchToFP();
 	void SwitchToTP();

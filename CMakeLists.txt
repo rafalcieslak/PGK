@@ -180,11 +180,10 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie4")
 		engine/Render.cpp
 		engine/Shader.cpp
 		engine/Node.cpp
-		engine/Body.cpp
 		engine/Text.cpp
-		engine/SimplePhysics.cpp
 		engine/Viewpoint.cpp
 		engine/Light.cpp
+		engine/World.cpp
 		zadanie4/Cube.cpp
 		zadanie4/Ball.cpp
 		zadanie4/Plane.cpp

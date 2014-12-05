@@ -1,10 +1,6 @@
 #include "Player.hpp"
-#include <iostream>
+#include "../engine/World.hpp"
 #include <glm/gtx/rotate_vector.hpp>
-
-glm::vec3 Player::front(0.0,-1.0,0.0);
-glm::vec3 Player::left(1.0, 0.0,0.0);
-glm::vec3 Player::up(0.0, 0.0,1.0);
 
 Player::Player() {
 	player_cube = std::make_shared<Cube>(0.2);
@@ -29,38 +25,33 @@ std::shared_ptr<Player> Player::Create(){
 }
 
 void Player::MoveForward(float delta){
-	glm::vec3 pitched_front = glm::rotate(front,pitch,up);
-	glm::vec3 pitched_left = glm::rotate(left,pitch,up);
+	glm::vec3 pitched_front = glm::rotate(World::front,pitch,World::up);
+	glm::vec3 pitched_left = glm::rotate(World::left,pitch,World::up);
 	glm::vec3 yawedpitched_front = glm::rotate(pitched_front,yaw,pitched_left);
 	SetPosition(GetPosition() + speed*delta*yawedpitched_front);
 }
 void Player::MoveBackward(float delta){
-	glm::vec3 pitched_front = glm::rotate(front,pitch,up);
-	glm::vec3 pitched_left = glm::rotate(left,pitch,up);
+	glm::vec3 pitched_front = glm::rotate(World::front,pitch,World::up);
+	glm::vec3 pitched_left = glm::rotate(World::left,pitch,World::up);
 	glm::vec3 yawedpitched_front = glm::rotate(pitched_front,yaw,pitched_left);
 	SetPosition(GetPosition() - speed*delta*yawedpitched_front);
 }
 void Player::StrafeRight(float delta){
-	glm::vec3 pitched_left = glm::rotate(left,pitch,up);
+	glm::vec3 pitched_left = glm::rotate(World::left,pitch,World::up);
 	SetPosition(GetPosition() - speed*delta*pitched_left);
 }
 void Player::StrafeLeft(float delta){
-	glm::vec3 pitched_left = glm::rotate(left,pitch,up);
+	glm::vec3 pitched_left = glm::rotate(World::left,pitch,World::up);
 	SetPosition(GetPosition() + speed*delta*pitched_left);
 }
 
 void Player::MovePitch(float delta){
 	pitch -= delta;
-	UpdateRotation();
+	player_cube->SetRotation(World::Rotation(pitch,yaw));
 }
 void Player::MoveYaw(float delta){
 	yaw = glm::clamp(yaw + delta,-3.1415926f/2.0f,3.1415926f/2.0f);
-	UpdateRotation();
-}
-void Player::UpdateRotation(){
-	glm::quat pitch_quat = glm::angleAxis(pitch,glm::vec3(0.0f,0.0f,1.0f));
-	glm::quat yaw_quat = glm::angleAxis(yaw,glm::rotate(pitch_quat,glm::vec3(1.0f,0.0f,0.0f)));
-	player_cube->SetRotation( yaw_quat * pitch_quat);
+	player_cube->SetRotation(World::Rotation(pitch,yaw));
 }
 void Player::SwitchToFP(){
 	first_person_view->SetAsActive();

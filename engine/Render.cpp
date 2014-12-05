@@ -7,6 +7,7 @@
 #include "Text.hpp"
 #include "Viewpoint.hpp"
 #include "Light.hpp"
+#include "World.hpp"
 #include <iostream>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/transform.hpp>
@@ -174,7 +175,7 @@ void Render::Frame(){
 		glUniform3f(uniform_lightpos,lightpos.x,lightpos.y,lightpos.z);
 	}
 	if(Viewpoint::active_viewpoint){
-		glm::mat4 cameraview =  glm::lookAt(glm::vec3(0.0) , 1.0f* Viewpoint::active_viewpoint->GetDirection(), glm::vec3(0.0,0.0,1.0)) * glm::inverse(Viewpoint::active_viewpoint->GetGlobalTransform());
+		glm::mat4 cameraview =  glm::lookAt(glm::vec3(0.0) , 1.0f* Viewpoint::active_viewpoint->GetDirection(), World::up) * glm::inverse(Viewpoint::active_viewpoint->GetGlobalTransform());
 		glm::mat4 perspective = glm::perspective(Viewpoint::active_viewpoint->GetFOV(), 1.0f, 0.1f, 100.0f);
 		glUniformMatrix4fv(uniform_camera_transform, 1, GL_FALSE, &cameraview[0][0]);
 		glUniformMatrix4fv(uniform_perspective_transform, 1, GL_FALSE, &perspective[0][0]);

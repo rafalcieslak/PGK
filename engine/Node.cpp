@@ -2,12 +2,6 @@
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 
-glm::vec2 Rotate2dVector01(glm::vec2 v, float angle){
-	glm::mat2 m(glm::cos(angle*2.0*M_PI), glm::sin(angle*-2.0*M_PI),
-	            glm::sin(angle*2.0*M_PI), glm::cos(angle*2.0*M_PI));
-	return m*v;
-}
-
 Node::Node(glm::vec3 relative_pos_){
 	SetPosition(relative_pos_);
 }

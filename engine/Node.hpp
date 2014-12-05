@@ -10,8 +10,6 @@
 #include <memory>
 #include <algorithm>
 
-glm::vec2 Rotate2dVector01(glm::vec2, float);
-
 /* A Node is the most basic object. It can represent a drawable element
  * a physical body, or anything that is represented by 2d position.
  * The Nodes are arranged in tree-like structures. Each is aware of
