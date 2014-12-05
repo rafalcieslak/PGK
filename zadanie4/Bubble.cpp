@@ -108,7 +108,7 @@ int prepare_ball_model(const unsigned int hstripes, const unsigned int ncir, std
 Bubble::Bubble(float scale){
 	if(!ModelBase::GetInstance().HasModel("ball")){
 		std::vector<float> vertices, normals, colors;
-		int n = prepare_ball_model(16,32,vertices,normals,colors);
+		int n = prepare_ball_model(12,24,vertices,normals,colors);
 		std::cerr << "Ball model has " << n << " triangles." << std::endl;
 		ModelBase::GetInstance().AddModelTriangles("ball",n, vertices.data(), normals.data(), colors.data());
 	}
@@ -128,12 +128,10 @@ void Bubble::ApplyMovement(float time_delta){
 	glm::vec3 pos = GetPosition();
 	float my_h = ZPosToH(pos.z);
 	float new_h = my_h + SpeedFunc(my_h)*time_delta; // this should be an integral...
-	/*std::cout << "z " << pos.z << std::endl;
-	std::cout << "bubble h " << my_h << std::endl;
-	std::cout << "bubble newh " << new_h << std::endl;
-	std::cout << "bubble newz " << HToZPos(new_h) << std::endl;*/
 	SetPosition(pos.x,pos.y,HToZPos(new_h));
-	SetScale(BUBBLE_MAIN_SIZE*ScaleFunc(new_h));
+}
+void Bubble::ApplyScale(){
+	SetScale(BUBBLE_MAIN_SIZE*ScaleFunc( ZPosToH(GetPosition().z) ));
 }
 
 float Bubble::ZPosToH(float zpos){

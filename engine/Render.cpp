@@ -76,7 +76,7 @@ int Render::Init(){
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_FALSE);
 
 	// Black background
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClearColor(100/255.0,200.0/255.0,1.0,1.0);
 
 	// Prepare main vertex array.
 	glGenVertexArrays(1, &VertexArrayID);

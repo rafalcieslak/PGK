@@ -23,7 +23,7 @@ std::shared_ptr<Node> bubble_node;
 std::set<std::shared_ptr<Bubble>> bubbles;
 std::set<std::shared_ptr<Bubble>> bubbles_to_pop;
 
-unsigned int bubble_limit = 30;
+unsigned int bubble_limit = 90;
 
 float random_float(float s){
 	return s*((rand()%10000)/5000.0 - 1.0);
@@ -51,6 +51,7 @@ void spawn_new_bubble(){
 	float y = random_float(ROOM_SIZE_Y/2.0);
 	new_bubble->SetPosition(x,y, -ROOM_SIZE_Z/2.0);
 	new_bubble->spatial = 3.1;
+	new_bubble->ApplyScale();
 	bubble_node->AddChild(new_bubble);
 }
 
@@ -100,9 +101,9 @@ int main(){
 		double time_delta = newtime-lasttime;
 		lasttime = newtime;
 
-
 		for(auto b : bubbles){
 			b->ApplyMovement(time_delta);
+			b->ApplyScale();
 			b->RotateTowards(Viewpoint::active_viewpoint->GetGlobalPos());
 			if(b->ShouldPop()) bubbles_to_pop.insert(b);
 		}
@@ -113,16 +114,17 @@ int main(){
 		}
 		bubbles_to_pop.clear();
 
-		bubble_node->SortChildren([](std::shared_ptr<Node> n) -> float{
-			auto b = std::dynamic_pointer_cast<Bubble>(n);
-			return b->DistanceToCamera();
-		});
-
 		time_to_next_spawn -= time_delta;
 		if(time_to_next_spawn <= 0.0){
 			time_to_next_spawn = time_between_spawns;
 			if(bubbles.size() < bubble_limit) spawn_new_bubble();
 		}
+
+		bubble_node->SortChildren([](std::shared_ptr<Node> n) -> float{
+			auto b = std::dynamic_pointer_cast<Bubble>(n);
+			return b->DistanceToCamera();
+		});
+
 
 		if(!Render::IsKeyPressed(GLFW_KEY_F)) F_key_down = false;
 		else if(Render::IsKeyPressed(GLFW_KEY_F) && F_key_down == false){
