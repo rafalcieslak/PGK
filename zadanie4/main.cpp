@@ -23,6 +23,8 @@ std::shared_ptr<Node> bubble_node;
 std::set<std::shared_ptr<Bubble>> bubbles;
 std::set<std::shared_ptr<Bubble>> bubbles_to_pop;
 
+unsigned int bubble_limit = 30;
+
 float random_float(float s){
 	return s*((rand()%10000)/5000.0 - 1.0);
 }
@@ -61,20 +63,9 @@ int main(){
 	auto root = std::make_shared<Node>();
 
 	auto fishtank = std::make_shared<Cube>(1.0);
-	fishtank->SetScale(ROOM_SIZE_X/2.0,ROOM_SIZE_Y/2.0,ROOM_SIZE_Z/2.0);
-	fishtank->culling = 2;
+	fishtank->SetScale(-ROOM_SIZE_X/2.0,-ROOM_SIZE_Y/2.0,-ROOM_SIZE_Z/2.0);
+	fishtank->culling = 1;
 	root->AddChild(fishtank);
-
-
-	auto cube2 = std::make_shared<Cube>(0.2);
-	cube2->SetPosition(1.0,0.0,1.0);
-	cube2->variant = 1;
-	root->AddChild(cube2);
-	auto cube3 = std::make_shared<Cube>(0.3);
-	cube3->SetScale(0.3,0.1,0.5);
-	cube3->SetPosition(0.0,0.0,1.0);
-	cube3->variant = 1;
-	root->AddChild(cube3);
 
 	auto camera = std::make_shared<Viewpoint>(glm::vec3(0.0,2.0,0.8));
 	camera->LookAt(0.0,0.0,0.0);
@@ -82,7 +73,7 @@ int main(){
 
 	root->AddChild(camera);
 
-	auto light = std::make_shared<Light>(glm::vec3(0.0,0.0,3.0));
+	auto light = std::make_shared<Light>(glm::vec3(0.0,0.0,8.0));
 	root->AddChild(light);
 
 	player = Player::Create();
@@ -98,16 +89,16 @@ int main(){
 
 	double lasttime = Render::GetTime();
 	bool F_key_down = false;
+
+	const double time_between_spawns = 10.0/bubble_limit;
+	double time_to_next_spawn = time_between_spawns;
+
 	// This is the main loop.
-	double p = 0.0;
-	spawn_new_bubble();
 	do{
 		double newtime = Render::GetTime();
 		double time_delta = newtime-lasttime;
 		lasttime = newtime;
 
-		p += 0.7 * time_delta;
-		cube2->SetRotation(World::Rotation(p,0));
 
 		for(auto b : bubbles){
 			b->ApplyMovement(time_delta);
@@ -120,6 +111,12 @@ int main(){
 			spawn_new_bubble();
 		}
 		bubbles_to_pop.clear();
+
+		time_to_next_spawn -= time_delta;
+		if(time_to_next_spawn <= 0.0){
+			time_to_next_spawn = time_between_spawns;
+			if(bubbles.size() < bubble_limit) spawn_new_bubble();
+		}
 
 		if(!Render::IsKeyPressed(GLFW_KEY_F)) F_key_down = false;
 		else if(Render::IsKeyPressed(GLFW_KEY_F) && F_key_down == false){

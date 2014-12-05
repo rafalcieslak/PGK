@@ -144,7 +144,7 @@ float Bubble::HToZPos(float h){
 	return a*ROOM_SIZE_Z/2.0;
 }
 float Bubble::SpeedFunc(float h){
-	return h*h*h/2.0 + 0.05;
+	return h*h*h/1.7 + 0.1;
 }
 float Bubble::ScaleFunc(float h){
 	return h*h/0.9 + 0.2;
