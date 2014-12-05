@@ -185,7 +185,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie4")
 		engine/Light.cpp
 		engine/World.cpp
 		zadanie4/Cube.cpp
-		zadanie4/Ball.cpp
+		zadanie4/Bubble.cpp
 		zadanie4/Plane.cpp
 		zadanie4/Player.cpp
 		zadanie4/main.cpp

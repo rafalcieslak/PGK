@@ -1,12 +1,14 @@
 #include "../engine/Render.hpp"
 #include "../engine/Viewpoint.hpp"
 #include "Cube.hpp"
-#include "Ball.hpp"
+#include "Bubble.hpp"
 #include "Plane.hpp"
 #include "Player.hpp"
 #include "../engine/Light.hpp"
 #include "../engine/World.hpp"
 #include <iostream>
+#include <set>
+#include "main.hpp"
 
 typedef enum viewModes{
 	VIEW_MODE_THIRD_PERSON = 0,
@@ -16,6 +18,14 @@ typedef enum viewModes{
 viewModes view_mode = VIEW_MODE_THIRD_PERSON;
 
 std::shared_ptr<Player> player;
+std::shared_ptr<Node> bubble_node;
+
+std::set<std::shared_ptr<Bubble>> bubbles;
+std::set<std::shared_ptr<Bubble>> bubbles_to_pop;
+
+float random_float(float s){
+	return s*((rand()%10000)/5000.0 - 1.0);
+}
 
 void SwitchViewMode(){
 	switch(view_mode){
@@ -32,7 +42,14 @@ void SwitchViewMode(){
 	};
 }
 
-
+void spawn_new_bubble(){
+	auto new_bubble = std::make_shared<Bubble>(BUBBLE_MAIN_SIZE);
+	bubbles.emplace(new_bubble);
+	float x = random_float(ROOM_SIZE_X/2.0);
+	float y = random_float(ROOM_SIZE_Y/2.0);
+	new_bubble->SetPosition(x,y, -ROOM_SIZE_Z/2.0);
+	bubble_node->AddChild(new_bubble);
+}
 
 int main(){
 	srand(time(nullptr));
@@ -44,7 +61,7 @@ int main(){
 	auto root = std::make_shared<Node>();
 
 	auto fishtank = std::make_shared<Cube>(1.0);
-	fishtank->SetScale(3.0,8.0,3.0);
+	fishtank->SetScale(ROOM_SIZE_X/2.0,ROOM_SIZE_Y/2.0,ROOM_SIZE_Z/2.0);
 	fishtank->culling = 2;
 	root->AddChild(fishtank);
 
@@ -73,10 +90,9 @@ int main(){
 	player->SwitchToTP();
 	root->AddChild(player);
 
-	auto ball = std::make_shared<Ball>(0.9);
-	//ball->culling = 1;
-	ball->spatial = 2.5;
-	root->AddChild(ball);
+	bubble_node = std::make_shared<Node>();
+	bubble_node->SetScale(1.0);
+	root->AddChild(bubble_node);
 
 	Render::SetRootNode(root);
 
@@ -84,12 +100,26 @@ int main(){
 	bool F_key_down = false;
 	// This is the main loop.
 	double p = 0.0;
+	spawn_new_bubble();
 	do{
 		double newtime = Render::GetTime();
 		double time_delta = newtime-lasttime;
 		lasttime = newtime;
 
 		p += 0.7 * time_delta;
+		cube2->SetRotation(World::Rotation(p,0));
+
+		for(auto b : bubbles){
+			b->ApplyMovement(time_delta);
+			b->RotateTowards(Viewpoint::active_viewpoint->GetGlobalPos());
+			if(b->ShouldPop()) bubbles_to_pop.insert(b);
+		}
+		for(auto b : bubbles_to_pop){
+			bubbles.erase(b);
+			bubble_node->RemoveChild(b);
+			spawn_new_bubble();
+		}
+		bubbles_to_pop.clear();
 
 		if(!Render::IsKeyPressed(GLFW_KEY_F)) F_key_down = false;
 		else if(Render::IsKeyPressed(GLFW_KEY_F) && F_key_down == false){
@@ -97,9 +127,6 @@ int main(){
 			SwitchViewMode();
 		}
 
-		ball->RotateTowards(Viewpoint::active_viewpoint->GetGlobalPos());
-
-		cube2->SetRotation(glm::quat(glm::vec3(p,0.0,0.0)));
 		if(Render::IsKeyPressed(GLFW_KEY_W)) player->MoveForward(time_delta);
 		if(Render::IsKeyPressed(GLFW_KEY_S)) player->MoveBackward(time_delta);
 		if(Render::IsKeyPressed(GLFW_KEY_A)) player->StrafeLeft(time_delta);

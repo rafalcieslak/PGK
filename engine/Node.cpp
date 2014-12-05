@@ -10,6 +10,15 @@ void Node::AddChild(std::shared_ptr<Node> ch){
 	children.push_back(ch);
 	ch->parent = shared_from_this();
 }
+void Node::RemoveChild(std::shared_ptr<Node> ch){
+	ch->parent.reset();
+	auto it = std::find(children.begin(), children.end(), ch);
+	if(it == children.end()){
+		std::cerr << "Error: Trying to remove a non-existent child!" << std::endl;
+	}else{
+		children.erase(it);
+	}
+}
 void Node::SetParent(std::shared_ptr<Node> p){
 	parent = p;
 }
@@ -87,4 +96,8 @@ void NodeGroup::SetBottom(std::shared_ptr<Node> p){
 void NodeGroup::AddChild(std::shared_ptr<Node> ch){
 	if(bottom == nullptr) Node::AddChild(ch);
 	else bottom->AddChild(ch);
+}
+void NodeGroup::RemoveChild(std::shared_ptr<Node> ch){
+	if(bottom == nullptr) Node::RemoveChild(ch);
+	else bottom->RemoveChild(ch);
 }

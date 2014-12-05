@@ -24,13 +24,15 @@ void main()
 	float ratio = smoothstep(5.0, 50.0, cameradistance);
 	vec3 c1 = min(material_diffuse_ratio*diffuse_color + material_spatial_ratio*spatial_color + ambient_color, vec3(1.0));
 	ratio = pow(10.0,ratio) / 10.0;
-	c1 = mix(c1, vec3(30/255.0,144.0/255.0,1.0), ratio*0.7);
+	c1 = mix(c1, vec3(100/255.0,200.0/255.0,1.0), ratio*0.7);
 
 	float angleratio = length(cross(N,V));
 	angleratio = pow(angleratio,10);
 	float alpha = baseColor.a;
-	if(alpha < 0.9) alpha *= (1+5*angleratio);
-	//if(alpha < 0.9) alpha /= max(alpha,abs(dot(N,V)));
+	//if(alpha < 0.9) alpha *= (1+5*angleratio);
+	if(alpha < 0.9) alpha /= max(alpha,abs(dot(N,V)));
+
+	if(dot(N,V) < 0) alpha *= 2.0;
 
 	color = vec4(c1,alpha);
 }

@@ -71,6 +71,7 @@ public:
 	// Creates a parent-children relationship. Adds a child node, and set's
 	// its parent to this node.
 	virtual void AddChild(std::shared_ptr<Node>);
+	virtual void RemoveChild(std::shared_ptr<Node>);
 	// Cleanup procedure. Removes patent-child relationship of this node and
 	// it's parent. This may cause shared_ptrs to zero their use count,
 	// which in turn would destruct all this subtree. Useful for removing
@@ -98,6 +99,7 @@ public:
 	// A custom version of AddChild, that attaches children to the node
 	// designated by SetBottom.
 	virtual void AddChild(std::shared_ptr<Node>);
+	virtual void RemoveChild(std::shared_ptr<Node>);
 };
 
 #endif //POSITIONABLE_H

@@ -1,15 +1,16 @@
-#include "Ball.hpp"
+#include "Bubble.hpp"
 #include "../engine/ModelBase.hpp"
 #include <cmath>
 #include <iostream>
 #include <glm/gtx/quaternion.hpp>
+#include "main.hpp"
 
 #define rgb(x,y,z)	x/255.0, y/255.0, z/255.0, 1.0
 #define rgba(x,y,z,a)	x/255.0, y/255.0, z/255.0, a
 #define C_BLUE rgb(58, 92, 226)
 #define C_RED rgb(223, 41, 31)
 #define C_GREEN rgb(45, 199, 81)
-#define BUBBLE_BLUE rgba(75, 165, 225, 0.16)
+#define BUBBLE_BLUE rgba(75, 165, 225, 0.1)
 #define x3(a) a,a,a
 #define x3b(a,b,c) a,b,c,a,b,c,a,b,c
 #define x12(a) a,a,a,a,a,a,a,a,a,a,a,a
@@ -103,7 +104,7 @@ int prepare_ball_model(const unsigned int hstripes, const unsigned int ncir, std
 	return n;
 }
 
-Ball::Ball(float scale){
+Bubble::Bubble(float scale){
 	if(!ModelBase::GetInstance().HasModel("ball")){
 		std::vector<float> vertices, normals, colors;
 		int n = prepare_ball_model(16,32,vertices,normals,colors);
@@ -114,10 +115,40 @@ Ball::Ball(float scale){
 	SetScale(scale);
 }
 
-void Ball::RotateTowards(glm::vec3 to){
-	glm::vec4 my_current_up = glm::vec4(GetGlobalTransform() * glm::vec4(0.0,1.0,0.0,1.0));
+void Bubble::RotateTowards(glm::vec3 to){
+	glm::vec4 my_up =  glm::vec4(0.0,1.0,0.0,1.0);
 	glm::vec4 my_pos = GetGlobalTransform() * glm::vec4(0.0,0.0,0.0,1.0);
 	glm::vec4 dir = glm::vec4(to,1.0) - my_pos;
-	glm::quat rot = glm::rotation(glm::normalize(my_current_up.xyz()), glm::normalize(dir.xyz()));
-	SetRotation(rot * GetRotation());
+	glm::quat rot = glm::rotation(glm::normalize(my_up.xyz()), glm::normalize(dir.xyz()));
+	SetRotation(rot);
+}
+
+void Bubble::ApplyMovement(float time_delta){
+	glm::vec3 pos = GetPosition();
+	float my_h = ZPosToH(pos.z);
+	float new_h = my_h + SpeedFunc(my_h)*time_delta; // this should be an integral...
+	/*std::cout << "z " << pos.z << std::endl;
+	std::cout << "bubble h " << my_h << std::endl;
+	std::cout << "bubble newh " << new_h << std::endl;
+	std::cout << "bubble newz " << HToZPos(new_h) << std::endl;*/
+	SetPosition(pos.x,pos.y,HToZPos(new_h));
+	SetScale(BUBBLE_MAIN_SIZE*ScaleFunc(new_h));
+}
+
+float Bubble::ZPosToH(float zpos){
+	float a = zpos/(ROOM_SIZE_Z/2.0);
+	return (a+1.0)/2.0;
+}
+float Bubble::HToZPos(float h){
+	float a = (h*2.0)-1.0;
+	return a*ROOM_SIZE_Z/2.0;
+}
+float Bubble::SpeedFunc(float h){
+	return h*h*h/2.0 + 0.05;
+}
+float Bubble::ScaleFunc(float h){
+	return h*h/0.9 + 0.2;
+}
+bool Bubble::ShouldPop(){
+	return ZPosToH(GetPosition().z) >= 1.0;
 }
