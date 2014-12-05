@@ -74,7 +74,7 @@ else(GLM_FOUND)
 	ExternalProject_Add(GLM
 		PREFIX GLM
 		GIT_REPOSITORY https://github.com/g-truc/glm.git
-		GIT_TAG 0.9.4
+		GIT_TAG 0.9.5
 		CONFIGURE_COMMAND ""
 		BUILD_COMMAND ""
 	    INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/glm ${CMAKE_BINARY_DIR}/install/glm
