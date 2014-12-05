@@ -7,6 +7,7 @@
 #define C_BLUE rgb(58, 92, 226)
 #define C_RED rgb(223, 41, 31)
 #define C_GREEN rgb(45, 199, 81)
+#define BUBBLE_BLUE rgb(75, 165, 225)
 #define x3(a) a,a,a
 #define x3b(a,b,c) a,b,c,a,b,c,a,b,c
 #define x12(a) a,a,a,a,a,a,a,a,a,a,a,a
@@ -26,7 +27,7 @@ inline void add_triangle_color(std::vector<float>& v, const glm::vec4 a, const g
 int prepare_ball_model(const unsigned int hstripes, const unsigned int ncir, std::vector<float>& vertices, std::vector<float>& normals, std::vector<float>& colors){
 	vertices.clear(); normals.clear(); colors.clear();
 	int n = 0;
-	glm::vec4 color(0.6f,0.1f,0.0f,1.0f);
+	glm::vec4 color(BUBBLE_BLUE);
 
 	//float hangle = 1.0f/hstripes;
 	const float rangle = 1.0f/ncir;
