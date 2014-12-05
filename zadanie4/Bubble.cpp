@@ -3,6 +3,7 @@
 #include <cmath>
 #include <iostream>
 #include <glm/gtx/quaternion.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include "main.hpp"
 #include "../engine/Viewpoint.hpp"
 
