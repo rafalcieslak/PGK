@@ -70,8 +70,8 @@ int main(){
 	auto root = std::make_shared<Node>();
 
 	auto fishtank = std::make_shared<Cube>(1.0);
-	fishtank->SetScale(-ROOM_SIZE_X/2.0,-ROOM_SIZE_Y/2.0,-ROOM_SIZE_Z/2.0);
-	fishtank->culling = 1;
+	fishtank->SetScale(ROOM_SIZE_X/2.0,ROOM_SIZE_Y/2.0,ROOM_SIZE_Z/2.0);
+	fishtank->culling = 2;
 	root->AddChild(fishtank);
 
 	external_cam = ExternalCamera::Create();

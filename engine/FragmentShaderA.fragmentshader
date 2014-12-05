@@ -10,6 +10,7 @@ in vec3 fragmentPosition_cameraspace;
 
 uniform float material_diffuse_ratio;
 uniform float material_spatial_ratio;
+uniform float material_ambient_ratio;
 
 void main()
 {
@@ -19,13 +20,14 @@ void main()
 	vec3 V = normalize( vector_to_camera_cameraspace );
 	vec3 R = reflect(-L,N);
  	vec3 diffuse_color = baseColor.xyz * max( 0.0f, dot(N,L));
-	vec3 spatial_color = baseColor.xyz * pow( max( 0.0f, dot(V,R)) ,10) / pow(lightdistance, 0.4);
-	vec3 ambient_color = baseColor.xyz*vec3(0.15,0.15,0.15);
+	vec3 spatial_color = baseColor.xyz * pow( max( 0.0f, dot(V,R)) ,10) / pow(lightdistance, 0.2);
+	vec3 ambient_color = baseColor.xyz;
 
-	vec3 c1 = min(material_diffuse_ratio*diffuse_color + material_spatial_ratio*spatial_color + ambient_color, vec3(1.0));
-	float fogratio = smoothstep(13.0, 30.0, cameradistance);
-	fogratio = pow(6.0,fogratio) / 6.0;
-	c1 = mix(c1, vec3(100/255.0,200.0/255.0,1.0), fogratio*0.9);
+	vec3 c1 = min(material_diffuse_ratio*diffuse_color + material_spatial_ratio*spatial_color + material_ambient_ratio*ambient_color, vec3(1.0));
+	float fogratio = smoothstep(2.0, 30.0, cameradistance);
+	fogratio = min(1.0,pow(6.0,fogratio) / 6.0);
+	c1 = mix(c1, vec3(100/255.0,200.0/255.0,1.0), fogratio*0.6);
+	//c1.r = fogratio*0.1;
 
 	float angleratio = length(cross(N,V));
 	angleratio = pow(angleratio,10);

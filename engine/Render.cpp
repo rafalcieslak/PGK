@@ -17,7 +17,7 @@ GLFWwindow* window;
 
 // All the static members of Render class.
 GLint Render::uniform_model_transform, Render::uniform_camera_transform, Render::uniform_perspective_transform;
-GLint Render::uniform_lightpos, Render::uniform_diffuse, Render::uniform_spatial;
+GLint Render::uniform_lightpos, Render::uniform_diffuse, Render::uniform_spatial, Render::uniform_ambient;
 GLint Render::uniform_anim_mode, Render::uniform_anim_phase;
 GLuint Render::VertexArrayID;
 float Render::pxsizex, Render::pxsizey;
@@ -94,7 +94,8 @@ int Render::Init(){
 	uniform_anim_phase = glGetUniformLocation(shader_program_id,"anim_phase");
 	uniform_diffuse = glGetUniformLocation(shader_program_id,"material_diffuse_ratio");
 	uniform_spatial = glGetUniformLocation(shader_program_id,"material_spatial_ratio");
-	if(uniform_model_transform == -1 || uniform_anim_mode == -1 || uniform_anim_phase == -1 || uniform_camera_transform == -1 || uniform_perspective_transform == -1 || uniform_lightpos == -1 || uniform_diffuse == -1 || uniform_spatial == -1){
+	uniform_ambient = glGetUniformLocation(shader_program_id,"material_ambient_ratio");
+	if(uniform_model_transform == -1 || uniform_anim_mode == -1 || uniform_anim_phase == -1 || uniform_camera_transform == -1 || uniform_perspective_transform == -1 || uniform_lightpos == -1 || uniform_diffuse == -1 || uniform_spatial == -1 || uniform_ambient == -1){
 		std::cerr << "A uniform is missing from the shader." << std::endl;
 		glfwTerminate();
 		return -1;
@@ -153,6 +154,7 @@ void Render::RecursivellyProcessNode(std::shared_ptr<Node> n, glm::mat4 current_
 			}
 			glUniform1f(uniform_diffuse, d->diffuse);
 			glUniform1f(uniform_spatial, d->spatial);
+			glUniform1f(uniform_ambient, d->ambient);
 			m->metaDraw(d->variant);
 		}else{
 			std::cerr << "Warning: A drawable has no model in base (" << d->model_id << ")" << std::endl;
