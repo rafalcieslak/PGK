@@ -7,6 +7,10 @@ in vec3 vector_to_light_cameraspace;
 in vec3 vector_to_camera_cameraspace;
 in float lightdistance;
 in vec3 fragmentPosition_cameraspace;
+
+uniform float material_diffuse_ratio;
+uniform float material_spatial_ratio;
+
 void main()
 {
 	float cameradistance = length(fragmentPosition_cameraspace);
@@ -18,14 +22,15 @@ void main()
 	vec3 spatial_color = baseColor.xyz * pow( max( 0.0f, dot(V,R)) ,10) / pow(lightdistance, 0.4);
 	vec3 ambient_color = baseColor.xyz*vec3(0.15,0.15,0.15);
 	float ratio = smoothstep(5.0, 50.0, cameradistance);
-	vec3 c1 = min(1.1*diffuse_color + 1.1*spatial_color + ambient_color, vec3(1.0));
+	vec3 c1 = min(material_diffuse_ratio*diffuse_color + material_spatial_ratio*spatial_color + ambient_color, vec3(1.0));
 	ratio = pow(10.0,ratio) / 10.0;
 	c1 = mix(c1, vec3(30/255.0,144.0/255.0,1.0), ratio*0.7);
 
 	float angleratio = length(cross(N,V));
-	angleratio = pow(angleratio,2);
+	angleratio = pow(angleratio,10);
 	float alpha = baseColor.a;
-	if(alpha < 0.9) alpha *= (1+angleratio);
+	if(alpha < 0.9) alpha *= (1+5*angleratio);
+	//if(alpha < 0.9) alpha /= max(alpha,abs(dot(N,V)));
 
 	color = vec4(c1,alpha);
 }

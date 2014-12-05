@@ -75,6 +75,7 @@ int main(){
 
 	auto ball = std::make_shared<Ball>(0.9);
 	//ball->culling = 1;
+	ball->spatial = 2.5;
 	root->AddChild(ball);
 
 	Render::SetRootNode(root);

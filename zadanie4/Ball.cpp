@@ -9,7 +9,7 @@
 #define C_BLUE rgb(58, 92, 226)
 #define C_RED rgb(223, 41, 31)
 #define C_GREEN rgb(45, 199, 81)
-#define BUBBLE_BLUE rgba(75, 165, 225, 0.2)
+#define BUBBLE_BLUE rgba(75, 165, 225, 0.16)
 #define x3(a) a,a,a
 #define x3b(a,b,c) a,b,c,a,b,c,a,b,c
 #define x12(a) a,a,a,a,a,a,a,a,a,a,a,a
