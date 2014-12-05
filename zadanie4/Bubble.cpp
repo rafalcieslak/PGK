@@ -4,6 +4,7 @@
 #include <iostream>
 #include <glm/gtx/quaternion.hpp>
 #include "main.hpp"
+#include "../engine/Viewpoint.hpp"
 
 #define rgb(x,y,z)	x/255.0, y/255.0, z/255.0, 1.0
 #define rgba(x,y,z,a)	x/255.0, y/255.0, z/255.0, a
@@ -149,6 +150,9 @@ float Bubble::SpeedFunc(float h){
 float Bubble::ScaleFunc(float h){
 	return h*h/0.9 + 0.2;
 }
-bool Bubble::ShouldPop(){
+bool Bubble::ShouldPop() const{
 	return ZPosToH(GetPosition().z) >= 1.0;
+}
+float Bubble::DistanceToCamera() const{
+	return glm::distance(GetGlobalPos(),Viewpoint::active_viewpoint->GetGlobalPos());
 }

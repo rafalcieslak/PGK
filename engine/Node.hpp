@@ -6,9 +6,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
-#include <list>
+#include <vector>
 #include <memory>
 #include <algorithm>
+#include <functional>
 
 /* A Node is the most basic object. It can represent a drawable element
  * a physical body, or anything that is represented by 2d position.
@@ -43,7 +44,7 @@ public:
 	Node(glm::vec3 position);
 	Node(float x, float y, float z) : Node(glm::vec3(x,y,z)) {}
 	// The list of children nodes.
-	std::list<std::shared_ptr<Node>> children;
+	std::vector<std::shared_ptr<Node>> children;
 
 	// Returns whether this node should be processed.
 	bool GetActive() const;
@@ -72,6 +73,8 @@ public:
 	// its parent to this node.
 	virtual void AddChild(std::shared_ptr<Node>);
 	virtual void RemoveChild(std::shared_ptr<Node>);
+	// Orders the children using the function given as parameter.
+	void SortChildren(std::function<float(std::shared_ptr<Node>)> value_func);
 	// Cleanup procedure. Removes patent-child relationship of this node and
 	// it's parent. This may cause shared_ptrs to zero their use count,
 	// which in turn would destruct all this subtree. Useful for removing

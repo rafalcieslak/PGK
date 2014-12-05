@@ -79,6 +79,12 @@ void Node::UpdateTransform(){
 	transform = tr* ro * sc;
 }
 
+void Node::SortChildren(std::function<float(std::shared_ptr<Node>)> value_func){
+	std::sort(children.begin(),children.end(), [value_func](std::shared_ptr<Node> a, std::shared_ptr<Node> b) -> bool {
+		return value_func(a) > value_func(b);
+	});
+}
+
 std::shared_ptr<Node> Node::Create(glm::vec3 pos){
 	return std::make_shared<Node>(pos);
 }

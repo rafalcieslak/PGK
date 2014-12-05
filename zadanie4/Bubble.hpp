@@ -8,7 +8,8 @@ public:
 	Bubble(float scale = 1.0);
 	void RotateTowards(glm::vec3);
 	void ApplyMovement(float time_delta);
-	bool ShouldPop();
+	bool ShouldPop() const;
+	float DistanceToCamera() const;
 private:
 	static float ZPosToH(float zpos);
 	static float HToZPos(float h);

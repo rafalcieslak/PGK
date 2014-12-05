@@ -50,6 +50,7 @@ void spawn_new_bubble(){
 	float x = random_float(ROOM_SIZE_X/2.0);
 	float y = random_float(ROOM_SIZE_Y/2.0);
 	new_bubble->SetPosition(x,y, -ROOM_SIZE_Z/2.0);
+	new_bubble->spatial = 3.1;
 	bubble_node->AddChild(new_bubble);
 }
 
@@ -111,6 +112,11 @@ int main(){
 			spawn_new_bubble();
 		}
 		bubbles_to_pop.clear();
+
+		bubble_node->SortChildren([](std::shared_ptr<Node> n) -> float{
+			auto b = std::dynamic_pointer_cast<Bubble>(n);
+			return b->DistanceToCamera();
+		});
 
 		time_to_next_spawn -= time_delta;
 		if(time_to_next_spawn <= 0.0){
