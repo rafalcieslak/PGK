@@ -42,6 +42,7 @@ int main(){
 	auto root = std::make_shared<Node>();
 
 	auto ball = std::make_shared<Ball>(0.9);
+	ball->culling = 1;
 	auto cube2 = std::make_shared<Cube>(0.2);
 	cube2->SetPosition(1.0,0.0,1.0);
 	cube2->variant = 1;
@@ -69,6 +70,7 @@ int main(){
 
 	auto fishtank = std::make_shared<Cube>(1.0);
 	fishtank->SetScale(3.0,8.0,3.0);
+	fishtank->culling = 2;
 	root->AddChild(fishtank);
 
 	Render::SetRootNode(root);

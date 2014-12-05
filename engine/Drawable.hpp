@@ -24,6 +24,8 @@ public:
 	unsigned int variant;
 	// This signal is emitted when an animation for this drawable has been completed.
 	Signal<int> on_animation_finished;
+	// 0 - no culling, 1 - cull backfaces, 2 - cull frontfaces
+	unsigned int culling = 0;
 private:
 	friend class Render;
 	// Animation state.

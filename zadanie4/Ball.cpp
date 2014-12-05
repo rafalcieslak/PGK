@@ -23,6 +23,16 @@ inline void add_triangle_color(std::vector<float>& v, const glm::vec4 a, const g
 	v.push_back(b.x); v.push_back(b.y); v.push_back(b.z); v.push_back(b.w);
 	v.push_back(c.x); v.push_back(c.y); v.push_back(c.z); v.push_back(c.w);
 }
+inline void add_triangle_REV(std::vector<float>& v, const glm::vec3 a, const glm::vec3 b, const glm::vec3 c){
+	v.push_back(c.x); v.push_back(c.y); v.push_back(c.z);
+	v.push_back(b.x); v.push_back(b.y); v.push_back(b.z);
+	v.push_back(a.x); v.push_back(a.y); v.push_back(a.z);
+}
+inline void add_triangle_color_REV(std::vector<float>& v, const glm::vec4 a, const glm::vec4 b, const glm::vec4 c){
+	v.push_back(c.x); v.push_back(c.y); v.push_back(c.z); v.push_back(c.w);
+	v.push_back(b.x); v.push_back(b.y); v.push_back(b.z); v.push_back(b.w);
+	v.push_back(a.x); v.push_back(a.y); v.push_back(a.z); v.push_back(a.w);
+}
 
 int prepare_ball_model(const unsigned int hstripes, const unsigned int ncir, std::vector<float>& vertices, std::vector<float>& normals, std::vector<float>& colors){
 	vertices.clear(); normals.clear(); colors.clear();
@@ -79,12 +89,12 @@ int prepare_ball_model(const unsigned int hstripes, const unsigned int ncir, std
 			glm::vec3 normalB = (2.0f*pointB - pointB);
 			glm::vec3 normalC = (2.0f*pointC - pointC);
 			glm::vec3 normalD = (2.0f*pointD - pointD);
-			add_triangle(vertices, pointA, pointB, pointC);
-			add_triangle(vertices, pointC, pointB, pointD);
-			add_triangle(normals, normalA, normalB, normalC);
-			add_triangle(normals, normalC, normalB, normalD);
-			add_triangle_color(colors, color, color, color);
-			add_triangle_color(colors, color, color, color);
+			add_triangle_REV(vertices, pointA, pointB, pointC);
+			add_triangle_REV(vertices, pointC, pointB, pointD);
+			add_triangle_REV(normals, normalA, normalB, normalC);
+			add_triangle_REV(normals, normalC, normalB, normalD);
+			add_triangle_color_REV(colors, color, color, color);
+			add_triangle_color_REV(colors, color, color, color);
 			n += 2;
 		}
 	}

@@ -100,6 +100,7 @@ int Render::Init(){
 	// Enable blending for several alpha effects.
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_ZERO, GL_SRC_COLOR);
 
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
@@ -138,6 +139,16 @@ void Render::RecursivellyProcessNode(std::shared_ptr<Node> n, glm::mat4 current_
 				glUniform1f(uniform_anim_phase, anim_phase);
 				if(anim_phase >= 1.0) d->on_animation_finished.Happen(d->anim_mode);
 			}
+			if(d->culling == 0){
+				glDisable(GL_CULL_FACE);
+			}else if(d->culling == 1){
+				glFrontFace(GL_CCW);
+				glEnable(GL_CULL_FACE);
+			}else if(d->culling == 2){
+				glFrontFace(GL_CW);
+				glEnable(GL_CULL_FACE);
+			}
+			//glUniform1i(uniform_cullmode, d->culling);
 			m->metaDraw(d->variant);
 		}else{
 			std::cerr << "Warning: A drawable has no model in base (" << d->model_id << ")" << std::endl;

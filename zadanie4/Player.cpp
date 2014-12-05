@@ -9,6 +9,7 @@ glm::vec3 Player::up(0.0, 0.0,1.0);
 Player::Player() {
 	player_cube = std::make_shared<Cube>(0.2);
 	player_cube->variant = 2;
+	player_cube->culling = 1;
 	first_person_view = std::make_shared<Viewpoint>(glm::vec3(0.0,0.0,0.0));
  	third_person_view = std::make_shared<Viewpoint>(glm::vec3(0.0,10.0,5.0));
 	first_person_view->LookAt(glm::vec3(0.0,-1.0,0.0));
@@ -62,10 +63,8 @@ void Player::UpdateRotation(){
 	player_cube->SetRotation( yaw_quat * pitch_quat);
 }
 void Player::SwitchToFP(){
-	player_cube->SetActive(false);
 	first_person_view->SetAsActive();
 }
 void Player::SwitchToTP(){
-	player_cube->SetActive(true);
 	third_person_view->SetAsActive();
 }

@@ -22,5 +22,5 @@ void main()
 	ratio = pow(ratio,1.5);
 	c1 = mix(c1, vec3(30/255.0,144.0/255.0,1.0), ratio*0.7);
 	//c1 = c1*0.00001f + vec3(0.0f, 0.0f, ratio);
-	color = vec4(c1,1.0f);
+	color = vec4(c1,baseColor.a);
 }
