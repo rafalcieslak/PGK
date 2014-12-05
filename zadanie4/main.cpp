@@ -43,21 +43,21 @@ int main(){
 
 	auto ball = std::make_shared<Ball>(0.9);
 	auto cube2 = std::make_shared<Cube>(0.2);
-	cube2->SetPosition(glm::vec3(1.0,0.0,1.0));
+	cube2->SetPosition(1.0,0.0,1.0);
 	cube2->variant = 1;
 	ball->AddChild(cube2);
 	auto cube3 = std::make_shared<Cube>(0.3);
-	cube3->SetPosition(glm::vec3(0.0,0.0,1.0));
+	cube3->SetPosition(0.0,0.0,1.0);
 	cube3->variant = 1;
 	ball->AddChild(cube3);
 	root->AddChild(ball);
 
 	auto plane = std::make_shared<Plane>(5.0);
-	plane->SetPosition(glm::vec3(0.0,0.0,-2.0));
+	plane->SetPosition(0.0,0.0,-2.0);
 	root->AddChild(plane);
 
 	auto camera = std::make_shared<Viewpoint>(glm::vec3(0.0,2.0,0.8));
-	camera->LookAt(glm::vec3(0.0,0.0,0.0));
+	camera->LookAt(0.0,0.0,0.0);
 	camera->SetAsActive();
 
 	root->AddChild(camera);
@@ -66,7 +66,7 @@ int main(){
 	root->AddChild(light);
 
 	player = Player::Create();
-	player->SetPosition(glm::vec3(-1.0,2.0,0.0));
+	player->SetPosition(-1.0,2.0,0.0);
 	player->SwitchToTP();
 	root->AddChild(player);
 

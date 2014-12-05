@@ -42,7 +42,8 @@ protected:
 
 public:
 	Node() {};
-	Node(glm::vec3 relative_pos);
+	Node(glm::vec3 position);
+	Node(float x, float y, float z) : Node(glm::vec3(x,y,z)) {}
 	// The list of children nodes.
 	std::list<std::shared_ptr<Node>> children;
 
@@ -53,6 +54,7 @@ public:
 	float GetScale() const;
 	glm::quat GetRotation() const;
 	void SetPosition(glm::vec3);
+	void SetPosition(float x, float y, float z) {SetPosition(glm::vec3(x,y,z));}
 	void SetScale(float);
 	void SetRotation(glm::quat);
 	void SetActive(bool);

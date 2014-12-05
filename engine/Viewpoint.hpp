@@ -15,6 +15,7 @@ public:
 	void SetAsActive();
 	bool IsActive() const;
 	void LookAt(glm::vec3);
+	void LookAt(float x, float y, float z) {LookAt(glm::vec3(x,y,z));}
 	float GetFOV() const {return fov*2.0*3.14159265/360.0;}
 	static std::shared_ptr<Viewpoint> active_viewpoint;
 };
