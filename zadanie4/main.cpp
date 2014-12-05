@@ -47,6 +47,7 @@ int main(){
 	cube2->variant = 1;
 	ball->AddChild(cube2);
 	auto cube3 = std::make_shared<Cube>(0.3);
+	cube3->SetScale(0.3,0.1,0.5);
 	cube3->SetPosition(0.0,0.0,1.0);
 	cube3->variant = 1;
 	ball->AddChild(cube3);

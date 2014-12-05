@@ -16,7 +16,9 @@ struct CollisionShape : Node{
 	// The bounding radius is used to quickly check whether two shapes can possibly collide.
 	CollisionShape(float br) : bounding_radius(br) {}
 	float GetBoundingRadius() {
-		return bounding_radius * GetScale();
+		glm::vec3 s = GetScale();
+		float m = glm::max(s.x, glm::max(s.y, s.z));
+		return bounding_radius * m;
 	}
 private:
 	float bounding_radius;

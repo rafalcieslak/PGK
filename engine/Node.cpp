@@ -42,7 +42,7 @@ void Node::SetPosition(glm::vec3 pos){
 	position = pos;
 	UpdateTransform();
 }
-void Node::SetScale(float s){
+void Node::SetScale(glm::vec3 s){
 	scale = s;
 	UpdateTransform();
 }
@@ -53,7 +53,7 @@ void Node::SetRotation(glm::quat r){
 glm::vec3 Node::GetPosition() const{
 	return position;
 }
-float Node::GetScale() const{
+glm::vec3 Node::GetScale() const{
 	return scale;
 }
 glm::quat Node::GetRotation() const{
@@ -70,7 +70,7 @@ glm::mat4 Node::GetGlobalTransform() const{
 }
 
 void Node::UpdateTransform(){
-	glm::mat4 sc = glm::scale(glm::mat4(1.0),glm::vec3(scale));
+	glm::mat4 sc = glm::scale(glm::mat4(1.0),scale);
 	glm::mat4 tr = glm::translate(glm::mat4(1.0),position);
 	glm::mat4 ro = glm::toMat4(rotation);
 	transform = tr* ro * sc;

@@ -30,7 +30,7 @@ private:
 	// 3D position of this Node - relative to parent.
 	glm::vec3 position;
 	// Scale and rotation of this Node.
-	float scale = 1.0;
+	glm::vec3 scale = glm::vec3(1.0,1.0,1.0);
 	glm::quat rotation;
 	// Transform matrices for this node.
 	glm::mat4 transform;
@@ -51,11 +51,13 @@ public:
 	bool GetActive() const;
 	// Access for node transformation parameters
 	glm::vec3 GetPosition() const;
-	float GetScale() const;
+	glm::vec3 GetScale() const;
 	glm::quat GetRotation() const;
 	void SetPosition(glm::vec3);
 	void SetPosition(float x, float y, float z) {SetPosition(glm::vec3(x,y,z));}
-	void SetScale(float);
+	void SetScale(glm::vec3);
+	void SetScale(float x, float y, float z) {SetScale(glm::vec3(x,y,z));}
+	void SetScale(float s) {SetScale(glm::vec3(s,s,s));}
 	void SetRotation(glm::quat);
 	void SetActive(bool);
 	// Sets position in absolute coordinates. Useful for physics calculations,
