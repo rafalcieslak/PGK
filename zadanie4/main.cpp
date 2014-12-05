@@ -60,7 +60,7 @@ int main(){
 
 	root->AddChild(camera);
 
-	auto light = std::make_shared<Light>(glm::vec3(-1.5,1.5,0.9));
+	auto light = std::make_shared<Light>(glm::vec3(0.0,0.0,3.0));
 	root->AddChild(light);
 
 	player = Player::Create();
