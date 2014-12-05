@@ -13,17 +13,19 @@
 typedef enum viewModes{
 	VIEW_MODE_THIRD_PERSON = 0,
 	VIEW_MODE_FIRST_PERSON,
+	VIEW_MODE_EXTERNAL,
 	VIEW_MODE_MAX
 } viewModes;
 viewModes view_mode = VIEW_MODE_THIRD_PERSON;
 
 std::shared_ptr<Player> player;
+std::shared_ptr<ExternalCamera> external_cam;
 std::shared_ptr<Node> bubble_node;
 
 std::set<std::shared_ptr<Bubble>> bubbles;
 std::set<std::shared_ptr<Bubble>> bubbles_to_pop;
 
-unsigned int bubble_limit = 90;
+unsigned int bubble_limit = 30;
 
 float random_float(float s){
 	return s*((rand()%10000)/5000.0 - 1.0);
@@ -31,13 +33,17 @@ float random_float(float s){
 
 void SwitchViewMode(){
 	switch(view_mode){
-		case VIEW_MODE_THIRD_PERSON:
+		case VIEW_MODE_EXTERNAL:
 			view_mode = VIEW_MODE_FIRST_PERSON;
 			player->SwitchToFP();
 			break;
 		case VIEW_MODE_FIRST_PERSON:
 			view_mode = VIEW_MODE_THIRD_PERSON;
 			player->SwitchToTP();
+			break;
+		case VIEW_MODE_THIRD_PERSON:
+			view_mode = VIEW_MODE_EXTERNAL;
+			external_cam->SetAsActive();
 			break;
 		case VIEW_MODE_MAX:
 			break;
@@ -69,13 +75,12 @@ int main(){
 	fishtank->culling = 1;
 	root->AddChild(fishtank);
 
-	auto camera = std::make_shared<Viewpoint>(glm::vec3(0.0,2.0,0.8));
-	camera->LookAt(0.0,0.0,0.0);
-	camera->SetAsActive();
+	external_cam = ExternalCamera::Create();
+	external_cam->SetAsActive();
 
-	root->AddChild(camera);
+	root->AddChild(external_cam);
 
-	auto light = std::make_shared<Light>(glm::vec3(0.0,0.0,8.0));
+	auto light = std::make_shared<Light>(glm::vec3(ROOM_SIZE_X/2.0,ROOM_SIZE_Y/4.0,8.0));
 	root->AddChild(light);
 
 	player = Player::Create();
@@ -138,8 +143,13 @@ int main(){
 		if(Render::IsKeyPressed(GLFW_KEY_D)) player->StrafeRight(time_delta);
 
 		glm::vec2 mouse = Render::ProbeMouse();
-		player->MovePitch(mouse.x);
-		player->MoveYaw(mouse.y);
+		if(view_mode == VIEW_MODE_FIRST_PERSON || view_mode == VIEW_MODE_THIRD_PERSON){
+			player->MovePitch(mouse.x);
+			player->MoveYaw(mouse.y);
+		}else if(view_mode == VIEW_MODE_EXTERNAL){
+			external_cam->MovePitch(mouse.x);
+			external_cam->MoveYaw(-mouse.y);
+		}
 
 		Render::Frame();
 	}while( !Render::IsKeyPressed(GLFW_KEY_ESCAPE ) && !Render::IsWindowClosed() );

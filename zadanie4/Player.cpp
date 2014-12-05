@@ -59,3 +59,27 @@ void Player::SwitchToFP(){
 void Player::SwitchToTP(){
 	third_person_view->SetAsActive();
 }
+
+//==================
+
+ExternalCamera::ExternalCamera() {
+ 	the_cam = std::make_shared<Viewpoint>(glm::vec3(0.0,5.0,5.0));
+	the_cam->LookAt(glm::vec3(0.0,0.0,0.0));
+}
+
+void ExternalCamera::init(){
+	AddChild(the_cam);
+}
+std::shared_ptr<ExternalCamera> ExternalCamera::Create(){
+	auto p = std::shared_ptr<ExternalCamera>(new ExternalCamera());
+	p->init();
+	return p;
+}
+void ExternalCamera::MovePitch(float delta){
+	pitch -= delta;
+	SetRotation(World::Rotation(pitch,yaw));
+}
+void ExternalCamera::MoveYaw(float delta){
+	yaw = glm::clamp(yaw + delta,-3.1415926f/2.0f,3.1415926f/2.0f);
+	SetRotation(World::Rotation(pitch,yaw));
+}

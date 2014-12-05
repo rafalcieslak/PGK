@@ -26,4 +26,17 @@ public:
 	void MoveYaw(float delta);
 };
 
+class ExternalCamera : public NodeGroup{
+private:
+	ExternalCamera();
+	void init();
+	std::shared_ptr<Viewpoint> the_cam;
+	float pitch = 0.0f;
+	float yaw = 0.0f;
+public:
+	static std::shared_ptr<ExternalCamera> Create();
+	void MovePitch(float delta);
+	void MoveYaw(float delta);
+	void SetAsActive() {the_cam->SetAsActive();}
+};
 #endif //PLAYER_HPP
