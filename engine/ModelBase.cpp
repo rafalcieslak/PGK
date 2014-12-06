@@ -86,6 +86,16 @@ Model::Model(unsigned int p, GLenum m, unsigned int n, const float* v, const flo
 	boring_colors[0] = color;
 	init_buffers();
 }
+Model::Model(unsigned int p, GLenum m, unsigned int n, const float* v, const float* no, std::initializer_list<glm::vec4> color): size(n), ppp(p), mode(m){
+	variants = color.size();
+	single_color = true;
+	init_arrays();
+	auto ci = color.begin();
+	for(unsigned int i = 0; i < size*ppp*MODEL_DIMEN; i++) vertices[i] = v[i];
+	for(unsigned int i = 0; i < size*ppp*MODEL_DIMEN; i++) normals[i] = no[i];
+	for(unsigned int i = 0; i < variants; i++) boring_colors[i] = *(ci++);
+	init_buffers();
+}
 
 void Model::init_arrays(){
 	if(!Render::inited) Render::Init(); // To avoid problems when object constructor are called before init()
@@ -157,6 +167,10 @@ void ModelBase::AddModelTriangles(std::string id, unsigned int vertices, const f
 }
 void ModelBase::AddModelTriangles(std::string id, unsigned int vertices, const float* coords, const float* normals, glm::vec4 color){
 	std::shared_ptr<ModelTriangles> m = std::make_shared<ModelTriangles>(vertices,coords,normals,color);
+	models[id] = m;
+}
+void ModelBase::AddModelTriangles(std::string id, unsigned int vertices, const float* coords, const float* normals, std::initializer_list<glm::vec4> colors){
+	std::shared_ptr<ModelTriangles> m = std::make_shared<ModelTriangles>(vertices,coords,normals,colors);
 	models[id] = m;
 }
 void ModelBase::AddModelLines(std::string id, unsigned int vertices, std::initializer_list<float> coords, std::initializer_list<float> normals, std::initializer_list<float> colors){

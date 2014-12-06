@@ -7,16 +7,9 @@
 #include "main.hpp"
 #include "../engine/Viewpoint.hpp"
 
-#define rgb(x,y,z)	x/255.0, y/255.0, z/255.0, 1.0
-#define rgba(x,y,z,a)	x/255.0, y/255.0, z/255.0, a
-#define C_BLUE rgb(58, 92, 226)
-#define C_RED rgb(223, 41, 31)
-#define C_GREEN rgb(45, 199, 81)
 #define BUBBLE_BLUE rgba(75, 165, 225, 0.1)
-#define x3(a) a,a,a
-#define x3b(a,b,c) a,b,c,a,b,c,a,b,c
-#define x12(a) a,a,a,a,a,a,a,a,a,a,a,a
-#define x4(a,b,c) a,b,c,a,b,c,a,b,c,a,b,c
+#define BUBBLE_GREEN rgba(183, 244, 191, 0.1)
+#define BUBBLE_VIOLET rgba(176, 149, 201, 0.1)
 
 inline void add_triangle(std::vector<float>& v, const glm::vec3 a, const glm::vec3 b, const glm::vec3 c){
 	v.push_back(a.x); v.push_back(a.y); v.push_back(a.z);
@@ -111,7 +104,8 @@ Bubble::Bubble(float scale){
 		std::vector<float> vertices, normals, colors;
 		int n = prepare_ball_model(12,24,vertices,normals,colors);
 		std::cerr << "Ball model has " << n << " triangles." << std::endl;
-		ModelBase::GetInstance().AddModelTriangles("ball",n, vertices.data(), normals.data(), glm::vec4(BUBBLE_BLUE));
+		ModelBase::GetInstance().AddModelTriangles("ball",n, vertices.data(), normals.data(), {
+			glm::vec4(BUBBLE_BLUE), glm::vec4(BUBBLE_GREEN), glm::vec4(BUBBLE_VIOLET) });
 	}
 	model_id = "ball";
 	SetScale(scale);

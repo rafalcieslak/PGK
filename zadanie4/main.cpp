@@ -57,6 +57,7 @@ void spawn_new_bubble(){
 	float y = random_float(ROOM_SIZE_Y/2.0);
 	new_bubble->SetPosition(x,y, -ROOM_SIZE_Z/2.0);
 	new_bubble->spatial = 3.1;
+	new_bubble->variant = rand()%3;
 	new_bubble->ApplyScale();
 	bubble_node->AddChild(new_bubble);
 }

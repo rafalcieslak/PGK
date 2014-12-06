@@ -33,6 +33,7 @@ public:
 	Model(unsigned int ppp, GLenum mode, unsigned int vertices, std::initializer_list<float> v, std::initializer_list<float> c);
 	Model(unsigned int ppp, GLenum mode, unsigned int vertices, const float* v, const float* n, const float* c);
 	Model(unsigned int ppp, GLenum mode, unsigned int vertices, const float* v, const float* n, glm::vec4 color);
+	Model(unsigned int ppp, GLenum mode, unsigned int vertices, const float* v, const float* n, std::initializer_list<glm::vec4> color);
 	// Never implicitly copy a model, because it needs a VBO, and it allocates
 	// memory, too.
 	Model(const Model& other) = delete;
@@ -73,6 +74,8 @@ public:
 		Model(3, GL_TRIANGLES, vertices, v, n, c) {};
 	ModelTriangles(unsigned int vertices, const float* v, const float* n, glm::vec4 color):
 		Model(3, GL_TRIANGLES, vertices, v, n, color) {};
+	ModelTriangles(unsigned int vertices, const float* v, const float* n, std::initializer_list<glm::vec4> color):
+		Model(3, GL_TRIANGLES, vertices, v, n, color) {};
 
 };
 
@@ -109,6 +112,7 @@ public:
 	void AddModelTriangles(std::string id, unsigned int vertices, std::initializer_list<float> coords, std::initializer_list<float> colors);
 	void AddModelTriangles(std::string id, unsigned int vertices, const float *coords, const float* normals, const float* colors);
 	void AddModelTriangles(std::string id, unsigned int vertices, const float *coords, const float* normals, glm::vec4 color);
+	void AddModelTriangles(std::string id, unsigned int vertices, const float *coords, const float* normals, std::initializer_list<glm::vec4> color);
 	void AddModelLines(std::string id, unsigned int vertices, std::initializer_list<float> coords, std::initializer_list<float> normals, std::initializer_list<std::initializer_list<float>> colors);
 	void AddModelLines(std::string id, unsigned int vertices, std::initializer_list<float> coords, std::initializer_list<float> normals, std::initializer_list<float> colors);
 	void AddModelLines(std::string id, unsigned int vertices, const float *coords, const float* normals, const float* colors);
