@@ -63,7 +63,7 @@ void Player::SwitchToTP(){
 //==================
 
 ExternalCamera::ExternalCamera() {
- 	the_cam = std::make_shared<Viewpoint>(glm::vec3(0.0,5.0,5.0));
+ 	the_cam = std::make_shared<Viewpoint>(glm::vec3(0.0,7.0,0.0));
 	the_cam->LookAt(glm::vec3(0.0,0.0,0.0));
 }
 

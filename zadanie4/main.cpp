@@ -79,8 +79,8 @@ int main(){
 
 	root->AddChild(external_cam);
 
-	auto light = std::make_shared<Light>(glm::vec3(ROOM_SIZE_X/2.0,ROOM_SIZE_Y/4.0,8.0));
-	root->AddChild(light);
+	auto main_light = std::make_shared<Light>(glm::vec3(ROOM_SIZE_X/2.0,ROOM_SIZE_Y/4.0,ROOM_SIZE_Z/2.0 + 1.0));
+	root->AddChild(main_light);
 
 	player = Player::Create();
 	player->SetPosition(-1.0,2.0,0.0);
