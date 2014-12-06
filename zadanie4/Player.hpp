@@ -39,6 +39,7 @@ public:
 
 	void MovePitch(float delta);
 	void MoveYaw(float delta);
+	void ResetRotation();
 
 	std::list<glm::vec3> GetVerticesAbs() const;
 };

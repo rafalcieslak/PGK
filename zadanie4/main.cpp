@@ -16,7 +16,7 @@ typedef enum viewModes{
 	VIEW_MODE_EXTERNAL,
 	VIEW_MODE_MAX
 } viewModes;
-viewModes view_mode = VIEW_MODE_THIRD_PERSON;
+viewModes view_mode = VIEW_MODE_EXTERNAL;
 bool pause = false;
 
 std::shared_ptr<Player> player;
@@ -27,8 +27,11 @@ std::set<std::shared_ptr<Bubble>> bubbles;
 std::set<std::shared_ptr<Bubble>> bubbles_to_pop;
 
 std::shared_ptr<Text> text_fov;
+std::shared_ptr<Text> text_level;
+std::shared_ptr<Text> text_bubbles;
 
 unsigned int bubble_limit = 30;
+unsigned int current_level;
 
 float random_float(float s){
 	return s*((rand()%10000)/5000.0 - 1.0);
@@ -38,7 +41,10 @@ void UpdateFOVText(){
 	float fov = Viewpoint::active_viewpoint->GetFOVdg();
 	text_fov->SetText("Current FOV: " + std::to_string((int)(fov+0.5)));
 }
-
+void UpdateLevelText(){
+	text_level->SetText("Level: " + std::to_string(current_level));
+	text_bubbles->SetText("Bubbles: " + std::to_string(bubble_limit));
+}
 void SwitchViewMode(){
 	switch(view_mode){
 		case VIEW_MODE_EXTERNAL:
@@ -77,25 +83,24 @@ void ScrollCallback(double x){
 	Viewpoint::active_viewpoint->SetFOVdg(fov);
 	UpdateFOVText();
 }
-/*
-glm::vec3 PointCV(glm::vec3 p){
-	glm::vec3 res;
-	if(p.x < -ROOM_SIZE_X/2.0)      res += glm::vec3(-ROOM_SIZE_X/2.0 - p.x, 0.0, 0.0);
-	else if(p.x >  ROOM_SIZE_X/2.0) res += glm::vec3( ROOM_SIZE_X/2.0 - p.x, 0.0, 0.0);
-	if(p.y < -ROOM_SIZE_Y/2.0)      res += glm::vec3(0.0, -ROOM_SIZE_Y/2.0 - p.y, 0.0);
-	else if(p.y >  ROOM_SIZE_Y/2.0) res += glm::vec3(0.0,  ROOM_SIZE_Y/2.0 - p.y, 0.0);
-	if(p.z < -ROOM_SIZE_Z/2.0)      res += glm::vec3(0.0, 0.0, -ROOM_SIZE_Z/2.0 - p.z);
-	else if(p.z >  ROOM_SIZE_Z/2.0) res += glm::vec3(0.0, 0.0,  ROOM_SIZE_Z/2.0 - p.z);
-	return res;
+bool VertexWon(glm::vec3 v){
+	return v.y < -ROOM_SIZE_Y/2.0;
 }
-glm::vec3 PlayerCV(){
-	glm::vec3 res;
+bool PlayerWon(){
 	for(auto i : player->GetVerticesAbs()){
-		res +=
+		if(VertexWon(i)) return true;
 	}
 	return false;
 }
-*/
+
+void PrepareLevel(int levelno){
+	player->SetPosition(0.0,ROOM_SIZE_Y/2.0-0.3,0.0);
+	player->ResetRotation();
+	current_level = levelno;
+	bubble_limit = 30 + levelno*5;
+	UpdateLevelText();
+}
+
 bool IsVertexOutside(glm::vec3 p){
 	return p.x < -ROOM_SIZE_X/2.0 ||
 		   p.x >  ROOM_SIZE_X/2.0 ||
@@ -134,15 +139,18 @@ int main(){
 	root->AddChild(main_light);
 
 	player = Player::Create();
-	player->SetPosition(0.0,0.0,0.0);
-	player->SwitchToTP();
 	root->AddChild(player);
 
 	bubble_node = std::make_shared<Node>();
 	bubble_node->SetScale(1.0);
 	root->AddChild(bubble_node);
 
-	text_fov = Text::Create("Current FOV: 100", glm::vec2(5,30),24,glm::vec3(1.0,0.0,0.0));
+	text_fov     = Text::Create("", glm::vec2(5,30),24,glm::vec3(1.0,0.0,0.0));
+	text_level   = Text::Create("", glm::vec2(5,83),48,glm::vec3(0.0,1.0,0.0));
+	text_bubbles = Text::Create("", glm::vec2(5,113),24,glm::vec3(1.0,1.0,0.0));
+	UpdateFOVText();
+
+	PrepareLevel(1);
 
 	Render::SetRootNode(root);
 	Render::scroll_callback = ScrollCallback;
@@ -223,7 +231,8 @@ int main(){
 		}
 
 		player->PerformMove(time_delta);
-		if(!pause && IsPlayerOutside()) player->CancelMove();
+		if(!pause && PlayerWon()) PrepareLevel(current_level + 1);
+		else if(!pause && IsPlayerOutside()) player->CancelMove();
 
 		Render::Frame();
 	}while( !Render::IsKeyPressed(GLFW_KEY_ESCAPE ) && !Render::IsWindowClosed() );

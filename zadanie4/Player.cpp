@@ -88,6 +88,10 @@ void Player::MoveYaw(float delta){
 	yaw = glm::clamp(yaw + delta,-3.1415926f/2.0f,3.1415926f/2.0f);
 	player_cube->SetRotation(World::Rotation(pitch,yaw));
 }
+void Player::ResetRotation(){
+	pitch = yaw = 0;
+	player_cube->SetRotation(World::Rotation(pitch,yaw));
+}
 void Player::SwitchToFP(){
 	first_person_view->SetAsActive();
 }
