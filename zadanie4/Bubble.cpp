@@ -147,10 +147,10 @@ float Bubble::SpeedFunc(float h){
 	return h*h*h/1.7 + 0.1;
 }
 float Bubble::ScaleFunc(float h){
-	return h*h/0.9 + 0.2;
+	return glm::min(h*h/0.9 + 0.2, 0.7);
 }
 bool Bubble::ShouldPop() const{
-	return ZPosToH(GetPosition().z) >= 1.0;
+	return ZPosToH(GetPosition().z) >= 0.9;
 }
 float Bubble::DistanceToCamera() const{
 	return glm::distance(GetGlobalPos(),Viewpoint::active_viewpoint->GetGlobalPos());
