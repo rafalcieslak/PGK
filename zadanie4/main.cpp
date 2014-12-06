@@ -16,6 +16,7 @@ typedef enum viewModes{
 	VIEW_MODE_MAX
 } viewModes;
 viewModes view_mode = VIEW_MODE_THIRD_PERSON;
+bool pause = false;
 
 std::shared_ptr<Player> player;
 std::shared_ptr<ExternalCamera> external_cam;
@@ -94,7 +95,8 @@ int main(){
 	Render::SetRootNode(root);
 
 	double lasttime = Render::GetTime();
-	bool F_key_down = false;
+	bool TAB_key_down = false;
+	bool P_key_down = false;
 
 	const double time_between_spawns = 10.0/bubble_limit;
 	double time_to_next_spawn = time_between_spawns;
@@ -106,8 +108,10 @@ int main(){
 		lasttime = newtime;
 
 		for(auto b : bubbles){
-			b->ApplyMovement(time_delta);
-			b->ApplyScale();
+			if(!pause){
+				b->ApplyMovement(time_delta);
+				b->ApplyScale();
+			}
 			b->RotateTowards(Viewpoint::active_viewpoint->GetGlobalPos());
 			if(b->ShouldPop()) bubbles_to_pop.insert(b);
 		}
@@ -118,22 +122,30 @@ int main(){
 		}
 		bubbles_to_pop.clear();
 
-		time_to_next_spawn -= time_delta;
-		if(time_to_next_spawn <= 0.0){
-			time_to_next_spawn = time_between_spawns;
-			if(bubbles.size() < bubble_limit) spawn_new_bubble();
+		if(!pause){
+			time_to_next_spawn -= time_delta;
+			if(time_to_next_spawn <= 0.0){
+				time_to_next_spawn = time_between_spawns;
+				if(bubbles.size() < bubble_limit) spawn_new_bubble();
+			}
 		}
 
+		// Bubble ordering for correct transparency.
 		bubble_node->SortChildren([](std::shared_ptr<Node> n) -> float{
 			auto b = std::dynamic_pointer_cast<Bubble>(n);
 			return b->DistanceToCamera();
 		});
 
 
-		if(!Render::IsKeyPressed(GLFW_KEY_F)) F_key_down = false;
-		else if(Render::IsKeyPressed(GLFW_KEY_F) && F_key_down == false){
-			F_key_down = true;
+		if(!Render::IsKeyPressed(GLFW_KEY_TAB)) TAB_key_down = false;
+		else if(Render::IsKeyPressed(GLFW_KEY_TAB) && TAB_key_down == false){
+			TAB_key_down = true;
 			SwitchViewMode();
+		}
+		if(!Render::IsKeyPressed(GLFW_KEY_P)) P_key_down = false;
+		else if(Render::IsKeyPressed(GLFW_KEY_P) && P_key_down == false){
+			P_key_down = true;
+			pause = !pause;
 		}
 
 		if(Render::IsKeyPressed(GLFW_KEY_W)) player->MoveForward(time_delta);
