@@ -25,6 +25,9 @@ std::shared_ptr<Player> Player::Create(){
 }
 void Player::ClearMove(){
 	move = glm::vec3(0.0,0.0,0.0);
+	saved_pos = GetPosition();
+	saved_pitch = pitch;
+	saved_yaw = yaw;
 }
 void Player::MoveForward(){
 	glm::vec3 pitched_front = glm::rotate(World::front,pitch,World::up);
@@ -55,6 +58,26 @@ void Player::MoveBack(){ move += -World::front; }
 void Player::PerformMove(float delta){
 	if(glm::length(move) > 0.5)
 		SetPosition(GetPosition() + glm::normalize(move)*delta*speed);
+}
+void Player::CancelMove(){
+	SetPosition(saved_pos);
+	pitch = saved_pitch;
+	yaw = saved_yaw;
+	player_cube->SetRotation(World::Rotation(pitch,yaw));
+}
+
+std::list<glm::vec3> Player::GetVerticesAbs() const{
+	std::list<glm::vec3> res;
+	glm::mat4 t = player_cube->GetGlobalTransform();
+	res.push_back((t*glm::vec4( 1.0, 1.0, 1.0,1.0)).xyz());
+	res.push_back((t*glm::vec4( 1.0, 1.0,-1.0,1.0)).xyz());
+	res.push_back((t*glm::vec4( 1.0,-1.0, 1.0,1.0)).xyz());
+	res.push_back((t*glm::vec4( 1.0,-1.0,-1.0,1.0)).xyz());
+	res.push_back((t*glm::vec4(-1.0, 1.0, 1.0,1.0)).xyz());
+	res.push_back((t*glm::vec4(-1.0, 1.0,-1.0,1.0)).xyz());
+	res.push_back((t*glm::vec4(-1.0,-1.0, 1.0,1.0)).xyz());
+	res.push_back((t*glm::vec4(-1.0,-1.0,-1.0,1.0)).xyz());
+	return res;
 }
 
 void Player::MovePitch(float delta){

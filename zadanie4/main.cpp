@@ -77,6 +77,39 @@ void ScrollCallback(double x){
 	Viewpoint::active_viewpoint->SetFOVdg(fov);
 	UpdateFOVText();
 }
+/*
+glm::vec3 PointCV(glm::vec3 p){
+	glm::vec3 res;
+	if(p.x < -ROOM_SIZE_X/2.0)      res += glm::vec3(-ROOM_SIZE_X/2.0 - p.x, 0.0, 0.0);
+	else if(p.x >  ROOM_SIZE_X/2.0) res += glm::vec3( ROOM_SIZE_X/2.0 - p.x, 0.0, 0.0);
+	if(p.y < -ROOM_SIZE_Y/2.0)      res += glm::vec3(0.0, -ROOM_SIZE_Y/2.0 - p.y, 0.0);
+	else if(p.y >  ROOM_SIZE_Y/2.0) res += glm::vec3(0.0,  ROOM_SIZE_Y/2.0 - p.y, 0.0);
+	if(p.z < -ROOM_SIZE_Z/2.0)      res += glm::vec3(0.0, 0.0, -ROOM_SIZE_Z/2.0 - p.z);
+	else if(p.z >  ROOM_SIZE_Z/2.0) res += glm::vec3(0.0, 0.0,  ROOM_SIZE_Z/2.0 - p.z);
+	return res;
+}
+glm::vec3 PlayerCV(){
+	glm::vec3 res;
+	for(auto i : player->GetVerticesAbs()){
+		res +=
+	}
+	return false;
+}
+*/
+bool IsVertexOutside(glm::vec3 p){
+	return p.x < -ROOM_SIZE_X/2.0 ||
+		   p.x >  ROOM_SIZE_X/2.0 ||
+		   p.y < -ROOM_SIZE_Y/2.0 ||
+		   p.y >  ROOM_SIZE_Y/2.0 ||
+		   p.z < -ROOM_SIZE_Z/2.0 ||
+		   p.z >  ROOM_SIZE_Z/2.0;
+}
+bool IsPlayerOutside(){
+	for(auto i : player->GetVerticesAbs()){
+		if(IsVertexOutside(i)) return true;
+	}
+	return false;
+}
 
 int main(){
 	srand(time(nullptr));
@@ -101,7 +134,7 @@ int main(){
 	root->AddChild(main_light);
 
 	player = Player::Create();
-	player->SetPosition(-1.0,2.0,0.0);
+	player->SetPosition(0.0,0.0,0.0);
 	player->SwitchToTP();
 	root->AddChild(player);
 
@@ -179,7 +212,6 @@ int main(){
 		if(Render::IsKeyPressed(GLFW_KEY_DOWN)) player->MoveBack();
 		if(Render::IsKeyPressed(GLFW_KEY_PAGE_UP)) player->MoveUp();
 		if(Render::IsKeyPressed(GLFW_KEY_PAGE_DOWN)) player->MoveDown();
-		player->PerformMove(time_delta);
 
 		glm::vec2 mouse = Render::ProbeMouse();
 		if(view_mode == VIEW_MODE_FIRST_PERSON || view_mode == VIEW_MODE_THIRD_PERSON){
@@ -189,6 +221,9 @@ int main(){
 			external_cam->MovePitch(mouse.x);
 			external_cam->MoveYaw(-mouse.y);
 		}
+
+		player->PerformMove(time_delta);
+		if(!pause && IsPlayerOutside()) player->CancelMove();
 
 		Render::Frame();
 	}while( !Render::IsKeyPressed(GLFW_KEY_ESCAPE ) && !Render::IsWindowClosed() );

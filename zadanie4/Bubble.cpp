@@ -149,3 +149,10 @@ bool Bubble::ShouldPop() const{
 float Bubble::DistanceToCamera() const{
 	return glm::distance(GetGlobalPos(),Viewpoint::active_viewpoint->GetGlobalPos());
 }
+bool Bubble::IsPointInside(glm::vec3 p) const{
+	glm::vec3 pos = GetGlobalPos();
+	float dist = glm::distance(pos, p);
+	glm::mat4 m = GetGlobalTransform();
+	float scale = m[0][0]; // This trick works ONLY if the bubble is not an ellipsoid!
+	return scale > dist;
+}
