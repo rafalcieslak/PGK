@@ -61,6 +61,12 @@ void spawn_new_bubble(){
 	bubble_node->AddChild(new_bubble);
 }
 
+void ScrollCallback(double x){
+	float fov = Viewpoint::active_viewpoint->GetFOVdg();
+	fov = glm::min(glm::max(fov - 5*x,50.0),150.0);
+	Viewpoint::active_viewpoint->SetFOVdg(fov);
+}
+
 int main(){
 	srand(time(nullptr));
 
@@ -93,6 +99,7 @@ int main(){
 	root->AddChild(bubble_node);
 
 	Render::SetRootNode(root);
+	Render::scroll_callback = ScrollCallback;
 
 	double lasttime = Render::GetTime();
 	bool TAB_key_down = false;

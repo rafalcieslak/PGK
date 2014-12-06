@@ -2,6 +2,7 @@
 #define RENDER_HPP
 
 #include <algorithm>
+#include <functional>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -22,6 +23,8 @@ private:
 	static std::shared_ptr<Node> root;
 	// Tree traversal.
 	static void RecursivellyProcessNode(std::shared_ptr<Node> n, glm::mat4 current_transform);
+	// Used for scroll handling
+	static void ScrollCallback(GLFWwindow*, double, double);
 public:
 	// Prepares for rendering, sets up the window, prepares buffers.
 	static int Init();
@@ -40,6 +43,8 @@ public:
 	static void SetRootNode(std::shared_ptr<Node>);
 	// Resets the mouse to window center and returns it's previous position, scaled to -1,1
 	static glm::vec2 ProbeMouse();
+	// Scroll callback
+	static std::function<void(double)> scroll_callback;
 };
 
 

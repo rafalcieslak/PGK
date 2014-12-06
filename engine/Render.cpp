@@ -24,6 +24,7 @@ float Render::pxsizex, Render::pxsizey;
 GLuint Render::shader_program_id;
 bool Render::inited = false;
 std::shared_ptr<Node> Render::root;
+std::function<void(double)> Render::scroll_callback;
 
 double Render::GetTime(){
 	return glfwGetTime();
@@ -39,6 +40,11 @@ bool Render::IsWindowClosed(){
 
 void Render::SetRootNode(std::shared_ptr<Node> r){
 	root = r;
+}
+
+void Render::ScrollCallback(GLFWwindow*, double, double x){
+	if(scroll_callback)
+		scroll_callback(x);
 }
 
 int Render::Init(){
@@ -74,6 +80,7 @@ int Render::Init(){
 	}
 
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_FALSE);
+	glfwSetScrollCallback(window,ScrollCallback);
 
 	// Black background
 	glClearColor(100/255.0,200.0/255.0,1.0,1.0);
