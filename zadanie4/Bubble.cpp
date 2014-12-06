@@ -122,11 +122,11 @@ void Bubble::RotateTowards(glm::vec3 to){
 void Bubble::ApplyMovement(float time_delta){
 	glm::vec3 pos = GetPosition();
 	float my_h = ZPosToH(pos.z);
-	float new_h = my_h + SpeedFunc(my_h)*time_delta; // this should be an integral...
+	float new_h = my_h + SpeedFunc(my_h)*time_delta*sizemult*sizemult; // this should be an integral...
 	SetPosition(pos.x,pos.y,HToZPos(new_h));
 }
 void Bubble::ApplyScale(){
-	SetScale(BUBBLE_MAIN_SIZE*ScaleFunc( ZPosToH(GetPosition().z) ));
+	SetScale(BUBBLE_MAIN_SIZE*sizemult*ScaleFunc( ZPosToH(GetPosition().z) ));
 }
 
 float Bubble::ZPosToH(float zpos){

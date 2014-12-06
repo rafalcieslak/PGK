@@ -73,6 +73,7 @@ void spawn_new_bubble(){
 	new_bubble->SetPosition(x,y, -ROOM_SIZE_Z/2.0);
 	new_bubble->spatial = 3.1;
 	new_bubble->variant = rand()%3;
+	new_bubble->sizemult = 1.0 + random_float(0.4);
 	new_bubble->ApplyScale();
 	bubble_node->AddChild(new_bubble);
 }
@@ -94,7 +95,7 @@ bool PlayerWon(){
 }
 
 void PrepareLevel(int levelno){
-	player->SetPosition(0.0,ROOM_SIZE_Y/2.0-0.3,0.0);
+	player->SetPosition(0.0,ROOM_SIZE_Y/2.0-0.4,0.0);
 	player->ResetRotation();
 	current_level = levelno;
 	bubble_limit = 30 + levelno*5;

@@ -12,6 +12,7 @@ public:
 	bool ShouldPop() const;
 	float DistanceToCamera() const;
 	bool IsPointInside(glm::vec3) const;
+	float sizemult = 1.0;
 private:
 	static float ZPosToH(float zpos);
 	static float HToZPos(float h);
