@@ -5,6 +5,7 @@
 #include "Player.hpp"
 #include "../engine/Light.hpp"
 #include "../engine/World.hpp"
+#include "../engine/Text.hpp"
 #include <iostream>
 #include <set>
 #include "main.hpp"
@@ -25,10 +26,17 @@ std::shared_ptr<Node> bubble_node;
 std::set<std::shared_ptr<Bubble>> bubbles;
 std::set<std::shared_ptr<Bubble>> bubbles_to_pop;
 
+std::shared_ptr<Text> text_fov;
+
 unsigned int bubble_limit = 30;
 
 float random_float(float s){
 	return s*((rand()%10000)/5000.0 - 1.0);
+}
+
+void UpdateFOVText(){
+	float fov = Viewpoint::active_viewpoint->GetFOVdg();
+	text_fov->SetText("Current FOV: " + std::to_string((int)(fov+0.5)));
 }
 
 void SwitchViewMode(){
@@ -48,6 +56,7 @@ void SwitchViewMode(){
 		case VIEW_MODE_MAX:
 			break;
 	};
+	UpdateFOVText();
 }
 
 void spawn_new_bubble(){
@@ -66,6 +75,7 @@ void ScrollCallback(double x){
 	float fov = Viewpoint::active_viewpoint->GetFOVdg();
 	fov = glm::min(glm::max(fov - 5*x,50.0),150.0);
 	Viewpoint::active_viewpoint->SetFOVdg(fov);
+	UpdateFOVText();
 }
 
 int main(){
@@ -98,6 +108,8 @@ int main(){
 	bubble_node = std::make_shared<Node>();
 	bubble_node->SetScale(1.0);
 	root->AddChild(bubble_node);
+
+	text_fov = Text::Create("Current FOV: 100", glm::vec2(5,30),24,glm::vec3(1.0,0.0,0.0));
 
 	Render::SetRootNode(root);
 	Render::scroll_callback = ScrollCallback;

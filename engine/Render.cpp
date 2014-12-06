@@ -211,11 +211,13 @@ void Render::Frame(){
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
 
+	// Prepare main light
 	if(Light::lights.size() > 0){
 		Light* l = Light::lights[0];
 		glm::vec3 lightpos(l->GetGlobalTransform()[3]);
 		glUniform3f(uniform_lightpos,lightpos.x,lightpos.y,lightpos.z);
 	}
+	// Prepare camera
 	if(Viewpoint::active_viewpoint){
 		glm::mat4 cameraview =  glm::lookAt(glm::vec3(0.0) , 1.0f* Viewpoint::active_viewpoint->GetDirection(), World::up) * glm::inverse(Viewpoint::active_viewpoint->GetGlobalTransform());
 		glm::mat4 perspective = glm::perspective(Viewpoint::active_viewpoint->GetFOV(), 1.0f, 0.1f, 100.0f);
@@ -223,21 +225,15 @@ void Render::Frame(){
 		glUniformMatrix4fv(uniform_perspective_transform, 1, GL_FALSE, &perspective[0][0]);
 	}
 
-	//std::cout << "starting render" << std::endl;
 	RecursivellyProcessNode(root, glm::mat4(1.0));
 
-/* Temporarily disabled
 	for(auto t : Text::texts){
-		if(!t->GetActiveAbsolute()) continue;
-
-		glm::vec2 pos = t->GetPos();
+		if(!t->active) continue;
 		glm::vec2 off = t->px_offset;
 		glm::vec3 color = t->color;
-		float scale = t->GetScale();
 
-		render_text(t->text.c_str(), pos.x + off.x*pxsizex, pos.y - off.y*pxsizey, color.r, color.g, color.b, t->size*scale, pxsizex, pxsizey);
+		render_text(t->text.c_str(), -1.0 + off.x*pxsizex, 1.0 - off.y*pxsizey, color.r, color.g, color.b, t->size, pxsizex, pxsizey);
 	}
-*/
 
 	glDisableVertexAttribArray(2);
 	glDisableVertexAttribArray(1);
