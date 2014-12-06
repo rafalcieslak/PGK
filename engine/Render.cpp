@@ -19,6 +19,7 @@ GLFWwindow* window;
 GLint Render::uniform_model_transform, Render::uniform_camera_transform, Render::uniform_perspective_transform;
 GLint Render::uniform_lightpos, Render::uniform_diffuse, Render::uniform_spatial, Render::uniform_ambient;
 GLint Render::uniform_anim_mode, Render::uniform_anim_phase;
+GLint Render::uniform_single_color, Render::uniform_boring_color;
 GLuint Render::VertexArrayID;
 float Render::pxsizex, Render::pxsizey;
 GLuint Render::shader_program_id;
@@ -102,7 +103,10 @@ int Render::Init(){
 	uniform_diffuse = glGetUniformLocation(shader_program_id,"material_diffuse_ratio");
 	uniform_spatial = glGetUniformLocation(shader_program_id,"material_spatial_ratio");
 	uniform_ambient = glGetUniformLocation(shader_program_id,"material_ambient_ratio");
-	if(uniform_model_transform == -1 || uniform_anim_mode == -1 || uniform_anim_phase == -1 || uniform_camera_transform == -1 || uniform_perspective_transform == -1 || uniform_lightpos == -1 || uniform_diffuse == -1 || uniform_spatial == -1 || uniform_ambient == -1){
+	uniform_single_color = glGetUniformLocation(shader_program_id,"single_color");
+	uniform_boring_color = glGetUniformLocation(shader_program_id,"boring_color");
+	if(uniform_model_transform == -1 || uniform_anim_mode == -1 || uniform_anim_phase == -1 || uniform_camera_transform == -1 || uniform_perspective_transform == -1 ||
+       uniform_lightpos == -1 || uniform_diffuse == -1 || uniform_spatial == -1 || uniform_ambient == -1 || uniform_single_color == -1 || uniform_boring_color == -1){
 		std::cerr << "A uniform is missing from the shader." << std::endl;
 		glfwTerminate();
 		return -1;
@@ -162,7 +166,33 @@ void Render::RecursivellyProcessNode(std::shared_ptr<Node> n, glm::mat4 current_
 			glUniform1f(uniform_diffuse, d->diffuse);
 			glUniform1f(uniform_spatial, d->spatial);
 			glUniform1f(uniform_ambient, d->ambient);
-			m->metaDraw(d->variant);
+			{ // RENDERING A MODEL
+				unsigned int variant = d->variant %= m->variants;
+
+				if(!m->single_color){
+					// Select buffers to use
+					glBindBuffer(GL_ARRAY_BUFFER, m->buffer_vertex);
+					glVertexAttribPointer( 0, MODEL_DIMEN, GL_FLOAT, GL_FALSE, 0, (void*)0 );
+					glBindBuffer(GL_ARRAY_BUFFER, m->buffer_normals);
+					glVertexAttribPointer( 2, MODEL_DIMEN, GL_FLOAT, GL_FALSE, 0, (void*)0 );
+					glEnableVertexAttribArray(1);
+					glBindBuffer(GL_ARRAY_BUFFER, m->buffers_color[variant]);
+					glVertexAttribPointer( 1, MODEL_COLOR_SIZE, GL_FLOAT, GL_FALSE, 0, (void*)0 );
+					glUniform1i(uniform_single_color,0);
+				}else{
+					// Select buffers to use
+					glBindBuffer(GL_ARRAY_BUFFER, m->buffer_vertex);
+					glVertexAttribPointer( 0, MODEL_DIMEN, GL_FLOAT, GL_FALSE, 0, (void*)0 );
+					glBindBuffer(GL_ARRAY_BUFFER, m->buffer_normals);
+					glVertexAttribPointer( 2, MODEL_DIMEN, GL_FLOAT, GL_FALSE, 0, (void*)0 );
+					glDisableVertexAttribArray(1);
+					glUniform1i(uniform_single_color,1);
+					glUniform4fv(uniform_boring_color, 1, glm::value_ptr(m->boring_colors[variant]));
+
+				}
+				// Draw the model
+				glDrawArrays(m->mode, 0, m->ppp*m->size);
+			}
 		}else{
 			std::cerr << "Warning: A drawable has no model in base (" << d->model_id << ")" << std::endl;
 		}

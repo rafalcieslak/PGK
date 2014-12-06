@@ -111,7 +111,7 @@ Bubble::Bubble(float scale){
 		std::vector<float> vertices, normals, colors;
 		int n = prepare_ball_model(12,24,vertices,normals,colors);
 		std::cerr << "Ball model has " << n << " triangles." << std::endl;
-		ModelBase::GetInstance().AddModelTriangles("ball",n, vertices.data(), normals.data(), colors.data());
+		ModelBase::GetInstance().AddModelTriangles("ball",n, vertices.data(), normals.data(), glm::vec4(BUBBLE_BLUE));
 	}
 	model_id = "ball";
 	SetScale(scale);

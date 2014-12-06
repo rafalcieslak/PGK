@@ -5,6 +5,8 @@
 #include <map>
 #include <string>
 #include <memory>
+#define GLM_FORCE_RADIANS
+#include <glm/glm.hpp>
 
 #define MODEL_DIMEN 3
 #define MODEL_COLOR_SIZE 4
@@ -30,20 +32,23 @@ public:
 	Model(unsigned int ppp, GLenum mode, unsigned int vertices, std::initializer_list<float> v, std::initializer_list<float> n, std::initializer_list<float> c);
 	Model(unsigned int ppp, GLenum mode, unsigned int vertices, std::initializer_list<float> v, std::initializer_list<float> c);
 	Model(unsigned int ppp, GLenum mode, unsigned int vertices, const float* v, const float* n, const float* c);
+	Model(unsigned int ppp, GLenum mode, unsigned int vertices, const float* v, const float* n, glm::vec4 color);
 	// Never implicitly copy a model, because it needs a VBO, and it allocates
 	// memory, too.
 	Model(const Model& other) = delete;
 	void operator=(const Model& other) = delete;
 	~Model();
-	// This method uses all data behind this model to draw it using GL calls.
-	void metaDraw(unsigned int variant = 0);
+
+	friend class Render;
 private:
 	// Data copies in memory.
 	float *vertices = nullptr, *normals = nullptr, **colors = nullptr;
 	// Number of vertices and color variants.
 	unsigned int size, variants;
+	bool single_color = false;
 	// VBO indices.
 	GLuint buffer_vertex, *buffers_color = nullptr, buffer_normals;
+	glm::vec4* boring_colors = nullptr;
 	// Helper functions for initialization.
 	void init_buffers();
 	void init_arrays();
@@ -66,6 +71,8 @@ public:
 		Model(3, GL_TRIANGLES, vertices, v, c) {};
 	ModelTriangles(unsigned int vertices, const float* v, const float* n, const float* c):
 		Model(3, GL_TRIANGLES, vertices, v, n, c) {};
+	ModelTriangles(unsigned int vertices, const float* v, const float* n, glm::vec4 color):
+		Model(3, GL_TRIANGLES, vertices, v, n, color) {};
 
 };
 
@@ -101,6 +108,7 @@ public:
 	void AddModelTriangles(std::string id, unsigned int vertices, std::initializer_list<float> coords, std::initializer_list<float> normals, std::initializer_list<float> colors);
 	void AddModelTriangles(std::string id, unsigned int vertices, std::initializer_list<float> coords, std::initializer_list<float> colors);
 	void AddModelTriangles(std::string id, unsigned int vertices, const float *coords, const float* normals, const float* colors);
+	void AddModelTriangles(std::string id, unsigned int vertices, const float *coords, const float* normals, glm::vec4 color);
 	void AddModelLines(std::string id, unsigned int vertices, std::initializer_list<float> coords, std::initializer_list<float> normals, std::initializer_list<std::initializer_list<float>> colors);
 	void AddModelLines(std::string id, unsigned int vertices, std::initializer_list<float> coords, std::initializer_list<float> normals, std::initializer_list<float> colors);
 	void AddModelLines(std::string id, unsigned int vertices, const float *coords, const float* normals, const float* colors);
