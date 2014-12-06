@@ -14,14 +14,25 @@ class Player : public NodeGroup{
 	float speed = 1.2f;
 	float pitch = 0.0f;
 	float yaw = 0.0f;
+	glm::vec3 move = glm::vec3(0.0,0.0,0.0);
 public:
 	void SwitchToFP();
 	void SwitchToTP();
 	static std::shared_ptr<Player> Create();
-	void MoveForward(float delta);
-	void MoveBackward(float delta);
-	void StrafeLeft(float delta);
-	void StrafeRight(float delta);
+
+	void ClearMove();
+	void MoveForward();
+	void MoveBackward();
+	void StrafeLeft();
+	void StrafeRight();
+	void MoveLeft();
+	void MoveRight();
+	void MoveUp();
+	void MoveDown();
+	void MoveFront();
+	void MoveBack();
+	void PerformMove(float delta);
+
 	void MovePitch(float delta);
 	void MoveYaw(float delta);
 };

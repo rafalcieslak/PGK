@@ -155,10 +155,18 @@ int main(){
 			pause = !pause;
 		}
 
-		if(Render::IsKeyPressed(GLFW_KEY_W)) player->MoveForward(time_delta);
-		if(Render::IsKeyPressed(GLFW_KEY_S)) player->MoveBackward(time_delta);
-		if(Render::IsKeyPressed(GLFW_KEY_A)) player->StrafeLeft(time_delta);
-		if(Render::IsKeyPressed(GLFW_KEY_D)) player->StrafeRight(time_delta);
+		player->ClearMove();
+		if(Render::IsKeyPressed(GLFW_KEY_W)) player->MoveForward();
+		if(Render::IsKeyPressed(GLFW_KEY_S)) player->MoveBackward();
+		if(Render::IsKeyPressed(GLFW_KEY_A)) player->StrafeLeft();
+		if(Render::IsKeyPressed(GLFW_KEY_D)) player->StrafeRight();
+		if(Render::IsKeyPressed(GLFW_KEY_LEFT)) player->MoveLeft();
+		if(Render::IsKeyPressed(GLFW_KEY_RIGHT)) player->MoveRight();
+		if(Render::IsKeyPressed(GLFW_KEY_UP)) player->MoveFront();
+		if(Render::IsKeyPressed(GLFW_KEY_DOWN)) player->MoveBack();
+		if(Render::IsKeyPressed(GLFW_KEY_PAGE_UP)) player->MoveUp();
+		if(Render::IsKeyPressed(GLFW_KEY_PAGE_DOWN)) player->MoveDown();
+		player->PerformMove(time_delta);
 
 		glm::vec2 mouse = Render::ProbeMouse();
 		if(view_mode == VIEW_MODE_FIRST_PERSON || view_mode == VIEW_MODE_THIRD_PERSON){

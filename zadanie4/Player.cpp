@@ -23,26 +23,38 @@ std::shared_ptr<Player> Player::Create(){
 	p->init();
 	return p;
 }
-
-void Player::MoveForward(float delta){
+void Player::ClearMove(){
+	move = glm::vec3(0.0,0.0,0.0);
+}
+void Player::MoveForward(){
 	glm::vec3 pitched_front = glm::rotate(World::front,pitch,World::up);
 	glm::vec3 pitched_left = glm::rotate(World::left,pitch,World::up);
 	glm::vec3 yawedpitched_front = glm::rotate(pitched_front,yaw,pitched_left);
-	SetPosition(GetPosition() + speed*delta*yawedpitched_front);
+	move += yawedpitched_front;
 }
-void Player::MoveBackward(float delta){
+void Player::MoveBackward(){
 	glm::vec3 pitched_front = glm::rotate(World::front,pitch,World::up);
 	glm::vec3 pitched_left = glm::rotate(World::left,pitch,World::up);
 	glm::vec3 yawedpitched_front = glm::rotate(pitched_front,yaw,pitched_left);
-	SetPosition(GetPosition() - speed*delta*yawedpitched_front);
+	move -= yawedpitched_front;
 }
-void Player::StrafeRight(float delta){
+void Player::StrafeRight(){
 	glm::vec3 pitched_left = glm::rotate(World::left,pitch,World::up);
-	SetPosition(GetPosition() - speed*delta*pitched_left);
+	move -= pitched_left;
 }
-void Player::StrafeLeft(float delta){
+void Player::StrafeLeft(){
 	glm::vec3 pitched_left = glm::rotate(World::left,pitch,World::up);
-	SetPosition(GetPosition() + speed*delta*pitched_left);
+	move += pitched_left;
+}
+void Player::MoveLeft(){ move += World::left; }
+void Player::MoveRight(){ move += -World::left; }
+void Player::MoveUp(){ move += World::up; }
+void Player::MoveDown(){ move += -World::up; }
+void Player::MoveFront(){ move += World::front; }
+void Player::MoveBack(){ move += -World::front; }
+void Player::PerformMove(float delta){
+	if(glm::length(move) > 0.5)
+		SetPosition(GetPosition() + glm::normalize(move)*delta*speed);
 }
 
 void Player::MovePitch(float delta){
