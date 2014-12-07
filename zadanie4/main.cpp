@@ -30,7 +30,7 @@ std::shared_ptr<Text> text_fov;
 std::shared_ptr<Text> text_level;
 std::shared_ptr<Text> text_bubbles;
 
-unsigned int bubble_limit = 30;
+unsigned int bubble_limit;
 unsigned int current_level;
 
 float random_float(float s){
@@ -65,11 +65,19 @@ void SwitchViewMode(){
 	UpdateFOVText();
 }
 
+bool NearSpawn(float x, float y){
+	return glm::distance(glm::vec2(0.0,ROOM_SIZE_Y/2.0-0.4), glm::vec2(x,y)) < 1.0;
+}
+
 void spawn_new_bubble(){
 	auto new_bubble = std::make_shared<Bubble>(BUBBLE_MAIN_SIZE);
 	bubbles.emplace(new_bubble);
 	float x = random_float(ROOM_SIZE_X/2.0);
 	float y = random_float(ROOM_SIZE_Y/2.0);
+	while(NearSpawn(x,y)){
+		x = random_float(ROOM_SIZE_X/2.0);
+		y = random_float(ROOM_SIZE_Y/2.0);
+	}
 	new_bubble->SetPosition(x,y, -ROOM_SIZE_Z/2.0);
 	new_bubble->spatial = 3.1;
 	new_bubble->variant = rand()%3;
