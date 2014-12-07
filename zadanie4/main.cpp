@@ -43,7 +43,7 @@ void UpdateFOVText(){
 }
 void UpdateLevelText(){
 	text_level->SetText("Level: " + std::to_string(current_level));
-	text_bubbles->SetText("Bubbles: " + std::to_string(bubble_limit));
+	text_bubbles->SetText("Bubbles: " + std::to_string(bubbles.size()) + "/" + std::to_string(bubble_limit));
 }
 void SwitchViewMode(){
 	switch(view_mode){
@@ -84,6 +84,7 @@ void spawn_new_bubble(){
 	new_bubble->sizemult = 1.0 + random_float(0.4);
 	new_bubble->ApplyScale();
 	bubble_node->AddChild(new_bubble);
+	UpdateLevelText();
 }
 
 void ScrollCallback(double x){
@@ -177,10 +178,9 @@ int main(){
 	Render::scroll_callback = ScrollCallback;
 
 	double lasttime = Render::GetTime();
-	bool TAB_key_down = false;
-	bool P_key_down = false;
+	bool TAB_key_down = false, P_key_down = false, O_key_down = false;
 
-	const double time_between_spawns = 10.0/bubble_limit;
+	double time_between_spawns = 5.0/bubble_limit;
 	double time_to_next_spawn = time_between_spawns;
 
 	// This is the main loop.
@@ -188,6 +188,7 @@ int main(){
 		double newtime = Render::GetTime();
 		double time_delta = newtime-lasttime;
 		lasttime = newtime;
+		time_between_spawns = 5.0/bubble_limit;
 
 		for(auto b : bubbles){
 			if(!pause){
@@ -200,7 +201,6 @@ int main(){
 		for(auto b : bubbles_to_pop){
 			bubbles.erase(b);
 			bubble_node->RemoveChild(b);
-			spawn_new_bubble();
 		}
 		bubbles_to_pop.clear();
 
@@ -228,6 +228,11 @@ int main(){
 		else if(Render::IsKeyPressed(GLFW_KEY_P) && P_key_down == false){
 			P_key_down = true;
 			pause = !pause;
+		}
+		if(!Render::IsKeyPressed(GLFW_KEY_O)) O_key_down = false;
+		else if(Render::IsKeyPressed(GLFW_KEY_O) && O_key_down == false){
+			O_key_down = true;
+			PrepareLevel(current_level + 1);
 		}
 
 		player->ClearMove();
