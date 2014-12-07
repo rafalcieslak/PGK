@@ -3,7 +3,7 @@ std::vector<Light*> Light::lights;
 
 Light::Light(glm::vec3 pos, glm::vec3 i){
 	SetPosition(pos);
-	intensity = i;
+	color = i;
 	lights.emplace_back(this);
 }
 

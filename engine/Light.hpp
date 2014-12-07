@@ -4,11 +4,14 @@
 #include "Node.hpp"
 
 class Light : public Node{
-	glm::vec3 intensity;
 public:
-	Light(glm::vec3 pos, glm::vec3 intensity = glm::vec3(1.0,1.0,1.0));
+	Light(glm::vec3 pos, glm::vec3 c = glm::vec3(1.0,1.0,1.0));
 	~Light();
 
+	glm::vec3 color;
+	float distance_influence = 0.2;
+	float spatial_range = 10.0;
+	
 	static std::vector<Light*> lights;
 };
 

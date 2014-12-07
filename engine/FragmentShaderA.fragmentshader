@@ -1,16 +1,23 @@
 #version 330 core
+// Suggests drivers to unroll loops.
+#pragma optionNV(unroll all)
+#pragma unroll
 
 in vec4 baseColor;
 out vec4 outcolor;
 in vec3 normal_cameraspace;
-in vec3 vector_to_light_cameraspace;
+in vec3 vector_to_light_cameraspace[12];
 in vec3 vector_to_camera_cameraspace;
-in float lightdistance;
+in float lightdistance[12];
 in vec3 fragmentPosition_cameraspace;
+
+uniform vec2 light_parrams[12]; // distance influence (0.2), spatial tightness (10)
+uniform vec3 light_color[12];
 
 uniform float material_diffuse_ratio;
 uniform float material_spatial_ratio;
 uniform float material_ambient_ratio;
+uniform int light_number = 1;
 uniform int single_color;
 uniform vec4 boring_color;
 
@@ -22,18 +29,26 @@ void main()
 
 	float cameradistance = length(fragmentPosition_cameraspace);
 	vec3 N = normalize( normal_cameraspace );
-	vec3 L = normalize( vector_to_light_cameraspace );
 	vec3 V = normalize( vector_to_camera_cameraspace );
-	vec3 R = reflect(-L,N);
- 	vec3 diffuse_color = color.xyz * max( 0.0f, dot(N,L));
-	vec3 spatial_color = color.xyz * pow( max( 0.0f, dot(V,R)) ,10) / pow(lightdistance, 0.2);
-	vec3 ambient_color = color.xyz;
 
-	vec3 c1 = min(material_diffuse_ratio*diffuse_color + material_spatial_ratio*spatial_color + material_ambient_ratio*ambient_color, vec3(1.0));
+	vec3 diffuse_sum = vec3(0.0), spatial_sum = vec3(0.0), ambient_sum = vec3(0.0);
+    for(int i = 0; i < 12; i++){ // Will be unrolled!
+        if(i >= light_number) break;
+		vec3 L = normalize( vector_to_light_cameraspace[i] );
+		vec3 R = reflect(-L,N);
+	 	diffuse_sum += light_color[i] * max( 0.0f, dot(N,L));
+		spatial_sum += light_color[i] * pow( max( 0.0f, dot(V,R)) ,light_parrams[i].y) / pow(lightdistance[i], light_parrams[i].x);
+		ambient_sum += light_color[i] ;
+	}
+
+	vec3 c = min(color.xyz *(material_diffuse_ratio*diffuse_sum + material_spatial_ratio*spatial_sum + material_ambient_ratio*ambient_sum), vec3(1.0));
+
+	// Apply fog
 	float fogratio = smoothstep(2.0, 30.0, cameradistance);
 	fogratio = min(1.0,pow(6.0,fogratio) / 6.0);
-	c1 = mix(c1, vec3(100/255.0,200.0/255.0,1.0), fogratio*1.0);
+	c = mix(c, vec3(100/255.0,200.0/255.0,1.0), fogratio*1.0);
 
+	// Correct angular alpha
 	float angleratio = length(cross(N,V));
 	angleratio = pow(angleratio,10);
 	float alpha = color.a;
@@ -43,5 +58,5 @@ void main()
 		if(dot(N,V) < 0) alpha *= 1.6;
 	}
 
-	outcolor = vec4(c1,alpha);
+	outcolor = vec4(c,alpha);
 }

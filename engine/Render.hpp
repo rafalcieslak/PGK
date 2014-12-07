@@ -19,6 +19,7 @@ private:
 	static GLint uniform_model_transform, uniform_camera_transform, uniform_perspective_transform;
  	static GLint uniform_anim_mode, uniform_anim_phase, uniform_lightpos, uniform_diffuse, uniform_spatial, uniform_ambient;
 	static GLint uniform_single_color, uniform_boring_color;
+	static GLint uniform_lightnumber, uniform_lightcolor, uniform_lightparrams;
 	// Pixel sizes. Needed for perfect text alignment.
 	static float pxsizex, pxsizey;
 	// The root node for drawing.

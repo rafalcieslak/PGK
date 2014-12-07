@@ -18,6 +18,7 @@ GLFWwindow* window;
 // All the static members of Render class.
 GLint Render::uniform_model_transform, Render::uniform_camera_transform, Render::uniform_perspective_transform;
 GLint Render::uniform_lightpos, Render::uniform_diffuse, Render::uniform_spatial, Render::uniform_ambient;
+GLint Render::uniform_lightcolor, Render::uniform_lightnumber, Render::uniform_lightparrams;
 GLint Render::uniform_anim_mode, Render::uniform_anim_phase;
 GLint Render::uniform_single_color, Render::uniform_boring_color;
 GLuint Render::VertexArrayID;
@@ -106,8 +107,12 @@ int Render::Init(){
 	uniform_ambient = glGetUniformLocation(shader_program_id,"material_ambient_ratio");
 	uniform_single_color = glGetUniformLocation(shader_program_id,"single_color");
 	uniform_boring_color = glGetUniformLocation(shader_program_id,"boring_color");
+	uniform_lightnumber = glGetUniformLocation(shader_program_id,"light_number");
+	uniform_lightparrams = glGetUniformLocation(shader_program_id,"light_parrams");
+	uniform_lightcolor = glGetUniformLocation(shader_program_id,"light_color");
 	if(uniform_model_transform == -1 || uniform_anim_mode == -1 || uniform_anim_phase == -1 || uniform_camera_transform == -1 || uniform_perspective_transform == -1 ||
-       uniform_lightpos == -1 || uniform_diffuse == -1 || uniform_spatial == -1 || uniform_ambient == -1 || uniform_single_color == -1 || uniform_boring_color == -1){
+       uniform_lightpos == -1 || uniform_diffuse == -1 || uniform_spatial == -1 || uniform_ambient == -1 || uniform_single_color == -1 || uniform_boring_color == -1 ||
+       uniform_lightnumber == -1 || uniform_lightparrams == -1 || uniform_lightcolor == -1){
 		std::cerr << "A uniform is missing from the shader." << std::endl;
 		glfwTerminate();
 		return -1;
@@ -212,11 +217,26 @@ void Render::Frame(){
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
 
-	// Prepare main light
+	// Prepare lights
+	int n = Light::lights.size();
 	if(Light::lights.size() > 0){
-		Light* l = Light::lights[0];
-		glm::vec3 lightpos(l->GetGlobalTransform()[3]);
-		glUniform3f(uniform_lightpos,lightpos.x,lightpos.y,lightpos.z);
+		float lightspos[3*n], lightparrams[2*n], lightcolors[3*n];
+		glUniform1i(uniform_lightnumber,n);
+		for(int i = 0; i < n; i++){
+			Light* l = Light::lights[i];
+			glm::vec3 lightpos(l->GetGlobalPos());
+			lightspos[3*i+0] = lightpos.x;
+			lightspos[3*i+1] = lightpos.y;
+			lightspos[3*i+2] = lightpos.z;
+			lightcolors[3*i+0] = l->color.x;
+			lightcolors[3*i+1] = l->color.y;
+			lightcolors[3*i+2] = l->color.z;
+			lightparrams[2*i+0] = l->distance_influence;
+			lightparrams[2*i+1] = l->spatial_range;
+		}
+		glUniform3fv(uniform_lightpos,n,lightspos);
+		glUniform2fv(uniform_lightparrams,n,lightparrams);
+		glUniform3fv(uniform_lightcolor,n,lightcolors);
 	}
 	// Prepare camera
 	if(Viewpoint::active_viewpoint){
