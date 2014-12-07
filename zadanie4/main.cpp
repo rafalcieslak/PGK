@@ -93,13 +93,25 @@ bool PlayerWon(){
 	}
 	return false;
 }
-
+bool PlayerLost(){
+	auto q = player->GetVerticesAbs();
+	for(auto b : bubbles){
+		for(auto i : q){
+			if(b->IsPointInside(i)) return true;
+		}
+	}
+	return false;
+}
 void PrepareLevel(int levelno){
 	player->SetPosition(0.0,ROOM_SIZE_Y/2.0-0.4,0.0);
 	player->ResetRotation();
 	current_level = levelno;
 	bubble_limit = 30 + levelno*5;
 	UpdateLevelText();
+}
+
+void Reset(){
+	PrepareLevel(1);
 }
 
 bool IsVertexOutside(glm::vec3 p){
@@ -232,8 +244,11 @@ int main(){
 		}
 
 		player->PerformMove(time_delta);
-		if(!pause && PlayerWon()) PrepareLevel(current_level + 1);
-		else if(!pause && IsPlayerOutside()) player->CancelMove();
+		if(!pause){
+			if(PlayerLost()) Reset();
+			else if(PlayerWon()) PrepareLevel(current_level + 1);
+			else if(IsPlayerOutside()) player->CancelMove();
+		}
 
 		Render::Frame();
 	}while( !Render::IsKeyPressed(GLFW_KEY_ESCAPE ) && !Render::IsWindowClosed() );
