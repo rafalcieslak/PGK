@@ -3,6 +3,7 @@
 
 #include "../engine/Node.hpp"
 #include "../engine/Viewpoint.hpp"
+#include "../engine/Light.hpp"
 #include "Cube.hpp"
 #include <list>
 
@@ -10,6 +11,7 @@ class Player : public NodeGroup{
 	std::shared_ptr<Cube> player_cube;
 	std::shared_ptr<Viewpoint> first_person_view;
 	std::shared_ptr<Viewpoint> third_person_view;
+	std::shared_ptr<Light> light;
 	Player();
 	void init();
 	float speed = 1.2f;

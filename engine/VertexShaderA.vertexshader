@@ -15,6 +15,7 @@ uniform int anim_mode = 0;
 uniform float anim_phase;
 uniform int light_number = 1;
 uniform vec3 lightpos_global[12];
+uniform float light_fixrange[12];
 
 out vec4 baseColor;
 out vec3 normal_cameraspace;
@@ -26,7 +27,8 @@ out vec3 fragmentPosition_cameraspace;
 void main(){
     vec4 color = vertexColor;
 
-    vec4 vertexPosition_cameraspace = camera_transform * model_transform * vec4(vertexPosition_model,1.0f);
+    vec4 vertexPosition_global = model_transform * vec4(vertexPosition_model,1.0f);
+    vec4 vertexPosition_cameraspace = camera_transform * vertexPosition_global;
     vec4 vertexPosition_perspective =  perspective_transform * vertexPosition_cameraspace;
 
     vec3 camerapos_cameraspace = vec3(0.0,0.0,0.0);
@@ -36,7 +38,7 @@ void main(){
     for(int i = 0; i < 12; i++){ // Will be unrolled!
         if(i >= light_number) break;
         vec3 lightpos_cameraspace = ( camera_transform * vec4(lightpos_global[i],1.0f)).xyz;
-        lightdistance[i] = distance(vertexPosition_cameraspace.xyz, lightpos_cameraspace);
+        lightdistance[i] = max(0.0001, distance(vertexPosition_global.xyz, lightpos_global[i]) - light_fixrange[i]);
         vector_to_light_cameraspace[i] = lightpos_cameraspace + vector_to_camera_cameraspace;
     }
 

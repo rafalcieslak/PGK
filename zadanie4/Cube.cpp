@@ -2,8 +2,8 @@
 #include "../engine/ModelBase.hpp"
 
 #define rgb(x,y,z)	x/255.0, y/255.0, z/255.0, 1.0
-#define CL rgb(6, 25, 42)
-#define CD rgb(150,150,150)
+#define CL rgb(150,150,150)
+#define CD rgb(6, 25, 42)
 #define CG rgb(80,150,80)
 #define C_BLUE rgb(58, 92, 226)
 #define C_RED rgb(223, 41, 31)
@@ -41,7 +41,4 @@ Cube::Cube(float scale){
 	}
 	model_id = "cube";
 	SetScale(scale);
-	diffuse = 0.0;
-	spatial = 1.1;
-	ambient = 0.8;
 }

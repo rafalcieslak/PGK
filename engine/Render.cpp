@@ -18,8 +18,8 @@ GLFWwindow* window;
 // All the static members of Render class.
 GLint Render::uniform_model_transform, Render::uniform_camera_transform, Render::uniform_perspective_transform;
 GLint Render::uniform_lightpos, Render::uniform_diffuse, Render::uniform_spatial, Render::uniform_ambient;
-GLint Render::uniform_lightcolor, Render::uniform_lightnumber, Render::uniform_lightparrams;
-GLint Render::uniform_anim_mode, Render::uniform_anim_phase;
+GLint Render::uniform_lightcolor, Render::uniform_lightnumber, Render::uniform_lightparrams, Render::uniform_light_sda;
+GLint Render::uniform_anim_mode, Render::uniform_anim_phase, Render::uniform_light_fixrange;
 GLint Render::uniform_single_color, Render::uniform_boring_color;
 GLuint Render::VertexArrayID;
 float Render::pxsizex, Render::pxsizey;
@@ -110,9 +110,11 @@ int Render::Init(){
 	uniform_lightnumber = glGetUniformLocation(shader_program_id,"light_number");
 	uniform_lightparrams = glGetUniformLocation(shader_program_id,"light_parrams");
 	uniform_lightcolor = glGetUniformLocation(shader_program_id,"light_color");
+	uniform_light_sda = glGetUniformLocation(shader_program_id,"light_sda");
+	uniform_light_fixrange = glGetUniformLocation(shader_program_id,"light_fixrange");
 	if(uniform_model_transform == -1 || uniform_anim_mode == -1 || uniform_anim_phase == -1 || uniform_camera_transform == -1 || uniform_perspective_transform == -1 ||
        uniform_lightpos == -1 || uniform_diffuse == -1 || uniform_spatial == -1 || uniform_ambient == -1 || uniform_single_color == -1 || uniform_boring_color == -1 ||
-       uniform_lightnumber == -1 || uniform_lightparrams == -1 || uniform_lightcolor == -1){
+       uniform_lightnumber == -1 || uniform_lightparrams == -1 || uniform_lightcolor == -1 || uniform_light_sda == -1 || uniform_light_fixrange == -1){
 		std::cerr << "A uniform is missing from the shader." << std::endl;
 		glfwTerminate();
 		return -1;
@@ -220,7 +222,7 @@ void Render::Frame(){
 	// Prepare lights
 	int n = Light::lights.size();
 	if(Light::lights.size() > 0){
-		float lightspos[3*n], lightparrams[2*n], lightcolors[3*n];
+		float lightspos[3*n], lightparrams[2*n], lightcolors[3*n], sda[3*n], fixranges[n];
 		glUniform1i(uniform_lightnumber,n);
 		for(int i = 0; i < n; i++){
 			Light* l = Light::lights[i];
@@ -228,15 +230,21 @@ void Render::Frame(){
 			lightspos[3*i+0] = lightpos.x;
 			lightspos[3*i+1] = lightpos.y;
 			lightspos[3*i+2] = lightpos.z;
-			lightcolors[3*i+0] = l->color.x;
-			lightcolors[3*i+1] = l->color.y;
-			lightcolors[3*i+2] = l->color.z;
+			lightcolors[3*i+0] = l->color.x * l->multiplier;
+			lightcolors[3*i+1] = l->color.y * l->multiplier;
+			lightcolors[3*i+2] = l->color.z * l->multiplier;
 			lightparrams[2*i+0] = l->distance_influence;
 			lightparrams[2*i+1] = l->spatial_range;
+			sda[3*i+0] = l->sda.x;
+			sda[3*i+1] = l->sda.y;
+			sda[3*i+2] = l->sda.z;
+			fixranges[i] = l->fixrange;
 		}
 		glUniform3fv(uniform_lightpos,n,lightspos);
 		glUniform2fv(uniform_lightparrams,n,lightparrams);
 		glUniform3fv(uniform_lightcolor,n,lightcolors);
+		glUniform3fv(uniform_light_sda,n,sda);
+		glUniform1fv(uniform_light_fixrange,n,fixranges);
 	}
 	// Prepare camera
 	if(Viewpoint::active_viewpoint){

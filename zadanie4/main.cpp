@@ -66,7 +66,7 @@ void SwitchViewMode(){
 }
 
 bool NearSpawn(float x, float y){
-	return glm::distance(glm::vec2(0.0,ROOM_SIZE_Y/2.0-0.4), glm::vec2(x,y)) < 1.0;
+	return glm::distance(glm::vec2(0.0,-ROOM_SIZE_Y/2.0+0.4), glm::vec2(x,y)) < 1.0;
 }
 
 void spawn_new_bubble(){
@@ -94,7 +94,7 @@ void ScrollCallback(double x){
 	UpdateFOVText();
 }
 bool VertexWon(glm::vec3 v){
-	return v.y < -ROOM_SIZE_Y/2.0;
+	return v.y > ROOM_SIZE_Y/2.0;
 }
 bool PlayerWon(){
 	for(auto i : player->GetVerticesAbs()){
@@ -112,7 +112,7 @@ bool PlayerLost(){
 	return false;
 }
 void PrepareLevel(int levelno){
-	player->SetPosition(0.0,ROOM_SIZE_Y/2.0-0.4,0.0);
+	player->SetPosition(0.0,-ROOM_SIZE_Y/2.0+0.4,0.0);
 	player->ResetRotation();
 	current_level = levelno;
 	bubble_limit = 30 + levelno*5;
@@ -148,8 +148,11 @@ int main(){
 	auto root = std::make_shared<Node>();
 
 	auto fishtank = std::make_shared<Cube>(1.0);
-	fishtank->SetScale(ROOM_SIZE_X/2.0,ROOM_SIZE_Y/2.0,ROOM_SIZE_Z/2.0);
-	fishtank->culling = 2;
+	fishtank->SetScale(-ROOM_SIZE_X/2.0,-ROOM_SIZE_Y/2.0,-ROOM_SIZE_Z/2.0);
+	fishtank->culling = 1;
+	fishtank->diffuse = 0.3;
+	fishtank->spatial = 1.0;
+	fishtank->ambient = 0.8;
 	root->AddChild(fishtank);
 
 	external_cam = ExternalCamera::Create();
@@ -240,17 +243,17 @@ int main(){
 		if(Render::IsKeyPressed(GLFW_KEY_S)) player->MoveBackward();
 		if(Render::IsKeyPressed(GLFW_KEY_A)) player->StrafeLeft();
 		if(Render::IsKeyPressed(GLFW_KEY_D)) player->StrafeRight();
-		if(Render::IsKeyPressed(GLFW_KEY_LEFT)) player->MoveLeft();
-		if(Render::IsKeyPressed(GLFW_KEY_RIGHT)) player->MoveRight();
-		if(Render::IsKeyPressed(GLFW_KEY_UP)) player->MoveFront();
-		if(Render::IsKeyPressed(GLFW_KEY_DOWN)) player->MoveBack();
+		if(Render::IsKeyPressed(GLFW_KEY_LEFT)) player->MoveRight();
+		if(Render::IsKeyPressed(GLFW_KEY_RIGHT)) player->MoveLeft();
+		if(Render::IsKeyPressed(GLFW_KEY_UP)) player->MoveBack();
+		if(Render::IsKeyPressed(GLFW_KEY_DOWN)) player->MoveFront();
 		if(Render::IsKeyPressed(GLFW_KEY_PAGE_UP)) player->MoveUp();
 		if(Render::IsKeyPressed(GLFW_KEY_PAGE_DOWN)) player->MoveDown();
 
 		glm::vec2 mouse = Render::ProbeMouse();
 		if(view_mode == VIEW_MODE_FIRST_PERSON || view_mode == VIEW_MODE_THIRD_PERSON){
 			player->MovePitch(mouse.x);
-			player->MoveYaw(mouse.y);
+			player->MoveYaw(-mouse.y);
 		}else if(view_mode == VIEW_MODE_EXTERNAL){
 			external_cam->MovePitch(mouse.x);
 			external_cam->MoveYaw(-mouse.y);

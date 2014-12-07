@@ -13,6 +13,7 @@ in vec3 fragmentPosition_cameraspace;
 
 uniform vec2 light_parrams[12]; // distance influence (0.2), spatial tightness (10)
 uniform vec3 light_color[12];
+uniform vec3 light_sda[12];
 
 uniform float material_diffuse_ratio;
 uniform float material_spatial_ratio;
@@ -36,9 +37,10 @@ void main()
         if(i >= light_number) break;
 		vec3 L = normalize( vector_to_light_cameraspace[i] );
 		vec3 R = reflect(-L,N);
-	 	diffuse_sum += light_color[i] * max( 0.0f, dot(N,L));
-		spatial_sum += light_color[i] * pow( max( 0.0f, dot(V,R)) ,light_parrams[i].y) / pow(lightdistance[i], light_parrams[i].x);
-		ambient_sum += light_color[i] ;
+		float distint = pow(lightdistance[i], light_parrams[i].x);
+	 	diffuse_sum += light_sda[i].x * light_color[i] * max( 0.0f, dot(N,L)) / distint;
+		spatial_sum += light_sda[i].y * light_color[i] * pow( max( 0.0f, dot(V,R)) ,light_parrams[i].y) / distint;
+		ambient_sum += light_sda[i].z * light_color[i];
 	}
 
 	vec3 c = min(color.xyz *(material_diffuse_ratio*diffuse_sum + material_spatial_ratio*spatial_sum + material_ambient_ratio*ambient_sum), vec3(1.0));

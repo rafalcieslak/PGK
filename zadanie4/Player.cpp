@@ -7,15 +7,24 @@ Player::Player() {
 	player_cube->variant = 2;
 	player_cube->culling = 1;
 	first_person_view = std::make_shared<Viewpoint>(glm::vec3(0.0,0.0,0.0));
- 	third_person_view = std::make_shared<Viewpoint>(glm::vec3(0.0,10.0,5.0));
-	first_person_view->LookAt(glm::vec3(0.0,-1.0,0.0));
+ 	third_person_view = std::make_shared<Viewpoint>(glm::vec3(0.0,-10.0,5.0));
+	first_person_view->LookAt(glm::vec3(0.0,1.0,0.0));
 	third_person_view->LookAt(glm::vec3(0.0,0.0,0.0));
+	light = std::make_shared<Light>(glm::vec3(0.0,0.0,0.0),glm::vec3(1.0,0.0,0.0));
+	light->multiplier = 0.7;
+	light->distance_influence = 1.1;
+	light->spatial_range = 30.0;
+	light->sda.x = 1.0; // diffuse
+	light->sda.y = 0.9; // spatial
+	light->sda.z = 0.0; // no ambient lighting from this source
+	light->fixrange = 0.4;
 }
 
 void Player::init(){
 	AddChild(player_cube);
 	player_cube->AddChild(first_person_view);
 	player_cube->AddChild(third_person_view);
+	AddChild(light);
 }
 
 std::shared_ptr<Player> Player::Create(){
@@ -33,21 +42,21 @@ void Player::MoveForward(){
 	glm::vec3 pitched_front = glm::rotate(World::front,pitch,World::up);
 	glm::vec3 pitched_left = glm::rotate(World::left,pitch,World::up);
 	glm::vec3 yawedpitched_front = glm::rotate(pitched_front,yaw,pitched_left);
-	move += yawedpitched_front;
+	move -= yawedpitched_front;
 }
 void Player::MoveBackward(){
 	glm::vec3 pitched_front = glm::rotate(World::front,pitch,World::up);
 	glm::vec3 pitched_left = glm::rotate(World::left,pitch,World::up);
 	glm::vec3 yawedpitched_front = glm::rotate(pitched_front,yaw,pitched_left);
-	move -= yawedpitched_front;
+	move += yawedpitched_front;
 }
 void Player::StrafeRight(){
 	glm::vec3 pitched_left = glm::rotate(World::left,pitch,World::up);
-	move -= pitched_left;
+	move += pitched_left;
 }
 void Player::StrafeLeft(){
 	glm::vec3 pitched_left = glm::rotate(World::left,pitch,World::up);
-	move += pitched_left;
+	move -= pitched_left;
 }
 void Player::MoveLeft(){ move += World::left; }
 void Player::MoveRight(){ move += -World::left; }
