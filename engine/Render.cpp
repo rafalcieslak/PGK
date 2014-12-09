@@ -82,7 +82,7 @@ int Render::Init(){
 	}
 
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_FALSE);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetScrollCallback(window,ScrollCallback);
 
 	// Black background
