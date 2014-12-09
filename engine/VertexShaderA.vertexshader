@@ -14,14 +14,14 @@ uniform mat4 perspective_transform;
 uniform int anim_mode = 0;
 uniform float anim_phase;
 uniform int light_number = 1;
-uniform vec3 lightpos_global[12];
-uniform float light_fixrange[12];
+uniform vec3 lightpos_global[6];
+uniform float light_fixrange[6];
 
 out vec4 baseColor;
 out vec3 normal_cameraspace;
-out vec3 vector_to_light_cameraspace[12];
+out vec3 vector_to_light_cameraspace[6];
 out vec3 vector_to_camera_cameraspace;
-out float lightdistance[12];
+out float lightdistance[6];
 out vec3 fragmentPosition_cameraspace;
 
 void main(){
@@ -35,7 +35,7 @@ void main(){
     vector_to_camera_cameraspace = camerapos_cameraspace - vertexPosition_cameraspace.xyz;
     fragmentPosition_cameraspace = vertexPosition_cameraspace.xyz;
 
-    for(int i = 0; i < 12; i++){ // Will be unrolled!
+    for(int i = 0; i < 6; i++){ // Will be unrolled!
         if(i >= light_number) break;
         vec3 lightpos_cameraspace = ( camera_transform * vec4(lightpos_global[i],1.0f)).xyz;
         lightdistance[i] = max(0.0001, distance(vertexPosition_global.xyz, lightpos_global[i]) - light_fixrange[i]);

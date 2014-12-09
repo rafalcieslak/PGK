@@ -6,14 +6,14 @@
 in vec4 baseColor;
 out vec4 outcolor;
 in vec3 normal_cameraspace;
-in vec3 vector_to_light_cameraspace[12];
+in vec3 vector_to_light_cameraspace[6];
 in vec3 vector_to_camera_cameraspace;
-in float lightdistance[12];
+in float lightdistance[6];
 in vec3 fragmentPosition_cameraspace;
 
-uniform vec2 light_parrams[12]; // distance influence (0.2), spatial tightness (10)
-uniform vec3 light_color[12];
-uniform vec3 light_sda[12];
+uniform vec2 light_parrams[6]; // distance influence (0.2), spatial tightness (10)
+uniform vec3 light_color[6];
+uniform vec3 light_sda[6];
 
 uniform float material_diffuse_ratio;
 uniform float material_spatial_ratio;
@@ -33,7 +33,7 @@ void main()
 	vec3 V = normalize( vector_to_camera_cameraspace );
 
 	vec3 diffuse_sum = vec3(0.0), spatial_sum = vec3(0.0), ambient_sum = vec3(0.0);
-    for(int i = 0; i < 12; i++){ // Will be unrolled!
+    for(int i = 0; i < 6; i++){ // Will be unrolled!
         if(i >= light_number) break;
 		vec3 L = normalize( vector_to_light_cameraspace[i] );
 		vec3 R = reflect(-L,N);
