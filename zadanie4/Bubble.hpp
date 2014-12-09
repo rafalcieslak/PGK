@@ -3,9 +3,8 @@
 
 #include "../engine/Drawable.hpp"
 
-class Bubble : public Drawable{
+class Bubble : public NodeGroup{
 public:
-	Bubble(float scale = 1.0);
 	void RotateTowards(glm::vec3);
 	void ApplyMovement(float time_delta);
 	void ApplyScale();
@@ -13,11 +12,20 @@ public:
 	float DistanceToCamera() const;
 	bool IsPointInside(glm::vec3) const;
 	float sizemult = 1.0;
+	static std::shared_ptr<Bubble> Create(float scale);
+	std::shared_ptr<Drawable> GetDrawable() const {return drawable;}
 private:
+	class BubbleDrawable : public Drawable{
+	public:
+		BubbleDrawable();
+	};
+	std::shared_ptr<BubbleDrawable> drawable;
 	static float ZPosToH(float zpos);
 	static float HToZPos(float h);
 	static float SpeedFunc(float h);
 	static float ScaleFunc(float h);
+	Bubble(float scale = 1.0);
+	void init();
 };
 
 #endif //BUBBLE_HPP

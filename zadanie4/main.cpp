@@ -71,7 +71,7 @@ bool NearSpawn(float x, float y){
 }
 
 void spawn_new_bubble(){
-	auto new_bubble = std::make_shared<Bubble>(BUBBLE_MAIN_SIZE);
+	auto new_bubble = Bubble::Create(BUBBLE_MAIN_SIZE);
 	bubbles.emplace(new_bubble);
 	float x = random_float(ROOM_SIZE_X/2.0);
 	float y = random_float(ROOM_SIZE_Y/2.0);
@@ -79,9 +79,9 @@ void spawn_new_bubble(){
 		x = random_float(ROOM_SIZE_X/2.0);
 		y = random_float(ROOM_SIZE_Y/2.0);
 	}
-	new_bubble->SetPosition(x,y, -ROOM_SIZE_Z/2.0);
-	new_bubble->spatial = 3.1;
-	new_bubble->variant = rand()%3;
+	new_bubble->GetDrawable()->SetPosition(x,y, -ROOM_SIZE_Z/2.0);
+	new_bubble->GetDrawable()->spatial = 3.1;
+	new_bubble->GetDrawable()->variant = rand()%3;
 	new_bubble->sizemult = 1.0 + random_float(0.4);
 	new_bubble->ApplyScale();
 	bubble_node->AddChild(new_bubble);

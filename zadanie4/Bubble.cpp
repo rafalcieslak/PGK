@@ -99,7 +99,7 @@ int prepare_ball_model(const unsigned int hstripes, const unsigned int ncir, std
 	return n;
 }
 
-Bubble::Bubble(float scale){
+Bubble::BubbleDrawable::BubbleDrawable(){
 	if(!ModelBase::GetInstance().HasModel("ball")){
 		std::vector<float> vertices, normals, colors;
 		int n = prepare_ball_model(4,70,vertices,normals,colors);
@@ -108,25 +108,40 @@ Bubble::Bubble(float scale){
 			glm::vec4(BUBBLE_BLUE), glm::vec4(BUBBLE_GREEN), glm::vec4(BUBBLE_VIOLET) });
 	}
 	model_id = "ball";
-	SetScale(scale);
+}
+
+Bubble::Bubble(float scale){
+	drawable = std::make_shared<BubbleDrawable>();
+	drawable->SetScale(scale);
+}
+
+void Bubble::init(){
+	AddChild(drawable);
+	SetTop(drawable);
+}
+
+std::shared_ptr<Bubble> Bubble::Create(float s){
+	auto b = std::shared_ptr<Bubble>(new Bubble(s));
+	b->init();
+	return b;
 }
 
 void Bubble::RotateTowards(glm::vec3 to){
 	glm::vec4 my_up =  glm::vec4(0.0,1.0,0.0,1.0);
-	glm::vec4 my_pos = GetGlobalTransform() * glm::vec4(0.0,0.0,0.0,1.0);
+	glm::vec4 my_pos = drawable->GetGlobalTransform() * glm::vec4(0.0,0.0,0.0,1.0);
 	glm::vec4 dir = glm::vec4(to,1.0) - my_pos;
 	glm::quat rot = glm::rotation(glm::normalize(my_up.xyz()), glm::normalize(dir.xyz()));
-	SetRotation(rot);
+	drawable->SetRotation(rot);
 }
 
 void Bubble::ApplyMovement(float time_delta){
-	glm::vec3 pos = GetPosition();
+	glm::vec3 pos = drawable->GetPosition();
 	float my_h = ZPosToH(pos.z);
 	float new_h = my_h + SpeedFunc(my_h)*time_delta*sizemult*sizemult; // this should be an integral...
-	SetPosition(pos.x,pos.y,HToZPos(new_h));
+	drawable->SetPosition(pos.x,pos.y,HToZPos(new_h));
 }
 void Bubble::ApplyScale(){
-	SetScale(BUBBLE_MAIN_SIZE*sizemult*ScaleFunc( ZPosToH(GetPosition().z) ));
+	drawable->SetScale(BUBBLE_MAIN_SIZE*sizemult*ScaleFunc( ZPosToH(drawable->GetPosition().z) ));
 }
 
 float Bubble::ZPosToH(float zpos){
@@ -144,15 +159,15 @@ float Bubble::ScaleFunc(float h){
 	return glm::min(h*h/0.9 + 0.2, 0.7);
 }
 bool Bubble::ShouldPop() const{
-	return ZPosToH(GetPosition().z) >= 0.9;
+	return ZPosToH(drawable->GetPosition().z) >= 0.9;
 }
 float Bubble::DistanceToCamera() const{
-	return glm::distance(GetGlobalPos(),Viewpoint::active_viewpoint->GetGlobalPos());
+	return glm::distance(drawable->GetGlobalPos(),Viewpoint::active_viewpoint->GetGlobalPos());
 }
 bool Bubble::IsPointInside(glm::vec3 p) const{
-	glm::vec3 pos = GetGlobalPos();
+	glm::vec3 pos = drawable->GetGlobalPos();
 	float dist = glm::distance(pos, p);
-	glm::mat4 m = GetGlobalTransform();
+	glm::mat4 m = drawable->GetGlobalTransform();
 	float scale = m[0][0]; // This trick works ONLY if the bubble is not an ellipsoid!
 	return scale > dist;
 }
