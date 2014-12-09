@@ -25,22 +25,22 @@ uniform vec4 boring_color;
 void main()
 {
 	vec4 color;
-	if(single_color == 1) color = boring_color;//*0.0001 + vec4(1.0,0.0,0.0,0.4);
-	else color = baseColor;
+	color = mix(baseColor,boring_color,single_color);
 
 	float cameradistance = length(fragmentPosition_cameraspace);
 	vec3 N = normalize( normal_cameraspace );
 	vec3 V = normalize( vector_to_camera_cameraspace );
 
 	vec3 diffuse_sum = vec3(0.0), spatial_sum = vec3(0.0), ambient_sum = vec3(0.0);
-    for(int i = 0; i < 6; i++){ // Will be unrolled!
+	for(int i = 0; i < 6; i++){ // Will be unrolled!
         if(i >= light_number) break;
+		float use = 1.0-step(float(light_number+1),float(i));
 		vec3 L = normalize( vector_to_light_cameraspace[i] );
 		vec3 R = reflect(-L,N);
 		float distint = pow(lightdistance[i], light_parrams[i].x);
-	 	diffuse_sum += light_sda[i].x * light_color[i] * max( 0.0f, dot(N,L)) / distint;
-		spatial_sum += light_sda[i].y * light_color[i] * pow( max( 0.0f, dot(V,R)) ,light_parrams[i].y) / distint;
-		ambient_sum += light_sda[i].z * light_color[i];
+	 	diffuse_sum += use * light_sda[i].x * light_color[i] * max( 0.0f, dot(N,L)) / distint;
+		spatial_sum += use * light_sda[i].y * light_color[i] * pow( max( 0.0f, dot(V,R)) ,light_parrams[i].y) / distint;
+		ambient_sum += use * light_sda[i].z * light_color[i];
 	}
 
 	vec3 c = min(color.xyz *(material_diffuse_ratio*diffuse_sum + material_spatial_ratio*spatial_sum + material_ambient_ratio*ambient_sum), vec3(1.0));

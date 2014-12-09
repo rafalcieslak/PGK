@@ -51,7 +51,7 @@ int Render::Init(){
 
 	// Calculate grid lines coordinates (depending on board size)
 	GLfloat  vert_lines[4*(Game::board_width -1)];
-	GLfloat horiz_lines[4*(Game::board_height  )];
+	GLfloat horiz_lines[4*(Game::board_height +1)];
 	GLfloat lines_colors[6*std::max(Game::board_width,Game::board_height)];
 	for(unsigned int i = 0; i < Game::board_width; i++){
 		vert_lines[4*i + 0] = -1.0f + card_width*(i+1);

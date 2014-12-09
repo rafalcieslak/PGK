@@ -29,6 +29,7 @@ std::set<std::shared_ptr<Bubble>> bubbles_to_pop;
 std::shared_ptr<Text> text_fov;
 std::shared_ptr<Text> text_level;
 std::shared_ptr<Text> text_bubbles;
+std::shared_ptr<Text> text_fps;
 
 unsigned int bubble_limit;
 unsigned int current_level;
@@ -173,6 +174,8 @@ int main(){
 	text_fov     = Text::Create("", glm::vec2(5,30),24,glm::vec3(1.0,0.0,0.0));
 	text_level   = Text::Create("", glm::vec2(5,83),48,glm::vec3(0.0,1.0,0.0));
 	text_bubbles = Text::Create("", glm::vec2(5,113),24,glm::vec3(1.0,1.0,0.0));
+	text_bubbles = Text::Create("", glm::vec2(5,113),24,glm::vec3(1.0,1.0,0.0));
+	text_fps     = Text::Create("", glm::vec2(850,30),10.0,glm::vec3(0.0,0.0,0.0));
 	UpdateFOVText();
 
 	PrepareLevel(1);
@@ -191,6 +194,7 @@ int main(){
 		double newtime = Render::GetTime();
 		double time_delta = newtime-lasttime;
 		lasttime = newtime;
+		text_fps->SetText(std::to_string(time_delta) + "/" + std::to_string(((int)(10.0/time_delta))/10) + "FPS");
 		time_between_spawns = 5.0/bubble_limit;
 
 		for(auto b : bubbles){
