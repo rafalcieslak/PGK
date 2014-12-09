@@ -9,8 +9,10 @@ public:
 	void ApplyMovement(float time_delta);
 	void ApplyScale();
 	bool ShouldPop() const;
+	void AddLight();
 	float DistanceToCamera() const;
 	bool IsPointInside(glm::vec3) const;
+	bool HasLight() const {return has_light;}
 	float sizemult = 1.0;
 	static std::shared_ptr<Bubble> Create(float scale);
 	std::shared_ptr<Drawable> GetDrawable() const {return drawable;}
@@ -26,6 +28,7 @@ private:
 	static float ScaleFunc(float h);
 	Bubble(float scale = 1.0);
 	void init();
+	bool has_light = false;
 };
 
 #endif //BUBBLE_HPP

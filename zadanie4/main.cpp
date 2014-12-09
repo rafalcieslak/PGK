@@ -25,6 +25,8 @@ std::shared_ptr<Node> bubble_node;
 
 std::set<std::shared_ptr<Bubble>> bubbles;
 std::set<std::shared_ptr<Bubble>> bubbles_to_pop;
+const int max_lit_bubbles = 4;
+int curr_lit_bubbles = 0;
 
 std::shared_ptr<Text> text_fov;
 std::shared_ptr<Text> text_level;
@@ -81,9 +83,24 @@ void spawn_new_bubble(){
 	}
 	new_bubble->GetDrawable()->SetPosition(x,y, -ROOM_SIZE_Z/2.0);
 	new_bubble->GetDrawable()->spatial = 3.1;
-	new_bubble->GetDrawable()->variant = rand()%3;
 	new_bubble->sizemult = 1.0 + random_float(0.4);
 	new_bubble->ApplyScale();
+
+	// random variant.
+	int t = rand()%100;
+	if(t < 40)      new_bubble->GetDrawable()->variant = 0;
+	else if(t < 65) new_bubble->GetDrawable()->variant = 1;
+	else if(t < 90) new_bubble->GetDrawable()->variant = 2;
+	else {
+		if(curr_lit_bubbles < max_lit_bubbles){
+			new_bubble->GetDrawable()->variant = 3;
+			new_bubble->AddLight();
+			curr_lit_bubbles++;
+		}else{
+			new_bubble->GetDrawable()->variant = 0;
+		}
+	}
+
 	bubble_node->AddChild(new_bubble);
 	UpdateLevelText();
 }
@@ -207,6 +224,7 @@ int main(){
 		}
 		for(auto b : bubbles_to_pop){
 			bubbles.erase(b);
+			if(b->HasLight()) curr_lit_bubbles--;
 			bubble_node->RemoveChild(b);
 		}
 		bubbles_to_pop.clear();

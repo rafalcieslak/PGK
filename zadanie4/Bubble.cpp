@@ -6,10 +6,12 @@
 #include <glm/gtc/quaternion.hpp>
 #include "main.hpp"
 #include "../engine/Viewpoint.hpp"
+#include "../engine/Light.hpp"
 
 #define BUBBLE_BLUE rgba(75, 165, 225, 0.1)
 #define BUBBLE_GREEN rgba(183, 244, 191, 0.1)
 #define BUBBLE_VIOLET rgba(176, 149, 201, 0.1)
+#define BUBBLE_LIT rgba(243, 237, 159, 0.3)
 
 inline void add_triangle(std::vector<float>& v, const glm::vec3 a, const glm::vec3 b, const glm::vec3 c){
 	v.push_back(a.x); v.push_back(a.y); v.push_back(a.z);
@@ -105,7 +107,7 @@ Bubble::BubbleDrawable::BubbleDrawable(){
 		int n = prepare_ball_model(4,70,vertices,normals,colors);
 		std::cerr << "Ball model has " << n << " triangles." << std::endl;
 		ModelBase::GetInstance().AddModelTriangles("ball",n, vertices.data(), normals.data(), {
-			glm::vec4(BUBBLE_BLUE), glm::vec4(BUBBLE_GREEN), glm::vec4(BUBBLE_VIOLET) });
+			glm::vec4(BUBBLE_BLUE), glm::vec4(BUBBLE_GREEN), glm::vec4(BUBBLE_VIOLET), glm::vec4(BUBBLE_LIT) });
 	}
 	model_id = "ball";
 }
@@ -132,6 +134,20 @@ void Bubble::RotateTowards(glm::vec3 to){
 	glm::vec4 dir = glm::vec4(to,1.0) - my_pos;
 	glm::quat rot = glm::rotation(glm::normalize(my_up.xyz()), glm::normalize(dir.xyz()));
 	drawable->SetRotation(rot);
+}
+
+void Bubble::AddLight(){
+	auto light = std::make_shared<Light>(glm::vec3(0.0));
+	light->color = glm::vec3(glm::vec4(BUBBLE_LIT).xyz());
+	light->multiplier = 1.0;
+	light->distance_influence = 1.0;
+	light->spatial_range = 80.0;
+	light->sda.x = 1.0; // diffuse
+	light->sda.y = 0.9; // spatial
+	light->sda.z = 0.0; // no ambient lighting from this source
+	light->fixrange = 0.0;
+	drawable->AddChild(light);
+	has_light = true;
 }
 
 void Bubble::ApplyMovement(float time_delta){
