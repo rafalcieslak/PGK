@@ -102,7 +102,7 @@ int prepare_ball_model(const unsigned int hstripes, const unsigned int ncir, std
 Bubble::Bubble(float scale){
 	if(!ModelBase::GetInstance().HasModel("ball")){
 		std::vector<float> vertices, normals, colors;
-		int n = prepare_ball_model(12,24,vertices,normals,colors);
+		int n = prepare_ball_model(4,20,vertices,normals,colors);
 		std::cerr << "Ball model has " << n << " triangles." << std::endl;
 		ModelBase::GetInstance().AddModelTriangles("ball",n, vertices.data(), normals.data(), {
 			glm::vec4(BUBBLE_BLUE), glm::vec4(BUBBLE_GREEN), glm::vec4(BUBBLE_VIOLET) });
