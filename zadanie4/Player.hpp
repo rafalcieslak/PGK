@@ -1,9 +1,9 @@
 #ifndef PLAYER_HPP
 #define PLAYER_HPP
 
-#include "../engine/Node.hpp"
-#include "../engine/Viewpoint.hpp"
-#include "../engine/Light.hpp"
+#include "engine/Node.hpp"
+#include "engine/Viewpoint.hpp"
+#include "engine/Light.hpp"
 #include "Cube.hpp"
 #include <list>
 

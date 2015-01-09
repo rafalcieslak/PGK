@@ -1,7 +1,7 @@
 #ifndef BUBBLE_HPP
 #define BUBBLE_HPP
 
-#include "../engine/Drawable.hpp"
+#include "engine/Drawable.hpp"
 
 class Bubble : public NodeGroup{
 public:

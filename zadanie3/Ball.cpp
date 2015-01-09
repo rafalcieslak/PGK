@@ -1,5 +1,5 @@
 #include "Ball.hpp"
-#include "../engine-old/ModelBase.hpp"
+#include "engine/ModelBase.hpp"
 #include <cmath>
 
 std::array<float,BALL_PTS*6> prepare_ball_vertices(){

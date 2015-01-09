@@ -5,9 +5,9 @@
 #include "Background.hpp"
 #include "Paddle.hpp"
 #include "Overlay.hpp"
-#include "../engine-old/Text.hpp"
-#include "../engine-old/Render.hpp"
-#include "../engine-old/SimplePhysics.hpp"
+#include "engine/Text.hpp"
+#include "engine/Render.hpp"
+#include "engine/SimplePhysics.hpp"
 #include <ctime>
 #include <iostream>
 #include <cstdlib>

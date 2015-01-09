@@ -1,5 +1,5 @@
 #include "Cube.hpp"
-#include "../engine/ModelBase.hpp"
+#include "engine/ModelBase.hpp"
 
 #define rgb(x,y,z)	x/255.0, y/255.0, z/255.0, 1.0
 #define CL rgb(150,150,150)

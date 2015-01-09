@@ -1,5 +1,5 @@
 #include "Overlay.hpp"
-#include "../engine-old/ModelBase.hpp"
+#include "engine/ModelBase.hpp"
 
 #define OVERLAY_COLOR 0.0,0.0,0.0,0.7
 

@@ -111,15 +111,15 @@ endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie2")
 # ZADANIE3
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie3")
 	add_executable(zadanie3
-		engine-old/ModelBase.cpp
-		engine-old/Drawable.cpp
-		engine-old/Fonts.cpp
-		engine-old/Render.cpp
-		engine-old/Shader.cpp
-		engine-old/Positionable.cpp
-		engine-old/Body.cpp
-		engine-old/Text.cpp
-		engine-old/SimplePhysics.cpp
+		zadanie3/engine/ModelBase.cpp
+		zadanie3/engine/Drawable.cpp
+		zadanie3/engine/Fonts.cpp
+		zadanie3/engine/Render.cpp
+		zadanie3/engine/Shader.cpp
+		zadanie3/engine/Positionable.cpp
+		zadanie3/engine/Body.cpp
+		zadanie3/engine/Text.cpp
+		zadanie3/engine/SimplePhysics.cpp
 		zadanie3/Ball.cpp
 		zadanie3/Board.cpp
 		zadanie3/Paddle.cpp
@@ -131,11 +131,11 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie3")
 
 	# Files needed by zadanie3 on runtime.
 	set( ZAD3_RUNTIME_FILES
-		engine-old/MainFragmentShader.fragmentshader
-		engine-old/MainVertexShader.vertexshader
-		engine-old/TextFragmentShader.fragmentshader
-		engine-old/TextVertexShader.vertexshader
-		engine-old/Ubuntu.ttf
+		zadanie3/engine/MainFragmentShader.fragmentshader
+		zadanie3/engine/MainVertexShader.vertexshader
+		zadanie3/engine/TextFragmentShader.fragmentshader
+		zadanie3/engine/TextVertexShader.vertexshader
+		zadanie3/engine/Ubuntu.ttf
 	)
 
 	if(GLFW_DEPS)
@@ -174,16 +174,16 @@ endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie3")
 # ZADANIE4
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie4")
 	add_executable(zadanie4
-		engine/ModelBase.cpp
-		engine/Drawable.cpp
-		engine/Fonts.cpp
-		engine/Render.cpp
-		engine/Shader.cpp
-		engine/Node.cpp
-		engine/Text.cpp
-		engine/Viewpoint.cpp
-		engine/Light.cpp
-		engine/World.cpp
+		zadanie4/engine/ModelBase.cpp
+		zadanie4/engine/Drawable.cpp
+		zadanie4/engine/Fonts.cpp
+		zadanie4/engine/Render.cpp
+		zadanie4/engine/Shader.cpp
+		zadanie4/engine/Node.cpp
+		zadanie4/engine/Text.cpp
+		zadanie4/engine/Viewpoint.cpp
+		zadanie4/engine/Light.cpp
+		zadanie4/engine/World.cpp
 		zadanie4/Cube.cpp
 		zadanie4/Bubble.cpp
 		zadanie4/Player.cpp
@@ -192,11 +192,11 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie4")
 
 	# Files needed by zadanie3 on runtime.
 	set( ZAD4_RUNTIME_FILES
-		engine/FragmentShaderA.fragmentshader
-		engine/VertexShaderA.vertexshader
-		engine/TextFragmentShader.fragmentshader
-		engine/TextVertexShader.vertexshader
-		engine/Ubuntu.ttf
+		zadanie4/engine/FragmentShaderA.fragmentshader
+		zadanie4/engine/VertexShaderA.vertexshader
+		zadanie4/engine/TextFragmentShader.fragmentshader
+		zadanie4/engine/TextVertexShader.vertexshader
+		zadanie4/engine/Ubuntu.ttf
 	)
 
 	if(GLFW_DEPS)

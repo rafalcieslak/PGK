@@ -1,5 +1,5 @@
 #include "Player.hpp"
-#include "../engine/World.hpp"
+#include "engine/World.hpp"
 #include <glm/gtx/rotate_vector.hpp>
 
 Player::Player() {

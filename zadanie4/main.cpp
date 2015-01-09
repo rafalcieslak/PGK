@@ -1,11 +1,11 @@
-#include "../engine/Render.hpp"
-#include "../engine/Viewpoint.hpp"
+#include "engine/Render.hpp"
+#include "engine/Viewpoint.hpp"
 #include "Cube.hpp"
 #include "Bubble.hpp"
 #include "Player.hpp"
-#include "../engine/Light.hpp"
-#include "../engine/World.hpp"
-#include "../engine/Text.hpp"
+#include "engine/Light.hpp"
+#include "engine/World.hpp"
+#include "engine/Text.hpp"
 #include <iostream>
 #include <set>
 #include "main.hpp"

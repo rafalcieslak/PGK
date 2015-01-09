@@ -1,12 +1,12 @@
 #include "Bubble.hpp"
-#include "../engine/ModelBase.hpp"
+#include "engine/ModelBase.hpp"
 #include <cmath>
 #include <iostream>
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include "main.hpp"
-#include "../engine/Viewpoint.hpp"
-#include "../engine/Light.hpp"
+#include "engine/Viewpoint.hpp"
+#include "engine/Light.hpp"
 
 #define BUBBLE_BLUE rgba(75, 165, 225, 0.1)
 #define BUBBLE_GREEN rgba(183, 244, 191, 0.1)

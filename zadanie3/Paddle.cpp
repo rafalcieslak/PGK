@@ -1,5 +1,5 @@
 #include "Paddle.hpp"
-#include "../engine-old/ModelBase.hpp"
+#include "engine/ModelBase.hpp"
 
 #define SQRT2 1.41421356237
 

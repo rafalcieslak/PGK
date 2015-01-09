@@ -1,7 +1,7 @@
 #ifndef CUBE_HPP
 #define CUBE_HPP
 
-#include "../engine/Drawable.hpp"
+#include "engine/Drawable.hpp"
 
 class Cube : public Drawable{
 public:
