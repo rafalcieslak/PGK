@@ -3,11 +3,20 @@
 //layout(location = 0) in int attrPosition;
 layout(location = 0) in uint attrPosition;
 layout(location = 1) in int attrData;
+layout(location = 2) in int attrNormalX;
+layout(location = 3) in int attrNormalY;
 
 uniform mat4 camera_transform;
 uniform mat4 perspective_transform;
 
 out vec4 fcolor;
+
+out vec3 normal_global;
+out vec3 vector_to_light_global;
+out vec3 vector_to_camera_global;
+//out float lightdistance;
+
+#define HSCALE (1.0/20)
 
 vec3 getcolor(float ht){
     vec3 color;
@@ -23,15 +32,28 @@ vec3 getcolor(float ht){
 void main(){
     float a = 1.0;
     if(attrData == -32768) a = -1e20;
-    vec4 position = vec4(0.0,0.0,0.0,0.0);
+    vec3 position = vec3(0.0,0.0,0.0);
     uint posXi = attrPosition >> 16;
     uint posYi = attrPosition & uint(0xffff);
     float posX = float(posXi)/1201.0;
     float posY = float(posYi)/1201.0;
 
-    float height = attrData/15000.0;
+    float height = attrData*HSCALE/1200;
 
-    position = vec4(posX*2-1, -posY*2+1, height, 1.0);
-    gl_Position = perspective_transform * camera_transform * position;
+    position = vec3(posX*2-1, -posY*2+1, height);
+    vec4 vertexPosition_cameraspace = camera_transform * vec4(position,1.0);
+    gl_Position = perspective_transform * vertexPosition_cameraspace;
+    //fcolor = vec4(getcolor(attrNormalX*100+1000),a);
     fcolor = vec4(getcolor(attrData),a);
+
+    vec3 normal = vec3(attrNormalX*HSCALE, attrNormalY*HSCALE, 10);
+
+    normal_global = (normalize(normal)).xyz;
+
+    vec3 lightpos_global = vec3(0.0,-4.0,1.0);
+
+    vec3 camerapos_global = -transpose(mat3(camera_transform)) * camera_transform[3].xyz;
+    //lightdistance = distance(position.xyz, lightpos_global);
+    vector_to_light_global = lightpos_global - position;
+    vector_to_camera_global = camerapos_global - position;
 }

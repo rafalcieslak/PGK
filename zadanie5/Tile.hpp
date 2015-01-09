@@ -9,13 +9,15 @@
 
 class Tile{
 private:
-	std::array<short,1201*1201> data;
+	std::array<short,1201*1202*3> data;
 	GLuint databuffer;
 	static GLuint indicesbuffer, positionsbuffer;
 	Tile();
-	static inline int XYtoN(int x, int y) {return 1201*y+x;}
+	static inline int XYtoN(int x, int y) {return 1202*y+x;}
 	inline short& AtN(int n);
-	inline short& AtXY(int x, int y);
+	inline short& XYpos(int x, int y);
+	inline short& XYnX(int x, int y);
+	inline short& XYnY(int x, int y);
 public:
 	void Prepare();
 	void Render();

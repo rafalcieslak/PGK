@@ -10,7 +10,7 @@ int main(){
 
 	auto q = std::make_shared<Text>("AAAaaa", glm::vec2(50,50));
 	Tile::Init();
-	auto t = Tile::CreateFromHGTFile("/tmp/" + Tile::TileString(44,15) + ".hgt");
+	auto t = Tile::CreateFromHGTFile("/tmp/" + Tile::TileString(45,07) + ".hgt");
 	t->Prepare();
 
 	auto v = std::make_shared<Viewpoint>(glm::vec3(0.0,0.0,1.0), glm::vec3(0.0,1.0,0.0));

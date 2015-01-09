@@ -120,6 +120,8 @@ void Render::FrameStart(){
 
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(3);
 
 	/*
 	// Prepare lights
@@ -162,6 +164,8 @@ void Render::FrameStart(){
 }
 
 void Render::FrameEnd(){
+	glDisableVertexAttribArray(3);
+	glDisableVertexAttribArray(2);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(0);
 
