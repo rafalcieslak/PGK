@@ -21,7 +21,8 @@ public:
 	static int Init();
 	static bool inited;
 	// Renders a single frame.
-	static void Frame();
+	static void FrameStart();
+	static void FrameEnd();
 	// Closes the window etc.
 	static void CleanUp();
 	// Returns current time (in secs) since the program was launched.

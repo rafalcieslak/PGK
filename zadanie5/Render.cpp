@@ -37,7 +37,7 @@ int Render::Init(){
 		std::cerr << "Failed to initialize GLFW." << std::endl;
 		return -1;
 	}
-	glfwWindowHint(GLFW_SAMPLES, 4);
+	glfwWindowHint(GLFW_SAMPLES, 1);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -78,21 +78,21 @@ int Render::Init(){
 	// Prepare uniforms of the vertex shader
 	uniform_camera_transform = glGetUniformLocation(shader_program_id, "camera_transform");
 	uniform_perspective_transform = glGetUniformLocation(shader_program_id, "perspective_transform");
-	if(uniform_camera_transform == -1 || uniform_perspective_transform == -1){
+	/*if(uniform_camera_transform == -1 || uniform_perspective_transform == -1){
 		std::cerr << "A uniform is missing from the shader." << std::endl;
 		glfwTerminate();
 		return -1;
 	}
-
+*/
 	// Enable blending for several alpha effects.
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//	glEnable(GL_BLEND);
+//	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//glBlendFunc(GL_ZERO, GL_SRC_COLOR);
 
 	// Enable depth test
-	glEnable(GL_DEPTH_TEST);
+//	glEnable(GL_DEPTH_TEST);
 	// Accept fragment if it closer to the camera than the former one
-	glDepthFunc(GL_LESS);
+//	glDepthFunc(GL_LESS);
 
 	// Prepare for rendering fonts.
 	int res = init_font();
@@ -110,7 +110,7 @@ glm::vec2 Render::ProbeMouse(){
 }
 
 
-void Render::Frame(){
+void Render::FrameStart(){
 	// Clear the screen
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -119,7 +119,6 @@ void Render::Frame(){
 
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
-	glEnableVertexAttribArray(2);
 
 	/*
 	// Prepare lights
@@ -159,7 +158,11 @@ void Render::Frame(){
 		glUniformMatrix4fv(uniform_perspective_transform, 1, GL_FALSE, &perspective[0][0]);
 	}
 */
-	//RecursivellyProcessNode(root, glm::mat4(1.0));
+}
+
+void Render::FrameEnd(){
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(0);
 
 	for(auto t : Text::texts){
 		if(!t->active) continue;
@@ -168,10 +171,6 @@ void Render::Frame(){
 
 		render_text(t->text.c_str(), -1.0 + off.x*pxsizex, 1.0 - off.y*pxsizey, color.r, color.g, color.b, t->size, pxsizex, pxsizey);
 	}
-
-	glDisableVertexAttribArray(2);
-	glDisableVertexAttribArray(1);
-	glDisableVertexAttribArray(0);
 
 	glUseProgram(0);
 

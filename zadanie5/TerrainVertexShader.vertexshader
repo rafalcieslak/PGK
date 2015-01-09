@@ -1,9 +1,32 @@
 #version 330 core
 
+//layout(location = 0) in int attrPosition;
+layout(location = 0) in uint attrPosition;
+layout(location = 1) in int attrData;
+
 uniform mat4 camera_transform;
 uniform mat4 perspective_transform;
 
+out vec3 fcolor;
+
+vec3 getcolor(float ht){
+    vec3 color;
+    if      (ht < 0  )   color = vec3(0.,       0.,        1.); //blue
+    else if (ht < 500)   color = vec3(0.,       ht/500,    0.); //->green
+    else if (ht < 1000)  color = vec3(ht/500-1, 1.,        0.); //->yellow
+    else if (ht < 2000)  color = vec3(1.,       2.-ht/1000,0.); //->red
+    else if (ht < 3000)  color = vec3(1.,       ht/1000-2 ,ht/1000-2); //->red
+    else                 color = vec3(1.,1.,1.);                //white
+    return color;
+}
+
 void main(){
-
-
+    vec4 position = vec4(0.0,0.0,0.0,0.0);
+    uint posXi = attrPosition >> 16;
+    uint posYi = attrPosition & uint(0xffff);
+    float posX = float(posXi)/1201.0;
+    float posY = float(posYi)/1201.0;
+    position = vec4(posX*2-1, -posY*2+1, 0.0, 1.0);
+    gl_Position = position;
+    fcolor = getcolor(attrData);
 }
