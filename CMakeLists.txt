@@ -190,7 +190,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie4")
 		zadanie4/main.cpp
 	)
 
-	# Files needed by zadanie3 on runtime.
+	# Files needed by zadanie4 on runtime.
 	set( ZAD4_RUNTIME_FILES
 		zadanie4/engine/FragmentShaderA.fragmentshader
 		zadanie4/engine/VertexShaderA.vertexshader
@@ -233,3 +233,59 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie4")
 	endforeach( file )
 
 endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie4")
+
+
+# ZADANIE5
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie5")
+	add_executable(zadanie5
+		zadanie5/main.cpp
+		zadanie5/Tile.cpp
+		zadanie5/Render.cpp
+		zadanie5/Text.cpp
+		zadanie5/Fonts.cpp
+		zadanie5/Shader.cpp
+	)
+
+	# Files needed by zadanie5 on runtime.
+	set( ZAD5_RUNTIME_FILES
+		zadanie5/TextFragmentShader.fragmentshader
+		zadanie5/TextVertexShader.vertexshader
+		zadanie5/TerrainFragmentShader.fragmentshader
+		zadanie5/TerrainVertexShader.vertexshader
+		zadanie5/Ubuntu.ttf
+	)
+
+	if(GLFW_DEPS)
+	add_dependencies(zadanie5 GLEW GLFW_303)
+	endif()
+	if(GLM_DEPS)
+	add_dependencies(zadanie5 GLM)
+	endif()
+	if(FREETYPE_DEPS)
+	add_dependencies(zadanie5 Freetype)
+	endif()
+
+
+	target_link_libraries(zadanie5
+		${GLFW_GLEW_LIBRARIES}
+		${FREETYPE_LIBRARIES}
+		${OPENGL_LIBRARY}
+		${CMAKE_DL_LIBS}
+	)
+
+	# Copy the binary
+	add_custom_command(
+		TARGET zadanie5 POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/zadanie5${CMAKE_EXECUTABLE_SUFFIX}" "${CMAKE_CURRENT_SOURCE_DIR}/zadanie5/"
+	)
+
+	# Copy runtime files
+	foreach( file ${ZAD5_RUNTIME_FILES})
+		add_custom_command(
+			TARGET zadanie5 POST_BUILD
+			COMMAND ${CMAKE_COMMAND}
+			ARGS -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${file}" "${CMAKE_CURRENT_BINARY_DIR}"
+	)
+	endforeach( file )
+
+endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie5")
