@@ -51,7 +51,7 @@ std::shared_ptr<Tile> Tile::CreateFromHGTFile(std::string hgtfile){
             short a0 = data[0];
             short a1 = data[1]&0x00ff;
 			t->AtXY(x,y) = (a0 << 8) | a1;
-            if(t->AtXY(x,y) < 0 && t->AtXY(x,y) != -32768) assert(false);
+            //if(t->AtXY(x,y) < 0 && t->AtXY(x,y) != -32768) assert(false);
 		}
 	file.close();
 	return t;

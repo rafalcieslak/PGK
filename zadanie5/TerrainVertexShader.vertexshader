@@ -7,7 +7,7 @@ layout(location = 1) in int attrData;
 uniform mat4 camera_transform;
 uniform mat4 perspective_transform;
 
-out vec3 fcolor;
+out vec4 fcolor;
 
 vec3 getcolor(float ht){
     vec3 color;
@@ -21,12 +21,17 @@ vec3 getcolor(float ht){
 }
 
 void main(){
+    float a = 1.0;
+    if(attrData == -32768) a = -1e20;
     vec4 position = vec4(0.0,0.0,0.0,0.0);
     uint posXi = attrPosition >> 16;
     uint posYi = attrPosition & uint(0xffff);
     float posX = float(posXi)/1201.0;
     float posY = float(posYi)/1201.0;
-    position = vec4(posX*2-1, -posY*2+1, 0.0, 1.0);
-    gl_Position = position;
-    fcolor = getcolor(attrData);
+
+    float height = attrData/15000.0;
+
+    position = vec4(posX*2-1, -posY*2+1, height, 1.0);
+    gl_Position = perspective_transform * camera_transform * position;
+    fcolor = vec4(getcolor(attrData),a);
 }

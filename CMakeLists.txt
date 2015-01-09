@@ -244,6 +244,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie5")
 		zadanie5/Text.cpp
 		zadanie5/Fonts.cpp
 		zadanie5/Shader.cpp
+		zadanie5/Viewpoint.cpp
 	)
 
 	# Files needed by zadanie5 on runtime.

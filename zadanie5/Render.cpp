@@ -7,6 +7,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include "Viewpoint.hpp"
 
 GLFWwindow* window;
 
@@ -66,7 +67,7 @@ int Render::Init(){
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	// Background
-	glClearColor(100/255.0,200.0/255.0,1.0,1.0);
+	glClearColor(50/255.0,80.0/255.0,0.7,1.0);
 
 	// Prepare main vertex array.
 	glGenVertexArrays(1, &VertexArrayID);
@@ -78,21 +79,21 @@ int Render::Init(){
 	// Prepare uniforms of the vertex shader
 	uniform_camera_transform = glGetUniformLocation(shader_program_id, "camera_transform");
 	uniform_perspective_transform = glGetUniformLocation(shader_program_id, "perspective_transform");
-	/*if(uniform_camera_transform == -1 || uniform_perspective_transform == -1){
+	if(uniform_camera_transform == -1 || uniform_perspective_transform == -1){
 		std::cerr << "A uniform is missing from the shader." << std::endl;
 		glfwTerminate();
 		return -1;
 	}
-*/
+
 	// Enable blending for several alpha effects.
-//	glEnable(GL_BLEND);
-//	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//glBlendFunc(GL_ZERO, GL_SRC_COLOR);
 
 	// Enable depth test
-//	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);
 	// Accept fragment if it closer to the camera than the former one
-//	glDepthFunc(GL_LESS);
+	glDepthFunc(GL_LESS);
 
 	// Prepare for rendering fonts.
 	int res = init_font();
@@ -149,15 +150,15 @@ void Render::FrameStart(){
 		glUniform1fv(uniform_light_fixrange,n,fixranges);
 	}
 	*/
-/*
+
 	// Prepare camera
 	if(Viewpoint::active_viewpoint){
-		glm::mat4 cameraview =  glm::lookAt(glm::vec3(0.0) , 1.0f* Viewpoint::active_viewpoint->GetDirection(), World::up) * glm::inverse(Viewpoint::active_viewpoint->GetGlobalTransform());
-		glm::mat4 perspective = glm::perspective(Viewpoint::active_viewpoint->GetFOV(), 1.0f, 0.1f, 100.0f);
+		glm::mat4 cameraview =  glm::lookAt(glm::vec3(0.0) , 1.0f* Viewpoint::active_viewpoint->GetDirection(), glm::vec3(0.0,0.0,1.0)) * glm::inverse(Viewpoint::active_viewpoint->GetTransform());
+		glm::mat4 perspective = glm::perspective(Viewpoint::active_viewpoint->GetFOV(), 1.0f, 0.005f, 10.0f);
 		glUniformMatrix4fv(uniform_camera_transform, 1, GL_FALSE, &cameraview[0][0]);
 		glUniformMatrix4fv(uniform_perspective_transform, 1, GL_FALSE, &perspective[0][0]);
 	}
-*/
+
 }
 
 void Render::FrameEnd(){
