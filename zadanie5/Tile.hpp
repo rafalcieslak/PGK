@@ -12,9 +12,11 @@ class Tile{
 private:
 	std::array<short,1201*1202*3> data;
 	GLuint databuffer;
-	static GLuint indicesbuffer, positionsbuffer;
+	static GLuint positionsbuffer;
+	static GLuint indicesbuffer[6];
 	Tile();
 	static inline int XYtoN(int x, int y) {return 1202*y+x;}
+	static inline int XYtoNscaled(int x, int y, float no) {return 1202*int(1200*y/(no-1))+int(1200*x/(no-1));}
 	inline short& AtN(int n);
 	inline short& XYpos(int x, int y);
 	inline short& XYnX(int x, int y);
@@ -28,7 +30,7 @@ private:
 public:
 	int lon, lat;
 	void Prepare();
-	void Render();
+	void Render(short lod);
 	static void Init();
 
 	static std::shared_ptr<Tile> Create(int lat, int lon);

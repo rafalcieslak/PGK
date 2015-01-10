@@ -7,11 +7,14 @@
 #include "Tile.hpp"
 #include "Render.hpp"
 
-GLuint Tile::positionsbuffer, Tile::indicesbuffer;
+GLuint Tile::positionsbuffer;
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 #define RESTART_INDEX ((unsigned int)-1)
 #define HSCALE (1.0/15000.0)
+
+int LODs[] = {1201, 600, 400, 250, 100, 30};
+GLuint Tile::indicesbuffer[6];
 
 Tile::Tile(){
 }
@@ -25,19 +28,22 @@ void Tile::Init(){
     glGenBuffers(1, &positionsbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, positionsbuffer);
     glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(unsigned int), positions.data(), GL_STATIC_DRAW);
-    std::vector<unsigned int> indices;
-    indices.reserve(1201*1202*2);
-    for(int y = 0; y < 1201; y++){
-        for(int x = 0; x < 1201; x++){
-            indices.push_back(XYtoN(x,y));
-            indices.push_back(XYtoN(x,y+1));
+    glGenBuffers(6, indicesbuffer);
+    for(int i = 0; i < 6; i++){
+        std::vector<unsigned int> indices;
+        int n = LODs[i];
+        indices.reserve(n*(n+1)*2);
+        for(int y = 0; y < n; y++){
+            for(int x = 0; x < n; x++){
+                indices.push_back(XYtoNscaled(x,y,n   ));
+                indices.push_back(XYtoNscaled(x,y+1,n ));
+            }
+            indices.push_back(RESTART_INDEX);
+            indices.push_back(RESTART_INDEX);
         }
-        indices.push_back(RESTART_INDEX);
-        indices.push_back(RESTART_INDEX);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesbuffer[i]);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
     }
-    glGenBuffers(1, &indicesbuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesbuffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 }
 
 std::shared_ptr<Tile> Tile::Create(int lat, int lon){
@@ -52,6 +58,7 @@ std::shared_ptr<Tile> Tile::Create(int lat, int lon){
 }
 
 void Tile::LoadFromHGTFile(std::ifstream& file, int lat_, int lon_){
+    std::cout << "Loading DTED for tile " << lat_ << " " << lon_ << std::endl;
     for(int y = 0; y < 1201; y++){
         for(int x = 0; x < 1201; x++){
             char data[2];
@@ -75,6 +82,7 @@ inline bool exists(std::string filename){
 }
 
 void Tile::PrepareFile(int lat, int lon){
+    std::cout << "Preparing file for tile " << lat << " " << lon << std::endl;
     if(!exists(TileHGT(lat,lon))){
         if(!exists(TileHGT(lat,lon) + ".zip")){
             DownloadZIP(lat,lon);
@@ -113,6 +121,7 @@ void Tile::UnpackZIP(int lat, int lon){
 }
 
 void Tile::GenerateNormals(){
+    std::cout << "Calculating normals for tile " << lat << " " << lon << std::endl;
     for(int y = 0; y < 1201; y++){
         for(int x = 0; x < 1201; x++)
         {
@@ -170,7 +179,7 @@ void Tile::Prepare(){
     glBufferData(GL_ARRAY_BUFFER, 1201*1202*3 * sizeof(short), data.data(), GL_STATIC_DRAW);
 }
 
-void Tile::Render(){
+void Tile::Render(short lod){
 
     glUniform2f(Render::uniform_pos, (float)lon, (float)lat );
     glBindBuffer(GL_ARRAY_BUFFER, positionsbuffer);
@@ -179,8 +188,8 @@ void Tile::Render(){
     glVertexAttribIPointer( 1, 1, GL_SHORT, 3*sizeof(short), (void*)0 );
     glVertexAttribIPointer( 2, 1, GL_SHORT, 3*sizeof(short), (void*)2 );
     glVertexAttribIPointer( 3, 1, GL_SHORT, 3*sizeof(short), (void*)4 );
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesbuffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesbuffer[lod]);
     glEnable(GL_PRIMITIVE_RESTART);
     glPrimitiveRestartIndex(RESTART_INDEX);
-    glDrawElements(GL_TRIANGLE_STRIP, 1201*1201*2, GL_UNSIGNED_INT, (void*)0 );
+    glDrawElements(GL_TRIANGLE_STRIP, LODs[lod]*LODs[lod]*2, GL_UNSIGNED_INT, (void*)0 );
 }

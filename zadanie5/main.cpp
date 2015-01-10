@@ -30,6 +30,7 @@ void AddTileRange(int lat1, int lat2, int lon1, int lon2){
 
 int main(){
 
+	std::cout << "Loading data..." << std::endl;
 	AddTileRange(45,48,6,10);
 
 	// Prepare the renderer.
@@ -37,7 +38,7 @@ int main(){
 	if(n) return n;
 	Tile::Init();
 
-	auto q = std::make_shared<Text>("AAAaaa", glm::vec2(50,50));
+	auto q = std::make_shared<Text>("1-6: set LOD", glm::vec2(10,34), 24, glm::vec3(1.0,1.0,1.0));
 
 
 	auto v = std::make_shared<Viewpoint>( FindCenter() , glm::vec3(0.0,1.0,0.0));
@@ -47,6 +48,7 @@ int main(){
 	std::cout << "Preparing VBOs..." << std::endl;
 	for(auto tile : tiles) tile->Prepare();
 
+	short lod = 3;
 	double lasttime = Render::GetTime();
 	do{
 		double newtime = Render::GetTime();
@@ -54,7 +56,7 @@ int main(){
 		lasttime = newtime;
 
 		Render::FrameStart();
-		for(auto tile : tiles) tile->Render();
+		for(auto tile : tiles) tile->Render(lod);
 		Render::FrameEnd();
 
 		time_delta *= 0.3;
@@ -62,6 +64,13 @@ int main(){
 		if(Render::IsKeyPressed(GLFW_KEY_S)) v->MoveBackward(time_delta);
 		if(Render::IsKeyPressed(GLFW_KEY_A)) v->StrafeLeft(time_delta);
 		if(Render::IsKeyPressed(GLFW_KEY_D)) v->StrafeRight(time_delta);
+
+		if(Render::IsKeyPressed(GLFW_KEY_1)) lod = 0;
+		if(Render::IsKeyPressed(GLFW_KEY_2)) lod = 1;
+		if(Render::IsKeyPressed(GLFW_KEY_3)) lod = 2;
+		if(Render::IsKeyPressed(GLFW_KEY_4)) lod = 3;
+		if(Render::IsKeyPressed(GLFW_KEY_5)) lod = 4;
+		if(Render::IsKeyPressed(GLFW_KEY_6)) lod = 5;
 
 		glm::vec2 mouse = Render::ProbeMouse();
 		v->MovePitch(mouse.x);
