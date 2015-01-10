@@ -18,12 +18,12 @@ out vec3 vector_to_light_global;
 out vec3 vector_to_camera_global;
 //out float lightdistance;
 
-#define HSCALE (1.0/20)
+#define HSCALE (1.0/30)
 
 vec3 getcolor(float ht){
     vec3 color;
-    if      (ht < 0  )   color = vec3(0.,       0.,        1.); //blue
-    else if (ht < 500)   color = vec3(0.,       ht/500,    0.); //->green
+    if      (ht < 5  )   color = vec3(0.,       0.,        1.); //blue
+    else if (ht < 500)   color = vec3(0.,       ht/1000 + 0.5,    0.); //->green
     else if (ht < 1000)  color = vec3(ht/500-1, 1.,        0.); //->yellow
     else if (ht < 2000)  color = vec3(1.,       2.-ht/1000,0.); //->red
     else if (ht < 3000)  color = vec3(1.,       ht/1000-2 ,ht/1000-2); //->red

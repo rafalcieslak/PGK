@@ -21,14 +21,19 @@ private:
 	inline short& XYnY(int x, int y);
 	void LoadFromHGTFile(std::ifstream& file, int lat, int lon);
 	void GenerateNormals();
+	static void PrepareFile(int lat, int lon);
+	static bool TryDownload(std::string dir, int lat, int lon);
+	static bool DownloadZIP(int lat, int lon);
+	static void UnpackZIP(int lat, int lon);
 public:
 	int lon, lat;
 	void Prepare();
 	void Render();
 	static void Init();
 
-	static std::shared_ptr<Tile> CreateFromHGTFile(int lat, int lon);
+	static std::shared_ptr<Tile> Create(int lat, int lon);
 	static std::string TileString(int lat, int lon);
+	inline static std::string TileHGT(int lat, int lon) __attribute__((pure));
 };
 
 #endif //TILE_HPP

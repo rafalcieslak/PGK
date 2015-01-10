@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <cassert>
+#include <cstdlib>
 #include "Tile.hpp"
 #include "Render.hpp"
 
@@ -13,7 +14,6 @@ GLuint Tile::positionsbuffer, Tile::indicesbuffer;
 #define HSCALE (1.0/15000.0)
 
 Tile::Tile(){
-    glGenBuffers(1, &databuffer);
 }
 
 void Tile::Init(){
@@ -40,10 +40,9 @@ void Tile::Init(){
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 }
 
-std::shared_ptr<Tile> Tile::CreateFromHGTFile(int lat, int lon){
-    std::string filename = "/tmp/" + Tile::TileString(lat,lon) + ".hgt";
-    std::ifstream file(filename, std::ios::in|std::ios::binary);
-    std::cout << filename << std::endl;
+std::shared_ptr<Tile> Tile::Create(int lat, int lon){
+    PrepareFile(lat,lon);
+    std::ifstream file(TileHGT(lat,lon), std::ios::in|std::ios::binary);
 	if(!file.is_open()) return nullptr;
 	std::shared_ptr<Tile> t = std::shared_ptr<Tile>(new Tile());
     t->LoadFromHGTFile(file, lat, lon);
@@ -54,8 +53,7 @@ std::shared_ptr<Tile> Tile::CreateFromHGTFile(int lat, int lon){
 
 void Tile::LoadFromHGTFile(std::ifstream& file, int lat_, int lon_){
     for(int y = 0; y < 1201; y++){
-        for(int x = 0; x < 1201; x++)
-        {
+        for(int x = 0; x < 1201; x++){
             char data[2];
             file.read(data,2);
             short a0 = data[0];
@@ -65,6 +63,53 @@ void Tile::LoadFromHGTFile(std::ifstream& file, int lat_, int lon_){
     }
     lat = lat_;
     lon = lon_;
+}
+
+inline bool exists(std::string filename){
+    std::ifstream f(filename.c_str());
+    if(f.good()){
+        f.close(); return true;
+    }else{
+        f.close(); return false;
+    }
+}
+
+void Tile::PrepareFile(int lat, int lon){
+    if(!exists(TileHGT(lat,lon))){
+        if(!exists(TileHGT(lat,lon) + ".zip")){
+            DownloadZIP(lat,lon);
+        }
+        UnpackZIP(lat,lon);
+    }
+}
+bool Tile::TryDownload(std::string dir, int lat, int lon){
+    std::string url = "http://dds.cr.usgs.gov/srtm/version2_1/SRTM3/" + dir + "/" + TileString(lat,lon) + ".hgt.zip";
+    std::string path = TileHGT(lat,lon) + ".zip";
+    std::cout << "Trying to download " << url << " with wget" << std::endl;
+    std::string command = "wget " + url + " --quiet -O " + path;
+    int result = system(command.c_str());
+    if(result == 8){
+        std::cout << "Server issued an HTTP error response." << std::endl;
+        return false;
+    }else if(result != 0){
+        std::cout << "Non-HTTP error." << std::endl;
+        return false;
+    }
+    return true;
+}
+bool Tile::DownloadZIP(int lat, int lon){
+    if(!TryDownload("Eurasia", lat, lon))
+        if(!TryDownload("Africa", lat, lon))
+            if(!TryDownload("North America", lat, lon))
+                if(!TryDownload("South America", lat, lon))
+                    if(!TryDownload("Australia", lat, lon))
+                        if(!TryDownload("Islands", lat, lon))
+                            return false; //pass
+    return true;
+}
+void Tile::UnpackZIP(int lat, int lon){
+    std::string command = "unzip -o " + TileHGT(lat,lon) + ".zip -d /tmp/";
+    system(command.c_str());
 }
 
 void Tile::GenerateNormals(){
@@ -115,7 +160,12 @@ std::string Tile::TileString(int lat, int lon){
 	return ss.str();
 }
 
+std::string Tile::TileHGT(int lat, int lon){
+    return "/tmp/" + Tile::TileString(lat,lon) + ".hgt";
+}
+
 void Tile::Prepare(){
+    glGenBuffers(1, &databuffer);
     glBindBuffer(GL_ARRAY_BUFFER, databuffer);
     glBufferData(GL_ARRAY_BUFFER, 1201*1202*3 * sizeof(short), data.data(), GL_STATIC_DRAW);
 }

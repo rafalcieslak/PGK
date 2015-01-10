@@ -2,6 +2,7 @@
 #include "Render.hpp"
 #include "Text.hpp"
 #include "Viewpoint.hpp"
+#include <iostream>
 
 std::vector<std::shared_ptr<Tile>> tiles;
 
@@ -19,20 +20,31 @@ glm::vec3 FindCenter(){
 	return glm::vec3(xc, yc, range+1);
 }
 
+void AddTileRange(int lat1, int lat2, int lon1, int lon2){
+	for(int lat = lat1; lat <= lat2; lat++)
+		for(int lon = lon1; lon <= lon2; lon++){
+			auto t = Tile::Create(lat,lon);
+			if(t) tiles.push_back(t);
+		}
+}
+
 int main(){
+
+	AddTileRange(45,48,6,10);
+
 	// Prepare the renderer.
 	int n = Render::Init();
 	if(n) return n;
 	Tile::Init();
 
 	auto q = std::make_shared<Text>("AAAaaa", glm::vec2(50,50));
-	tiles.push_back( Tile::CreateFromHGTFile(45,7) );
-	tiles.push_back( Tile::CreateFromHGTFile(45,8) );
+
 
 	auto v = std::make_shared<Viewpoint>( FindCenter() , glm::vec3(0.0,1.0,0.0));
 	v->yaw = -3.1415926f/2.0f;
 	v->SetAsActive();
 
+	std::cout << "Preparing VBOs..." << std::endl;
 	for(auto tile : tiles) tile->Prepare();
 
 	double lasttime = Render::GetTime();
