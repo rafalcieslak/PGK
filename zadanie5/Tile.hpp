@@ -6,6 +6,7 @@
 #include <array>
 #include <string>
 #include <memory>
+#include <fstream>
 
 class Tile{
 private:
@@ -18,12 +19,15 @@ private:
 	inline short& XYpos(int x, int y);
 	inline short& XYnX(int x, int y);
 	inline short& XYnY(int x, int y);
+	void LoadFromHGTFile(std::ifstream& file, int lat, int lon);
+	void GenerateNormals();
 public:
+	int lon, lat;
 	void Prepare();
 	void Render();
 	static void Init();
 
-	static std::shared_ptr<Tile> CreateFromHGTFile(std::string hgtfile);
+	static std::shared_ptr<Tile> CreateFromHGTFile(int lat, int lon);
 	static std::string TileString(int lat, int lon);
 };
 

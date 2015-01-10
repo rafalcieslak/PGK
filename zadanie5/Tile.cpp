@@ -1,10 +1,10 @@
-#include <fstream>
 #include <sstream>
 #include <iomanip>
 #include <iostream>
 #include <vector>
 #include <cassert>
 #include "Tile.hpp"
+#include "Render.hpp"
 
 GLuint Tile::positionsbuffer, Tile::indicesbuffer;
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
@@ -40,45 +40,54 @@ void Tile::Init(){
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 }
 
-std::shared_ptr<Tile> Tile::CreateFromHGTFile(std::string hgtfile){
-    std::ifstream file(hgtfile, std::ios::in|std::ios::binary);
-    std::cout << hgtfile << std::endl;
+std::shared_ptr<Tile> Tile::CreateFromHGTFile(int lat, int lon){
+    std::string filename = "/tmp/" + Tile::TileString(lat,lon) + ".hgt";
+    std::ifstream file(filename, std::ios::in|std::ios::binary);
+    std::cout << filename << std::endl;
 	if(!file.is_open()) return nullptr;
 	std::shared_ptr<Tile> t = std::shared_ptr<Tile>(new Tile());
-	for(int y = 0; y < 1201; y++){
-		for(int x = 0; x < 1201; x++)
-		{
+    t->LoadFromHGTFile(file, lat, lon);
+	file.close();
+    t->GenerateNormals();
+	return t;
+}
+
+void Tile::LoadFromHGTFile(std::ifstream& file, int lat_, int lon_){
+    for(int y = 0; y < 1201; y++){
+        for(int x = 0; x < 1201; x++)
+        {
             char data[2];
-			file.read(data,2);
+            file.read(data,2);
             short a0 = data[0];
             short a1 = data[1]&0x00ff;
-			t->XYpos(x,y) = (a0 << 8) | a1;
-		}
+            XYpos(x,y) = (a0 << 8) | a1;
+        }
     }
-    // Generate normals.
+    lat = lat_;
+    lon = lon_;
+}
 
+void Tile::GenerateNormals(){
     for(int y = 0; y < 1201; y++){
         for(int x = 0; x < 1201; x++)
         {
             // x normals.
             int h0, h1, h2;
-            h1 = t->XYpos(x,y);
-            if(x == 0) h0 = h1; else h0 = t->XYpos(x-1,y);
-            if(x == 1200) h2 = h1; else h2 = t->XYpos(x+1,y);
+            h1 = XYpos(x,y);
+            if(x == 0) h0 = h1; else h0 = XYpos(x-1,y);
+            if(x == 1200) h2 = h1; else h2 = XYpos(x+1,y);
             float a = (h0-h1);
             float b = (h1-h2);
-            t->XYnX(x,y) = -(a+b)/2.0;
+            XYnX(x,y) = -(a+b)/2.0;
             // y normals
-            h1 = t->XYpos(x,y);
-            if(y == 0) h0 = h1; else h0 = t->XYpos(x,y-1);
-            if(y == 1200) h2 = h1; else h2 = t->XYpos(x,y+1);
+            h1 = XYpos(x,y);
+            if(y == 0) h0 = h1; else h0 = XYpos(x,y-1);
+            if(y == 1200) h2 = h1; else h2 = XYpos(x,y+1);
             a = (h0-h1);
             b = (h1-h2);
-            t->XYnY(x,y) = -(a+b)/2.0;
+            XYnY(x,y) = -(a+b)/2.0;
         }
     }
-	file.close();
-	return t;
 }
 
 short& Tile::AtN(int n){
@@ -113,6 +122,7 @@ void Tile::Prepare(){
 
 void Tile::Render(){
 
+    glUniform2f(Render::uniform_pos, (float)lon, (float)lat );
     glBindBuffer(GL_ARRAY_BUFFER, positionsbuffer);
     glVertexAttribIPointer( 0, 1, GL_UNSIGNED_INT, 0, (void*)0 );
     glBindBuffer(GL_ARRAY_BUFFER, databuffer);

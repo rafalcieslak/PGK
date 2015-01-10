@@ -9,6 +9,8 @@ layout(location = 3) in int attrNormalY;
 uniform mat4 camera_transform;
 uniform mat4 perspective_transform;
 
+uniform vec2 pos;
+
 out vec4 fcolor;
 
 out vec3 normal_global;
@@ -35,12 +37,14 @@ void main(){
     vec3 position = vec3(0.0,0.0,0.0);
     uint posXi = attrPosition >> 16;
     uint posYi = attrPosition & uint(0xffff);
-    float posX = float(posXi)/1201.0;
-    float posY = float(posYi)/1201.0;
+    float posX = float(posXi)/1200.0;
+    float posY = float(posYi)/1200.0;
 
     float height = attrData*HSCALE/1200;
 
-    position = vec3(posX*2-1, -posY*2+1, height);
+    position = vec3(posX-0.5, -posY+0.5, height);
+    position += vec3(pos,0.0);;
+
     vec4 vertexPosition_cameraspace = camera_transform * vec4(position,1.0);
     gl_Position = perspective_transform * vertexPosition_cameraspace;
     //fcolor = vec4(getcolor(attrNormalX*100+1000),a);
@@ -50,7 +54,7 @@ void main(){
 
     normal_global = (normalize(normal)).xyz;
 
-    vec3 lightpos_global = vec3(0.0,-4.0,1.0);
+    vec3 lightpos_global = vec3(0.0,-400.0,100.0);
 
     vec3 camerapos_global = -transpose(mat3(camera_transform)) * camera_transform[3].xyz;
     //lightdistance = distance(position.xyz, lightpos_global);
