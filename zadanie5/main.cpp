@@ -9,8 +9,9 @@ std::vector<std::shared_ptr<Tile>> tiles;
 std::shared_ptr<Viewpoint> ortho_camera, persp_camera;
 std::shared_ptr<Text> fov_text;
 short lod = 3;
-bool tab_pressed = false;
+bool tab_pressed = false, ctrl_pressed = false;
 float light_intensity = 10.0;
+float light_angle = 0.0;
 bool auto_lod = false;
 unsigned int last_lod_change_frames = 0;
 #define MIN_FPS 25
@@ -57,13 +58,13 @@ void ScrollCallback(double x){
 }
 
 void AutoLODTooHigh(){
-	if(last_lod_change_frames < 20) return;
+	if(last_lod_change_frames < 10) return;
 	if(lod == 5) return;
 	lod++;
 	last_lod_change_frames = 0;
 }
 void AutoLODTooLow(){
-	if(last_lod_change_frames < 20) return;
+	if(last_lod_change_frames < 10) return;
 	if(lod == 0) return;
 	lod--;
 	last_lod_change_frames = 0;
@@ -92,7 +93,8 @@ int main(){
 	auto mouse_scroll_text = std::make_shared<Text>("Mouse wheel: Zoom in/out", glm::vec2(10,117), 24, glm::vec3(1.0,1.0,1.0));
 	auto iop_text = std::make_shared<Text>("I/O/P: Set light contrast", glm::vec2(10,144), 24, glm::vec3(1.0,1.0,1.0));
 	auto lig_text = std::make_shared<Text>("Light contrast: low", glm::vec2(700,22), 16, glm::vec3(0.5,0.5,1.0));
-	     fov_text = std::make_shared<Text>("Camera FOV: 0", glm::vec2(700,42), 16, glm::vec3(0.5,0.5,1.0));
+	auto lan_text = std::make_shared<Text>("Light angle: ", glm::vec2(700,42), 16, glm::vec3(0.5,0.5,1.0));
+	     fov_text = std::make_shared<Text>("Camera FOV: 0", glm::vec2(700,62), 16, glm::vec3(0.5,0.5,1.0));
 
 	glm::vec4 center = FindCenter();
 	float xscale = center.w;
@@ -136,7 +138,7 @@ int main(){
 		glm::vec2 campos(ortho_camera->GetPosition().x, ortho_camera->GetPosition().y);
 		float camrange = ortho_camera->ortho_range;
 
-		Render::FrameStart(light_intensity);
+		Render::FrameStart(light_intensity, light_angle*0.0174532925);
 		for(auto tile : tiles){
 			if(viewmode == VIEWMODE_ORTHO){
 				if(!intersect(campos.x - camrange, campos.y - camrange, campos.x + camrange, campos.y + camrange,
@@ -157,8 +159,13 @@ int main(){
 			if(Render::IsKeyPressed(GLFW_KEY_A)) persp_camera->StrafeLeft(time_delta);
 			if(Render::IsKeyPressed(GLFW_KEY_D)) persp_camera->StrafeRight(time_delta);
 			glm::vec2 mouse = Render::ProbeMouse();
-			persp_camera->MovePitch(mouse.x);
-			persp_camera->MoveYaw(-mouse.y);
+			if(Render::IsKeyPressed(GLFW_KEY_LEFT_CONTROL) || Render::IsKeyPressed(GLFW_KEY_RIGHT_CONTROL)){
+				light_angle -= mouse.x * 20;
+				lan_text->SetText("Light angle: " + std::to_string((int(light_angle+0.5)+360*1000)%360));
+			}else{
+				persp_camera->MovePitch(mouse.x);
+				persp_camera->MoveYaw(-mouse.y);
+			}
 			if(Render::IsKeyPressed(GLFW_KEY_TAB) && !tab_pressed){
 				tab_pressed = true;
 				// Switch to ortho camera
@@ -173,6 +180,11 @@ int main(){
 			if(Render::IsKeyPressed(GLFW_KEY_S)) ortho_camera->MoveSouth(amount);
 			if(Render::IsKeyPressed(GLFW_KEY_A)) ortho_camera->StrafeLeft(amount);
 			if(Render::IsKeyPressed(GLFW_KEY_D)) ortho_camera->StrafeRight(amount);
+			if(Render::IsKeyPressed(GLFW_KEY_LEFT_CONTROL) || Render::IsKeyPressed(GLFW_KEY_RIGHT_CONTROL)){
+				glm::vec2 mouse = Render::ProbeMouse();
+				light_angle -= mouse.x * 20;
+				lan_text->SetText("Light angle: " + std::to_string((int(light_angle+0.5)+360*1000)%360));
+			}
 			if(Render::IsKeyPressed(GLFW_KEY_TAB) && !tab_pressed){
 				tab_pressed = true;
 				// Switch to persp camera

@@ -12,6 +12,7 @@ uniform mat4 camera_transform;
 uniform mat4 perspective_transform;
 
 uniform float light_intensity;
+uniform float light_angle;
 
 uniform vec2 pos;
 uniform float xscale;
@@ -21,19 +22,18 @@ out vec4 fcolor;
 out vec3 normal_global;
 out vec3 vector_to_light_global;
 out vec3 vector_to_camera_global;
-//out float lightdistance;
 
 #define HSCALE (1.0/30)
 
 vec3 getcolor(float ht){
     vec3 color;
-    if      (ht < 0  )   color = vec3(0.,       0.,        1.); //blue
-    else if (ht < 10  )  color = vec3(0.,       0.5*ht/10,        1.-ht/10); //blue
-    else if (ht < 500)   color = vec3(0.,       ht/1000 + 0.5,    0.); //->green
-    else if (ht < 1000)  color = vec3(ht/500-1, 1.,        0.); //->yellow
-    else if (ht < 2000)  color = vec3(1.,       2.-ht/1000,0.); //->red
-    else if (ht < 3000)  color = vec3(1.,       ht/1000-2 ,ht/1000-2); //->red
-    else                 color = vec3(1.,1.,1.);                //white
+    if      (ht < 0  )   color = vec3(0.,       0.,           1.       ); //blue
+    else if (ht < 10  )  color = vec3(0.,       0.5*ht/10,    1.-ht/10 ); //blue->dgreen
+    else if (ht < 500)   color = vec3(0.,       ht/1000 + 0.5,0.       ); //dgreen->lgreen
+    else if (ht < 1000)  color = vec3(ht/500-1, 1.,           0.       ); //lgreen->yellow
+    else if (ht < 2000)  color = vec3(1.,       2.-ht/1000,   0.       ); //yellow->dred
+    else if (ht < 3000)  color = vec3(1.,       ht/1000-2,    ht/1000-2); //dred->lred
+    else                 color = vec3(1.,1.,1.);//white
     return color;
 }
 
@@ -55,18 +55,15 @@ void main(){
 
     vec4 vertexPosition_cameraspace = camera_transform * vec4(position,1.0);
     gl_Position = perspective_transform * vertexPosition_cameraspace;
-    //gl_Position = 0.000001*gl_Position * vertexPosition_cameraspace;
-    //fcolor = vec4(getcolor(attrNormalX*100+1000),a);
     fcolor = vec4(getcolor(attrData),a);
 
     vec3 normal = vec3(attrNormalX*HSCALE, attrNormalY*HSCALE, light_intensity);
 
     normal_global = (normalize(normal)).xyz;
 
-    vec3 lightpos_global = vec3(0.0,-400.0,100.0);
+    vec3 lightpos_global = vec3(sin(light_angle)*400.0,-cos(light_angle)*400.0,100.0);
 
     vec3 camerapos_global = -transpose(mat3(camera_transform)) * camera_transform[3].xyz;
-    //lightdistance = distance(position.xyz, lightpos_global);
     vector_to_light_global = lightpos_global - position;
     vector_to_camera_global = camerapos_global - position;
 }
