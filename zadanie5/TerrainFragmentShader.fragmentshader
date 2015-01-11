@@ -17,7 +17,7 @@ void main()
 	//float distint = pow(lightdistance, 1.0);
 	vec3 c = vec3(0.0);
 	vec3 light_color = vec3(1.0,1.0,0.7);
-	c +=  0.9f * light_color * max( 0.0f, dot(N,L)) / 1;
+	c +=  1.1f * light_color * max( 0.0f, dot(N,L)) / 1;
 	c +=  0.8f * light_color * pow( max( 0.0f, dot(V,R)) , 30) / 1;
 	c +=  0.0f * light_color;
 

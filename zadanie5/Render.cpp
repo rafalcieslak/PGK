@@ -12,7 +12,7 @@
 GLFWwindow* window;
 
 // All the static members of Render class.
-GLint Render::uniform_camera_transform, Render::uniform_perspective_transform, Render::uniform_pos;
+GLint Render::uniform_camera_transform, Render::uniform_perspective_transform, Render::uniform_pos, Render::uniform_xscale;
 GLuint Render::VertexArrayID;
 float Render::pxsizex, Render::pxsizey;
 GLuint Render::shader_program_id;
@@ -80,7 +80,8 @@ int Render::Init(){
 	uniform_camera_transform = glGetUniformLocation(shader_program_id, "camera_transform");
 	uniform_perspective_transform = glGetUniformLocation(shader_program_id, "perspective_transform");
 	uniform_pos = glGetUniformLocation(shader_program_id, "pos");
-	if(uniform_camera_transform == -1 || uniform_perspective_transform == -1 || uniform_pos == -1){
+	uniform_xscale = glGetUniformLocation(shader_program_id, "xscale");
+	if(uniform_camera_transform == -1 || uniform_perspective_transform == -1 || uniform_pos == -1 || uniform_xscale == -1){
 		std::cerr << "A uniform is missing from the shader." << std::endl;
 		glfwTerminate();
 		return -1;

@@ -117,7 +117,8 @@ bool Tile::DownloadZIP(int lat, int lon){
 }
 void Tile::UnpackZIP(int lat, int lon){
     std::string command = "unzip -o " + TileHGT(lat,lon) + ".zip -d /tmp/";
-    system(command.c_str());
+    int q = system(command.c_str());
+    (void)q;
 }
 
 void Tile::GenerateNormals(){
@@ -158,14 +159,26 @@ short& Tile::XYnY(int x, int y){
 	return data[XYtoN(x,y)*3+2];
 }
 
+int Tile::GetTileResolution(int lod){
+    return LODs[lod];
+}
+
 std::string Tile::TileString(int lat, int lon){
 	std::stringstream ss;
-	if(lat < 0) ss << "S";
-	else        ss << "N";
-	ss << std::setw(2) << std::setfill('0') << lat;
-	if(lon < 0) ss << "W";
-	else        ss << "E";
-	ss << std::setw(3) << std::setfill('0') << lon;
+	if(lat < 0){
+        ss << "S";
+    	ss << std::setw(2) << std::setfill('0') << -lat;
+	}else{
+        ss << "N";
+    	ss << std::setw(2) << std::setfill('0') << lat;
+    }
+	if(lon < 0){
+        ss << "W";
+    	ss << std::setw(3) << std::setfill('0') << -lon;
+	}else{
+        ss << "E";
+    	ss << std::setw(3) << std::setfill('0') << lon;
+    }
 	return ss.str();
 }
 
@@ -179,8 +192,9 @@ void Tile::Prepare(){
     glBufferData(GL_ARRAY_BUFFER, 1201*1202*3 * sizeof(short), data.data(), GL_STATIC_DRAW);
 }
 
-void Tile::Render(short lod){
+unsigned int Tile::Render(short lod, float xscale){
 
+    glUniform1f(Render::uniform_xscale, xscale );
     glUniform2f(Render::uniform_pos, (float)lon, (float)lat );
     glBindBuffer(GL_ARRAY_BUFFER, positionsbuffer);
     glVertexAttribIPointer( 0, 1, GL_UNSIGNED_INT, 0, (void*)0 );
@@ -192,4 +206,5 @@ void Tile::Render(short lod){
     glEnable(GL_PRIMITIVE_RESTART);
     glPrimitiveRestartIndex(RESTART_INDEX);
     glDrawElements(GL_TRIANGLE_STRIP, LODs[lod]*LODs[lod]*2, GL_UNSIGNED_INT, (void*)0 );
+    return LODs[lod]*LODs[lod]*2;
 }

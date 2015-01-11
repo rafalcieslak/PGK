@@ -1,5 +1,7 @@
 #version 330 core
 
+#define M_PI 3.14159265
+
 //layout(location = 0) in int attrPosition;
 layout(location = 0) in uint attrPosition;
 layout(location = 1) in int attrData;
@@ -10,6 +12,7 @@ uniform mat4 camera_transform;
 uniform mat4 perspective_transform;
 
 uniform vec2 pos;
+uniform float xscale;
 
 out vec4 fcolor;
 
@@ -22,7 +25,8 @@ out vec3 vector_to_camera_global;
 
 vec3 getcolor(float ht){
     vec3 color;
-    if      (ht < 5  )   color = vec3(0.,       0.,        1.); //blue
+    if      (ht < 0  )   color = vec3(0.,       0.,        1.); //blue
+    else if (ht < 10  )  color = vec3(0.,       0.5*ht/10,        1.-ht/10); //blue
     else if (ht < 500)   color = vec3(0.,       ht/1000 + 0.5,    0.); //->green
     else if (ht < 1000)  color = vec3(ht/500-1, 1.,        0.); //->yellow
     else if (ht < 2000)  color = vec3(1.,       2.-ht/1000,0.); //->red
@@ -43,7 +47,9 @@ void main(){
     float height = attrData*HSCALE/1200;
 
     position = vec3(posX-0.5, -posY+0.5, height);
-    position += vec3(pos,0.0);;
+    position += vec3(pos,0.0);
+
+    position.x *= xscale;
 
     vec4 vertexPosition_cameraspace = camera_transform * vec4(position,1.0);
     gl_Position = perspective_transform * vertexPosition_cameraspace;

@@ -19,7 +19,7 @@ add_definitions(
 	-DGLEW_STATIC
 	-D_CRT_SECURE_NO_WARNINGS
 	-std=c++11
-	-g
+	-O3
 	-Wall
 	-Wextra
 	-Werror

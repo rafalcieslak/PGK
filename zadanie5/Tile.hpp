@@ -30,8 +30,9 @@ private:
 public:
 	int lon, lat;
 	void Prepare();
-	void Render(short lod);
+	unsigned int Render(short lod, float xscale);
 	static void Init();
+	static int GetTileResolution(int lod);
 
 	static std::shared_ptr<Tile> Create(int lat, int lon);
 	static std::string TileString(int lat, int lon);
