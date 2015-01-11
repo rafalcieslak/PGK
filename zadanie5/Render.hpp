@@ -40,7 +40,8 @@ public:
 	// Returns true iff the user has closed the window.
 	static bool IsWindowClosed();
 	// Resets the mouse to window center and returns it's previous position, scaled to -1,1
-	static glm::vec2 ProbeMouse();
+	static glm::vec2 ProbeMousePos();
+	static bool IsMouseDown();
 	static GLint uniform_pos;
 	// Scroll callback
 	static std::function<void(double)> scroll_callback;

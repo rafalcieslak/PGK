@@ -148,11 +148,14 @@ int Render::Init(){
 	return 0;
 }
 
-glm::vec2 Render::ProbeMouse(){
+glm::vec2 Render::ProbeMousePos(){
 	double x,y;
 	glfwGetCursorPos(window,&x,&y);
 	glfwSetCursorPos(window,500.0,500.0);
 	return glm::vec2((x-500)/500,(y-500)/500);
+}
+bool Render::IsMouseDown(){
+	return glfwGetMouseButton(window,0)==GLFW_PRESS;
 }
 
 
@@ -171,7 +174,7 @@ void Render::FrameStart(float light_intensity, float light_angle, float xscale, 
 			float r = Viewpoint::active_viewpoint->ortho_range;
 			perspective = glm::ortho(-r,r,-r,r,0.1f,20.0f);
  		}else{
-			perspective = glm::perspective(Viewpoint::active_viewpoint->GetFOV(), 1.0f, 0.005f, 10.0f);
+			perspective = glm::perspective(Viewpoint::active_viewpoint->GetFOV(), 1.0f, 0.0005f, 4.0f);
 		}
 	}
 
