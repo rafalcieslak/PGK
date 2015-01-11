@@ -46,15 +46,19 @@ void AddTileRange(int lat1, int lat2, int lon1, int lon2){
 }
 void ScrollCallback(double x){
 	if(viewmode == VIEWMODE_3D){
-		float fov = persp_camera->GetFOVdg();
-		fov = glm::min(glm::max(fov - 5*x,50.0),150.0);
-		persp_camera->SetFOVdg(fov);
-		fov_text->SetText("Camera FOV: " + std::to_string(int(fov+0.5)));
+		persp_camera->MoveIn(x*(persp_camera->GetPosition().z-1.0f)*0.2);
 	}else{
 		float r = ortho_camera->ortho_range;
 		r *= pow(0.7,x);
 		ortho_camera->ortho_range = r;
 	}
+}
+
+void AdjustFov(double x){
+	float fov = persp_camera->GetFOVdg();
+	fov = glm::min(glm::max(fov - 5*x,50.0),150.0);
+	persp_camera->SetFOVdg(fov);
+	fov_text->SetText("Camera FOV: " + std::to_string(int(fov+0.5)));
 }
 
 void AutoLODTooHigh(){
@@ -89,6 +93,7 @@ int main(){
 	auto mouse_scroll_text = std::make_shared<Text>("Mouse wheel: Zoom in/out", glm::vec2(10,82), 16, glm::vec3(1.0,1.0,1.0));
 	auto iop_text = std::make_shared<Text>("I/O/P: Set light contrast", glm::vec2(10,102), 16, glm::vec3(1.0,1.0,1.0));
 	auto rot_text = std::make_shared<Text>("E+mouse: Rotate lightning", glm::vec2(10,122), 16, glm::vec3(1.0,1.0,1.0));
+	auto fov_text = std::make_shared<Text>("Z/X: Adjust FOV", glm::vec2(10,142), 16, glm::vec3(1.0,1.0,1.0));
 
 	auto tri_text = std::make_shared<Text>("Triangles: ", glm::vec2(830,22), 16, glm::vec3(1.0,0.5,0.5));
 	auto res_text = std::make_shared<Text>("Tile size: ", glm::vec2(830,42), 16, glm::vec3(1.0,0.5,0.5));
@@ -107,8 +112,8 @@ int main(){
 	ortho_camera->yaw = -3.1415926f/2.0f;
 	ortho_camera->SetAsActive();
 
-	//persp_camera = std::make_shared<Viewpoint>( glm::vec3(center.x, center.y, center.z) , glm::vec3(0.0,1.0,0.0));
-	persp_camera = std::make_shared<Viewpoint>( glm::vec3(1.0,1.0,1.0) , glm::vec3(0.0,1.0,0.0));
+	persp_camera = std::make_shared<Viewpoint>( glm::vec3(center.x, center.y, 2.0) , glm::vec3(0.0,1.0,0.0));
+	//persp_camera = std::make_shared<Viewpoint>( glm::vec3(1.0,1.0,2.0) , glm::vec3(0.0,1.0,0.0));
 	persp_camera->pitch = 0.0;
 	persp_camera->yaw = -3.1415926f/2.0f;
 
@@ -159,11 +164,14 @@ int main(){
 
 		// Processing user input
 		if(viewmode == VIEWMODE_3D){
-			float amount = time_delta*0.8*(glm::length(persp_camera->GetPosition())-1.0f);
-			if(Render::IsKeyPressed(GLFW_KEY_W)) persp_camera->MoveForward(amount);
-			if(Render::IsKeyPressed(GLFW_KEY_S)) persp_camera->MoveBackward(amount);
-			if(Render::IsKeyPressed(GLFW_KEY_A)) persp_camera->StrafeLeft(amount);
-			if(Render::IsKeyPressed(GLFW_KEY_D)) persp_camera->StrafeRight(amount);
+			float amount = time_delta*30.0*(persp_camera->GetPosition().z-1.0f);
+			if(Render::IsKeyPressed(GLFW_KEY_LEFT_SHIFT)) amount *= 3;
+			if(Render::IsKeyPressed(GLFW_KEY_W)) persp_camera->MoveNorth(amount);
+			if(Render::IsKeyPressed(GLFW_KEY_S)) persp_camera->MoveSouth(amount);
+			if(Render::IsKeyPressed(GLFW_KEY_A)) persp_camera->MoveEast(amount);
+			if(Render::IsKeyPressed(GLFW_KEY_D)) persp_camera->MoveWest(amount);
+			if(Render::IsKeyPressed(GLFW_KEY_Z)) AdjustFov(5);
+			if(Render::IsKeyPressed(GLFW_KEY_X)) AdjustFov(-5);
 			glm::vec2 mouse = Render::ProbeMousePos();
 			if(Render::IsKeyPressed(GLFW_KEY_E)){
 				light_angle -= mouse.x * 20;
@@ -177,21 +185,20 @@ int main(){
 				// Switch to ortho camera
 				viewmode = VIEWMODE_ORTHO;
 				ortho_camera->SetAsActive();
-				mouse_scroll_text->SetText("Mouse wheel: zoom in/out");
 				fov_text->SetText("Camera FOV: 0");
 			}else if(!Render::IsKeyPressed(GLFW_KEY_TAB)) tab_pressed = false;
 		}else{
 			float amount = time_delta * ortho_camera->ortho_range;
 			if(Render::IsKeyPressed(GLFW_KEY_W)) ortho_camera->MoveNorth(amount);
 			if(Render::IsKeyPressed(GLFW_KEY_S)) ortho_camera->MoveSouth(amount);
-			if(Render::IsKeyPressed(GLFW_KEY_A)) ortho_camera->StrafeLeft(amount);
-			if(Render::IsKeyPressed(GLFW_KEY_D)) ortho_camera->StrafeRight(amount);
+			if(Render::IsKeyPressed(GLFW_KEY_A)) ortho_camera->MoveEast(amount);
+			if(Render::IsKeyPressed(GLFW_KEY_D)) ortho_camera->MoveWest(amount);
 			glm::vec2 mouse = Render::ProbeMousePos();
 			if(Render::IsKeyPressed(GLFW_KEY_E)){
 				light_angle -= mouse.x * 20;
 				lan_text->SetText("Light angle: " + std::to_string((int(light_angle+0.5)+360*1000)%360));
 			}else if(Render::IsMouseDown()){
-				ortho_camera->StrafeLeft(mouse.x * camrange);
+				ortho_camera->MoveEast(mouse.x * camrange);
 				ortho_camera->MoveNorth(mouse.y * camrange);
 			}
 			if(Render::IsKeyPressed(GLFW_KEY_TAB) && !tab_pressed){
@@ -199,11 +206,9 @@ int main(){
 				// Switch to persp camera
 				viewmode = VIEWMODE_3D;
 				persp_camera->SetAsActive();
-				persp_camera->yaw = -3.1415926f/2.0f;
-				mouse_scroll_text->SetText("Mouse wheel: Adjust FOV");
 				fov_text->SetText("Camera FOV: " + std::to_string(int(persp_camera->GetFOVdg()+0.5)));
 				Render::ProbeMousePos(); // Resets mouse position to keep persp camera facing down
-				persp_camera->yaw = -3.1415926f/2.0f;
+				persp_camera->yaw = 0.0;
 			}else if(!Render::IsKeyPressed(GLFW_KEY_TAB)) tab_pressed = false;
 		}
 		if(Render::IsKeyPressed(GLFW_KEY_1)) {lod = 0; auto_lod = false;}
@@ -217,6 +222,9 @@ int main(){
 		if(Render::IsKeyPressed(GLFW_KEY_I)) { light_intensity = 4.0;   lig_text->SetText("Light contrast: high");}
 		if(Render::IsKeyPressed(GLFW_KEY_O)) { light_intensity = 10.0;  lig_text->SetText("Light contrast: low");}
 		if(Render::IsKeyPressed(GLFW_KEY_P)) { light_intensity = 100.0; lig_text->SetText("Light contrast: none");}
+		persp_camera->DownTo0();
+
+		std::cout << persp_camera->GetPosition().x << " " << persp_camera->GetPosition().y << " " << persp_camera->GetPosition().z << std::endl;
 
 
 	}while( !Render::IsKeyPressed(GLFW_KEY_ESCAPE ) && !Render::IsWindowClosed() );
