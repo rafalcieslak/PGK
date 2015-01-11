@@ -196,9 +196,8 @@ void Tile::Prepare(){
     glBufferData(GL_ARRAY_BUFFER, 1201*1202*3 * sizeof(short), data.data(), GL_STATIC_DRAW);
 }
 
-unsigned int Tile::Render(short lod, float xscale){
+unsigned int Tile::Render(short lod){
 
-    glUniform1f(Render::uniform_xscale, xscale );
     glUniform2f(Render::uniform_pos, (float)lon, (float)lat );
     glBindBuffer(GL_ARRAY_BUFFER, positionsbuffer);
     glVertexAttribIPointer( 0, 1, GL_UNSIGNED_INT, 0, (void*)0 );

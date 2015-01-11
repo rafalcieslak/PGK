@@ -12,11 +12,16 @@ private:
 	Render() = delete; // static class
 	// Shader program ID.
 	static GLuint shader_program_id;
+	static GLuint grid_program_id;
 	// The vertex array's ID.
 	static GLuint VertexArrayID;
+	static GLuint gridbuffer;
+	static int gridno;
 	// Pixel sizes. Needed for perfect text alignment.
 	static float pxsizex, pxsizey;
-	static GLint uniform_camera_transform, uniform_perspective_transform, uniform_light_intensity, uniform_light_angle;
+	static GLint uniform_camera_transform, uniform_perspective_transform, uniform_camera_transform_g;
+	static GLint uniform_perspective_transform_g, uniform_light_intensity, uniform_light_angle;
+	static GLint uniform_xscale, uniform_xscale_g, uniform_sphere, uniform_sphere_g;
 	// Used for scroll handling
 	static void ScrollCallback(GLFWwindow*, double, double);
 public:
@@ -24,7 +29,7 @@ public:
 	static int Init();
 	static bool inited;
 	// Renders a single frame.
-	static void FrameStart(float light_intensity, float light_angle);
+	static void FrameStart(float light_intensity, float light_angle, float xscale, bool sphere);
 	static void FrameEnd();
 	// Closes the window etc.
 	static void CleanUp();
@@ -36,7 +41,7 @@ public:
 	static bool IsWindowClosed();
 	// Resets the mouse to window center and returns it's previous position, scaled to -1,1
 	static glm::vec2 ProbeMouse();
-	static GLint uniform_pos, uniform_xscale;
+	static GLint uniform_pos;
 	// Scroll callback
 	static std::function<void(double)> scroll_callback;
 };

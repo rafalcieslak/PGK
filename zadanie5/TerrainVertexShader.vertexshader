@@ -16,6 +16,7 @@ uniform float light_angle;
 
 uniform vec2 pos;
 uniform float xscale;
+uniform int sphere;
 
 out vec4 fcolor;
 
@@ -24,6 +25,12 @@ out vec3 vector_to_light_global;
 out vec3 vector_to_camera_global;
 
 #define HSCALE (1.0/30)
+
+vec3 transformcoords(vec3 pos, float height){
+    float q = cos(pos.y * 0.0174532925);
+    float h = (6371000 + height)/6371000;
+    return vec3(sin(pos.x * 0.0174532925)*q,-cos(pos.x * 0.0174532925)*q,sin(pos.y * 0.0174532925)) * h;
+}
 
 vec3 getcolor(float ht){
     vec3 color;
@@ -51,10 +58,6 @@ void main(){
     position = vec3(posX,posY, height);
     position += vec3(pos,0.0);
 
-    position.x *= xscale;
-
-    vec4 vertexPosition_cameraspace = camera_transform * vec4(position,1.0);
-    gl_Position = perspective_transform * vertexPosition_cameraspace;
     fcolor = vec4(getcolor(attrData),a);
 
     vec3 normal = vec3(attrNormalX*HSCALE, attrNormalY*HSCALE, light_intensity);
@@ -66,4 +69,10 @@ void main(){
     vec3 camerapos_global = -transpose(mat3(camera_transform)) * camera_transform[3].xyz;
     vector_to_light_global = lightpos_global - position;
     vector_to_camera_global = camerapos_global - position;
+
+
+    vec3 position2 = (sphere==1)?transformcoords(position,attrData):vec3(position.x*xscale,position.y,position.z);
+
+    vec4 vertexPosition_cameraspace = camera_transform * vec4(position2,1.0);
+    gl_Position = perspective_transform * vertexPosition_cameraspace;
 }

@@ -76,7 +76,7 @@ inline bool intersect(float rAx1, float rAy1, float rAx2, float rAy2, float rBx1
 
 int main(){
 	std::cout << "Loading data..." << std::endl;
-	AddTileRange(40,45,-5,0);
+	AddTileRange(35,45,-10,0);
 
 	// Prepare the renderer.
 	int n = Render::Init();
@@ -104,7 +104,8 @@ int main(){
 	ortho_camera->yaw = -3.1415926f/2.0f;
 	ortho_camera->SetAsActive();
 
-	persp_camera = std::make_shared<Viewpoint>( glm::vec3(center.x, center.y, center.z) , glm::vec3(0.0,1.0,0.0));
+	//persp_camera = std::make_shared<Viewpoint>( glm::vec3(center.x, center.y, center.z) , glm::vec3(0.0,1.0,0.0));
+	persp_camera = std::make_shared<Viewpoint>( glm::vec3(1.0,1.0,1.0) , glm::vec3(0.0,1.0,0.0));
 	persp_camera->pitch = 0.0;
 	persp_camera->yaw = -3.1415926f/2.0f;
 
@@ -116,6 +117,7 @@ int main(){
 	double sum10 = 0.0;
 	std::list<double> times;
 	do{
+		// Measuring performance
 		double newtime = Render::GetTime();
 		double time_delta = newtime-lasttime;
 		lasttime = newtime;
@@ -127,7 +129,6 @@ int main(){
 		}
 		double avg10time = sum10/times.size();
 		int avg10fps = 1.0/avg10time;
-
 		if(auto_lod){
 			if(avg10fps < MIN_FPS) AutoLODTooHigh();
 			if(avg10fps > MAX_FPS) AutoLODTooLow();
@@ -138,13 +139,14 @@ int main(){
 		glm::vec2 campos(ortho_camera->GetPosition().x, ortho_camera->GetPosition().y);
 		float camrange = ortho_camera->ortho_range;
 
-		Render::FrameStart(light_intensity, light_angle*0.0174532925);
+		// Rendering the frame
+		Render::FrameStart(light_intensity, light_angle*0.0174532925, xscale, viewmode==VIEWMODE_3D);
 		for(auto tile : tiles){
 			if(viewmode == VIEWMODE_ORTHO){
 				if(!intersect(campos.x - camrange, campos.y - camrange, campos.x + camrange, campos.y + camrange,
 							  tile->lon*xscale, tile->lat-1.0, (tile->lon+1.0)*xscale, tile->lat)) continue;
 			}
-			triangles += tile->Render(lod, xscale);
+			triangles += tile->Render(lod);
 		}
 		tri_text->SetText("Triangles: " + std::to_string(triangles));
 		res_text->SetText("Tile resolution: " + std::to_string( Tile::GetTileResolution(lod)));
@@ -152,8 +154,9 @@ int main(){
 		fps_text->SetText("FPS: " + std::to_string( avg10fps ));
 		Render::FrameEnd();
 
-		time_delta *= 1.0;
+		// Processing user input
 		if(viewmode == VIEWMODE_3D){
+			time_delta *= 0.6;
 			if(Render::IsKeyPressed(GLFW_KEY_W)) persp_camera->MoveForward(time_delta);
 			if(Render::IsKeyPressed(GLFW_KEY_S)) persp_camera->MoveBackward(time_delta);
 			if(Render::IsKeyPressed(GLFW_KEY_A)) persp_camera->StrafeLeft(time_delta);

@@ -13,11 +13,15 @@ GLFWwindow* window;
 
 // All the static members of Render class.
 GLint Render::uniform_camera_transform, Render::uniform_perspective_transform;
-GLint Render::uniform_pos, Render::uniform_xscale, Render::uniform_light_intensity;
-GLint Render::uniform_light_angle;
+GLint Render::uniform_camera_transform_g, Render::uniform_perspective_transform_g;
+GLint Render::uniform_pos, Render::uniform_xscale, Render::uniform_xscale_g, Render::uniform_light_intensity;
+GLint Render::uniform_light_angle, Render::uniform_sphere_g, Render::uniform_sphere;
 GLuint Render::VertexArrayID;
 float Render::pxsizex, Render::pxsizey;
 GLuint Render::shader_program_id;
+GLuint Render::grid_program_id;
+GLuint Render::gridbuffer;
+int Render::gridno;
 bool Render::inited = false;
 std::function<void(double)> Render::scroll_callback;
 
@@ -84,15 +88,23 @@ int Render::Init(){
 
 	// Create and compile our GLSL program from the shaders
 	shader_program_id = LoadShaders( "TerrainVertexShader.vertexshader", "TerrainFragmentShader.fragmentshader" );
+	grid_program_id = LoadShaders( "GridVertexShader.vertexshader", "GridFragmentShader.fragmentshader" );
 
 	// Prepare uniforms of the vertex shader
 	uniform_camera_transform = glGetUniformLocation(shader_program_id, "camera_transform");
 	uniform_perspective_transform = glGetUniformLocation(shader_program_id, "perspective_transform");
-	uniform_pos = glGetUniformLocation(shader_program_id, "pos");
 	uniform_xscale = glGetUniformLocation(shader_program_id, "xscale");
+	uniform_sphere = glGetUniformLocation(shader_program_id, "sphere");
+	uniform_camera_transform_g = glGetUniformLocation(grid_program_id, "camera_transform");
+	uniform_perspective_transform_g = glGetUniformLocation(grid_program_id, "perspective_transform");
+	uniform_xscale_g = glGetUniformLocation(grid_program_id, "xscale");
+	uniform_sphere_g = glGetUniformLocation(grid_program_id, "sphere");
+	uniform_pos = glGetUniformLocation(shader_program_id, "pos");
 	uniform_light_intensity = glGetUniformLocation(shader_program_id, "light_intensity");
 	uniform_light_angle = glGetUniformLocation(shader_program_id, "light_angle");
-	if(uniform_camera_transform == -1 || uniform_perspective_transform == -1 || uniform_pos == -1 || uniform_xscale == -1 || uniform_light_intensity == -1 || uniform_light_angle == -1){
+	if(uniform_camera_transform == -1 || uniform_perspective_transform == -1 || uniform_camera_transform_g == -1
+    || uniform_perspective_transform_g == -1 || uniform_pos == -1 || uniform_xscale == -1 || uniform_xscale_g == -1
+    || uniform_light_intensity == -1 || uniform_light_angle == -1 || uniform_sphere == -1 || uniform_sphere_g == -1){
 		std::cerr << "A uniform is missing from the shader." << std::endl;
 		glfwTerminate();
 		return -1;
@@ -110,6 +122,28 @@ int Render::Init(){
 	int res = init_font();
 	if(res < 0) return res;
 
+	std::vector<float> linedata;
+	// horiz
+	for(int y = -75; y <=75; y++)
+		for(int x = -180; x < 180; x++){
+			linedata.push_back(x);
+			linedata.push_back(y);
+			linedata.push_back(x+1);
+			linedata.push_back(y);
+		}
+	// vert
+	for(int x = -180; x <= 180; x++)
+		for(int y = -75; y <75; y++){
+			linedata.push_back(x);
+			linedata.push_back(y);
+			linedata.push_back(x);
+			linedata.push_back(y+1);
+		}
+	glGenBuffers(1,&gridbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, gridbuffer);
+    glBufferData(GL_ARRAY_BUFFER, linedata.size() * sizeof(float), linedata.data(), GL_STATIC_DRAW);
+	gridno = linedata.size();
+
 	inited = true;
 	return 0;
 }
@@ -122,36 +156,49 @@ glm::vec2 Render::ProbeMouse(){
 }
 
 
-void Render::FrameStart(float light_intensity, float light_angle){
+void Render::FrameStart(float light_intensity, float light_angle, float xscale, bool sphere){
 	// Clear the screen
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	// Use the board shader
-	glUseProgram(shader_program_id);
-
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glEnableVertexAttribArray(2);
-	glEnableVertexAttribArray(3);
 
 	glEnable(GL_DEPTH_TEST);
 
 	// Prepare camera
+	glm::mat4 perspective;
+	glm::mat4 cameraview;
 	if(Viewpoint::active_viewpoint){
-		glm::mat4 cameraview =  glm::lookAt(glm::vec3(0.0) , 1.0f* Viewpoint::active_viewpoint->GetDirection(), glm::vec3(0.0,0.0,1.0)) * glm::inverse(Viewpoint::active_viewpoint->GetTransform());
-		glm::mat4 perspective;
+		cameraview =  glm::lookAt(glm::vec3(0.0) , 1.0f* Viewpoint::active_viewpoint->GetDirection(), glm::vec3(0.0,0.0,1.0)) * glm::inverse(Viewpoint::active_viewpoint->GetTransform());
 		if(Viewpoint::active_viewpoint->ortho){
 			float r = Viewpoint::active_viewpoint->ortho_range;
 			perspective = glm::ortho(-r,r,-r,r,0.1f,20.0f);
  		}else{
 			perspective = glm::perspective(Viewpoint::active_viewpoint->GetFOV(), 1.0f, 0.005f, 10.0f);
 		}
-		glUniformMatrix4fv(uniform_camera_transform, 1, GL_FALSE, &cameraview[0][0]);
-		glUniformMatrix4fv(uniform_perspective_transform, 1, GL_FALSE, &perspective[0][0]);
 	}
 
+	glUseProgram(grid_program_id);
+	glUniformMatrix4fv(uniform_camera_transform_g, 1, GL_FALSE, &cameraview[0][0]);
+	glUniformMatrix4fv(uniform_perspective_transform_g, 1, GL_FALSE, &perspective[0][0]);
+    glUniform1f(Render::uniform_xscale_g, xscale);
+    glUniform1i(Render::uniform_sphere_g, (int)sphere);
+	glEnableVertexAttribArray(0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, gridbuffer);
+	glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0 );
+	glDrawArrays(GL_LINES, 0, 2*gridno);
+
+	glDisableVertexAttribArray(0);
+
+	glUseProgram(shader_program_id);
+	glUniformMatrix4fv(uniform_camera_transform  , 1, GL_FALSE, &cameraview[0][0]);
+	glUniformMatrix4fv(uniform_perspective_transform  , 1, GL_FALSE, &perspective[0][0]);
     glUniform1f(Render::uniform_light_intensity, light_intensity);
     glUniform1f(Render::uniform_light_angle, light_angle);
+    glUniform1f(Render::uniform_xscale, xscale);
+    glUniform1i(Render::uniform_sphere, (int)sphere);
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(3);
 }
 
 void Render::FrameEnd(){

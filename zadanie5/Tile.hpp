@@ -30,7 +30,7 @@ private:
 public:
 	int lon, lat;
 	void Prepare();
-	unsigned int Render(short lod, float xscale);
+	unsigned int Render(short lod);
 	static void Init();
 	static int GetTileResolution(int lod);
 

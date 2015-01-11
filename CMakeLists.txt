@@ -253,6 +253,8 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie5")
 		zadanie5/TextVertexShader.vertexshader
 		zadanie5/TerrainFragmentShader.fragmentshader
 		zadanie5/TerrainVertexShader.vertexshader
+		zadanie5/GridFragmentShader.fragmentshader
+		zadanie5/GridVertexShader.vertexshader
 		zadanie5/Ubuntu.ttf
 	)
 
