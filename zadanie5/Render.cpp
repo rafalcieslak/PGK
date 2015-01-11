@@ -17,6 +17,7 @@ GLuint Render::VertexArrayID;
 float Render::pxsizex, Render::pxsizey;
 GLuint Render::shader_program_id;
 bool Render::inited = false;
+std::function<void(double)> Render::scroll_callback;
 
 double Render::GetTime(){
 	return glfwGetTime();
@@ -30,6 +31,11 @@ bool Render::IsWindowClosed(){
 	return (glfwWindowShouldClose(window) == 1);
 }
 
+
+void Render::ScrollCallback(GLFWwindow*, double, double x){
+	if(scroll_callback)
+		scroll_callback(x);
+}
 
 int Render::Init(){
 
@@ -65,6 +71,7 @@ int Render::Init(){
 
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_FALSE);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetScrollCallback(window,ScrollCallback);
 
 	// Background
 	glClearColor(50/255.0,80.0/255.0,0.7,1.0);
@@ -125,40 +132,18 @@ void Render::FrameStart(){
 	glEnableVertexAttribArray(2);
 	glEnableVertexAttribArray(3);
 
-	/*
-	// Prepare lights
-	int n = Light::lights.size();
-	if(Light::lights.size() > 0){
-		float lightspos[3*n], lightparrams[2*n], lightcolors[3*n], sda[3*n], fixranges[n];
-		glUniform1i(uniform_lightnumber,n);
-		for(int i = 0; i < n; i++){
-			Light* l = Light::lights[i];
-			glm::vec3 lightpos(l->GetGlobalPos());
-			lightspos[3*i+0] = lightpos.x;
-			lightspos[3*i+1] = lightpos.y;
-			lightspos[3*i+2] = lightpos.z;
-			lightcolors[3*i+0] = l->color.x * l->multiplier;
-			lightcolors[3*i+1] = l->color.y * l->multiplier;
-			lightcolors[3*i+2] = l->color.z * l->multiplier;
-			lightparrams[2*i+0] = l->distance_influence;
-			lightparrams[2*i+1] = l->spatial_range;
-			sda[3*i+0] = l->sda.x;
-			sda[3*i+1] = l->sda.y;
-			sda[3*i+2] = l->sda.z;
-			fixranges[i] = l->fixrange;
-		}
-		glUniform3fv(uniform_lightpos,n,lightspos);
-		glUniform2fv(uniform_lightparrams,n,lightparrams);
-		glUniform3fv(uniform_lightcolor,n,lightcolors);
-		glUniform3fv(uniform_light_sda,n,sda);
-		glUniform1fv(uniform_light_fixrange,n,fixranges);
-	}
-	*/
+	glEnable(GL_DEPTH_TEST);
 
 	// Prepare camera
 	if(Viewpoint::active_viewpoint){
 		glm::mat4 cameraview =  glm::lookAt(glm::vec3(0.0) , 1.0f* Viewpoint::active_viewpoint->GetDirection(), glm::vec3(0.0,0.0,1.0)) * glm::inverse(Viewpoint::active_viewpoint->GetTransform());
-		glm::mat4 perspective = glm::perspective(Viewpoint::active_viewpoint->GetFOV(), 1.0f, 0.005f, 10.0f);
+		glm::mat4 perspective;
+		if(Viewpoint::active_viewpoint->ortho){
+			float r = Viewpoint::active_viewpoint->ortho_range;
+			perspective = glm::ortho(-r,r,-r,r,0.1f,20.0f);
+ 		}else{
+			perspective = glm::perspective(Viewpoint::active_viewpoint->GetFOV(), 1.0f, 0.005f, 10.0f);
+		}
 		glUniformMatrix4fv(uniform_camera_transform, 1, GL_FALSE, &cameraview[0][0]);
 		glUniformMatrix4fv(uniform_perspective_transform, 1, GL_FALSE, &perspective[0][0]);
 	}
@@ -171,6 +156,8 @@ void Render::FrameEnd(){
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(0);
 
+
+	glDisable(GL_DEPTH_TEST);
 	for(auto t : Text::texts){
 		if(!t->active) continue;
 		glm::vec2 off = t->px_offset;

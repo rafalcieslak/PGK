@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
+#include <functional>
 
 class Render{
 private:
@@ -16,6 +17,8 @@ private:
 	// Pixel sizes. Needed for perfect text alignment.
 	static float pxsizex, pxsizey;
 	static GLint uniform_camera_transform, uniform_perspective_transform;
+	// Used for scroll handling
+	static void ScrollCallback(GLFWwindow*, double, double);
 public:
 	// Prepares for rendering, sets up the window, prepares buffers.
 	static int Init();
@@ -34,6 +37,8 @@ public:
 	// Resets the mouse to window center and returns it's previous position, scaled to -1,1
 	static glm::vec2 ProbeMouse();
 	static GLint uniform_pos, uniform_xscale;
+	// Scroll callback
+	static std::function<void(double)> scroll_callback;
 };
 
 

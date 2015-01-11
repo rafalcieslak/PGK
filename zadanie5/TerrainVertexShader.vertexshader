@@ -53,6 +53,7 @@ void main(){
 
     vec4 vertexPosition_cameraspace = camera_transform * vec4(position,1.0);
     gl_Position = perspective_transform * vertexPosition_cameraspace;
+    //gl_Position = 0.000001*gl_Position * vertexPosition_cameraspace;
     //fcolor = vec4(getcolor(attrNormalX*100+1000),a);
     fcolor = vec4(getcolor(attrData),a);
 

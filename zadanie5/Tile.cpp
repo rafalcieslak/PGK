@@ -133,14 +133,18 @@ void Tile::GenerateNormals(){
             if(x == 1200) h2 = h1; else h2 = XYpos(x+1,y);
             float a = (h0-h1);
             float b = (h1-h2);
-            XYnX(x,y) = -(a+b)/2.0;
+            short res = -(a+b)/2.0;
+            if(res > 1000 || res < -1000 ) res = 0;
+            XYnX(x,y) = res;
             // y normals
             h1 = XYpos(x,y);
             if(y == 0) h0 = h1; else h0 = XYpos(x,y-1);
             if(y == 1200) h2 = h1; else h2 = XYpos(x,y+1);
             a = (h0-h1);
             b = (h1-h2);
-            XYnY(x,y) = -(a+b)/2.0;
+            res = -(a+b)/2.0;
+            if(res > 1000 || res < -1000 ) res = 0;
+            XYnY(x,y) = res;
         }
     }
 }

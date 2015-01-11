@@ -64,6 +64,12 @@ void Viewpoint::StrafeLeft(float t){
 	glm::vec3 pitched_left = glm::rotate(glm::vec3(1.0,0.0,0.0),pitch,glm::vec3(0.0,0.0,1.0));
 	position -= pitched_left*t;
 }
+void Viewpoint::MoveNorth(float t){
+	position += glm::vec3(0.0,1.0,0.0)*t;
+}
+void Viewpoint::MoveSouth(float t){
+	position -= glm::vec3(0.0,1.0,0.0)*t;
+}
 void Viewpoint::MovePitch(float delta){
 	pitch -= delta;
 }

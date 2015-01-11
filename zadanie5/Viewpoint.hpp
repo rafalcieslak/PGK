@@ -30,9 +30,13 @@ public:
 	void MoveBackward(float t);
 	void StrafeLeft(float t);
 	void StrafeRight(float t);
+	void MoveNorth(float t);
+	void MoveSouth(float t);
 	void MovePitch(float delta);
 	void MoveYaw(float delta);
 	static std::shared_ptr<Viewpoint> active_viewpoint;
+	bool ortho = false;
+	float ortho_range = 1.0;
 };
 
 #endif //VIEWPOINT_HPP
