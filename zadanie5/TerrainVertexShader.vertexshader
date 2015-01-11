@@ -44,11 +44,11 @@ void main(){
     uint posXi = attrPosition >> 16;
     uint posYi = attrPosition & uint(0xffff);
     float posX = float(posXi)/1200.0;
-    float posY = float(posYi)/1200.0;
+    float posY = float(posYi)/-1200.0;
 
     float height = attrData*HSCALE/1200;
 
-    position = vec3(posX-0.5, -posY+0.5, height);
+    position = vec3(posX,posY, height);
     position += vec3(pos,0.0);
 
     position.x *= xscale;
