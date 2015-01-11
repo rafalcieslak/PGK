@@ -12,7 +12,8 @@
 GLFWwindow* window;
 
 // All the static members of Render class.
-GLint Render::uniform_camera_transform, Render::uniform_perspective_transform, Render::uniform_pos, Render::uniform_xscale;
+GLint Render::uniform_camera_transform, Render::uniform_perspective_transform;
+GLint Render::uniform_pos, Render::uniform_xscale, Render::uniform_light_intensity;
 GLuint Render::VertexArrayID;
 float Render::pxsizex, Render::pxsizey;
 GLuint Render::shader_program_id;
@@ -88,20 +89,19 @@ int Render::Init(){
 	uniform_perspective_transform = glGetUniformLocation(shader_program_id, "perspective_transform");
 	uniform_pos = glGetUniformLocation(shader_program_id, "pos");
 	uniform_xscale = glGetUniformLocation(shader_program_id, "xscale");
-	if(uniform_camera_transform == -1 || uniform_perspective_transform == -1 || uniform_pos == -1 || uniform_xscale == -1){
+	uniform_light_intensity = glGetUniformLocation(shader_program_id, "light_intensity");
+	if(uniform_camera_transform == -1 || uniform_perspective_transform == -1 || uniform_pos == -1 || uniform_xscale == -1 || uniform_light_intensity == -1){
 		std::cerr << "A uniform is missing from the shader." << std::endl;
 		glfwTerminate();
 		return -1;
 	}
 
-	// Enable blending for several alpha effects.
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// glEnable(GL_BLEND);
+	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//glBlendFunc(GL_ZERO, GL_SRC_COLOR);
 
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
-	// Accept fragment if it closer to the camera than the former one
 	glDepthFunc(GL_LESS);
 
 	// Prepare for rendering fonts.
@@ -120,7 +120,7 @@ glm::vec2 Render::ProbeMouse(){
 }
 
 
-void Render::FrameStart(){
+void Render::FrameStart(float light_intensity){
 	// Clear the screen
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -148,6 +148,7 @@ void Render::FrameStart(){
 		glUniformMatrix4fv(uniform_perspective_transform, 1, GL_FALSE, &perspective[0][0]);
 	}
 
+    glUniform1f(Render::uniform_light_intensity, light_intensity );
 }
 
 void Render::FrameEnd(){
@@ -156,8 +157,7 @@ void Render::FrameEnd(){
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(0);
 
-
-	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_DEPTH_TEST); // Force text to always stay on top
 	for(auto t : Text::texts){
 		if(!t->active) continue;
 		glm::vec2 off = t->px_offset;

@@ -11,6 +11,8 @@ layout(location = 3) in int attrNormalY;
 uniform mat4 camera_transform;
 uniform mat4 perspective_transform;
 
+uniform float light_intensity;
+
 uniform vec2 pos;
 uniform float xscale;
 
@@ -57,7 +59,7 @@ void main(){
     //fcolor = vec4(getcolor(attrNormalX*100+1000),a);
     fcolor = vec4(getcolor(attrData),a);
 
-    vec3 normal = vec3(attrNormalX*HSCALE, attrNormalY*HSCALE, 10);
+    vec3 normal = vec3(attrNormalX*HSCALE, attrNormalY*HSCALE, light_intensity);
 
     normal_global = (normalize(normal)).xyz;
 

@@ -8,6 +8,7 @@ std::vector<std::shared_ptr<Tile>> tiles;
 std::shared_ptr<Viewpoint> ortho_camera, persp_camera;
 short lod = 3;
 bool tab_pressed = false;
+float light_intensity = 10.0;
 
 enum {
 	VIEWMODE_ORTHO,
@@ -50,7 +51,7 @@ void ScrollCallback(double x){
 
 int main(){
 	std::cout << "Loading data..." << std::endl;
-	AddTileRange(40,42,-5,-4);
+	AddTileRange(40,45,-5,0);
 
 	// Prepare the renderer.
 	int n = Render::Init();
@@ -59,12 +60,14 @@ int main(){
 
 	auto lod_text = std::make_shared<Text>("1-6: set LOD", glm::vec2(10,34), 24, glm::vec3(1.0,1.0,1.0));
 	auto tab_text = std::make_shared<Text>("TAB: Switch camera mode", glm::vec2(10,63), 24, glm::vec3(1.0,1.0,1.0));
-	auto mov_text = std::make_shared<Text>("W/S/A/D: move camera", glm::vec2(10,90), 24, glm::vec3(1.0,1.0,1.0));
+	auto mov_text = std::make_shared<Text>("W/S/A/D: Move camera", glm::vec2(10,90), 24, glm::vec3(1.0,1.0,1.0));
 	auto tri_text = std::make_shared<Text>("Triangles: ", glm::vec2(850,22), 16, glm::vec3(1.0,0.5,0.5));
 	auto res_text = std::make_shared<Text>("Tile size: ", glm::vec2(850,42), 16, glm::vec3(1.0,0.5,0.5));
 	auto rendertime_text = std::make_shared<Text>("Frame time: ", glm::vec2(850,62), 16, glm::vec3(1.0,0.5,0.5));
 	auto fps_text = std::make_shared<Text>("FPS: ", glm::vec2(850,82), 16, glm::vec3(1.0,0.5,0.5));
-	auto mouse_scroll_text = std::make_shared<Text>("Mouse wheel: zoom in/out", glm::vec2(10,117), 24, glm::vec3(1.0,1.0,1.0));
+	auto mouse_scroll_text = std::make_shared<Text>("Mouse wheel: Zoom in/out", glm::vec2(10,117), 24, glm::vec3(1.0,1.0,1.0));
+	auto iop_text = std::make_shared<Text>("I/O/P: Set light contrast", glm::vec2(10,144), 24, glm::vec3(1.0,1.0,1.0));
+	auto lig_text = std::make_shared<Text>("Light contrast: low", glm::vec2(700,22), 16, glm::vec3(0.5,0.5,1.0));
 
 	glm::vec4 center = FindCenter();
 	float xscale = center.w;
@@ -88,7 +91,7 @@ int main(){
 		double time_delta = newtime-lasttime;
 		lasttime = newtime;
 
-		Render::FrameStart();
+		Render::FrameStart(light_intensity);
 		unsigned int triangles = 0;
 		for(auto tile : tiles) triangles += tile->Render(lod, xscale);
 		tri_text->SetText("Triangles: " + std::to_string(triangles));
@@ -136,6 +139,10 @@ int main(){
 		if(Render::IsKeyPressed(GLFW_KEY_4)) lod = 3;
 		if(Render::IsKeyPressed(GLFW_KEY_5)) lod = 4;
 		if(Render::IsKeyPressed(GLFW_KEY_6)) lod = 5;
+
+		if(Render::IsKeyPressed(GLFW_KEY_I)) { light_intensity = 4.0;   lig_text->SetText("Light contrast: high");}
+		if(Render::IsKeyPressed(GLFW_KEY_O)) { light_intensity = 10.0;  lig_text->SetText("Light contrast: low");}
+		if(Render::IsKeyPressed(GLFW_KEY_P)) { light_intensity = 100.0; lig_text->SetText("Light contrast: none");}
 
 
 	}while( !Render::IsKeyPressed(GLFW_KEY_ESCAPE ) && !Render::IsWindowClosed() );

@@ -16,7 +16,7 @@ private:
 	static GLuint VertexArrayID;
 	// Pixel sizes. Needed for perfect text alignment.
 	static float pxsizex, pxsizey;
-	static GLint uniform_camera_transform, uniform_perspective_transform;
+	static GLint uniform_camera_transform, uniform_perspective_transform, uniform_light_intensity;
 	// Used for scroll handling
 	static void ScrollCallback(GLFWwindow*, double, double);
 public:
@@ -24,7 +24,7 @@ public:
 	static int Init();
 	static bool inited;
 	// Renders a single frame.
-	static void FrameStart();
+	static void FrameStart(float light_intensity);
 	static void FrameEnd();
 	// Closes the window etc.
 	static void CleanUp();
