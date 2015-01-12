@@ -5,6 +5,7 @@
 #include <cassert>
 #include <cstdlib>
 #include "Tile.hpp"
+#include <sys/wait.h>
 #include "Render.hpp"
 
 GLuint Tile::positionsbuffer;
@@ -46,9 +47,9 @@ void Tile::Init(){
     }
 }
 
-std::shared_ptr<Tile> Tile::Create(int lat, int lon){
-    PrepareFile(lat,lon);
-    std::ifstream file(TileHGT(lat,lon), std::ios::in|std::ios::binary);
+std::shared_ptr<Tile> Tile::Create(int lat, int lon, std::string usercache){
+    std::string path = LocateFile(lat,lon,usercache);
+    std::ifstream file(path, std::ios::in|std::ios::binary);
 	if(!file.is_open()) return nullptr;
 	std::shared_ptr<Tile> t = std::shared_ptr<Tile>(new Tile());
     t->LoadFromHGTFile(file, lat, lon);
@@ -80,27 +81,58 @@ inline bool exists(std::string filename){
         f.close(); return false;
     }
 }
+std::ifstream::pos_type filesize(std::string filename)
+{
+    std::ifstream f(filename, std::ifstream::ate | std::ifstream::binary);
+    return f.tellg();
+}
 
-void Tile::PrepareFile(int lat, int lon){
-    std::cout << "Preparing file for tile " << lat << " " << lon << std::endl;
-    if(!exists(TileHGT(lat,lon))){
-        if(!exists(TileHGT(lat,lon) + ".zip")){
-            DownloadZIP(lat,lon);
+std::string Tile::LocateFile(int lat, int lon, std::string usercache){
+    std::string userpath = TileHGT(usercache,lat,lon);
+    std::string  tmppath = TileHGT("/tmp",  lat,lon);
+    if(usercache != ""){
+        std::cout << "Looking for tile " << TileString(lat,lon) << " in user cache: " << userpath << "...";
+        if(exists(userpath)){
+            std::cout << "Found!" << std::endl;
+            return userpath;
         }
-        UnpackZIP(lat,lon);
+        std::cout << "Not found." << std::endl;
     }
+    std::cout << "Looking for tile " << TileString(lat,lon) << " in /tmp cache: " << tmppath << "...";
+    if(exists(tmppath)){
+        std::cout << "Found!" << std::endl;
+        return tmppath;
+    }
+    std::cout << "Not found." << std::endl;
+    if(!exists(tmppath + ".zip")){
+        DownloadZIP(lat,lon);
+    }
+    if(filesize(tmppath + ".zip") < 1){
+        std::cout << "This tile is empty." << std::endl;
+        return "";
+    }
+    std::cout << "Unzipping " << tmppath << ".zip" << std::endl;
+    UnpackZIP(tmppath, "/tmp/");
+    return tmppath;
 }
 bool Tile::TryDownload(std::string dir, int lat, int lon){
     std::string url = "http://dds.cr.usgs.gov/srtm/version2_1/SRTM3/" + dir + "/" + TileString(lat,lon) + ".hgt.zip";
-    std::string path = TileHGT(lat,lon) + ".zip";
+    std::string path = TileHGT("/tmp",lat,lon) + ".zip";
     std::cout << "Trying to download " << url << " with wget" << std::endl;
     std::string command = "wget " + url + " --quiet -O " + path;
-    int result = system(command.c_str());
+    int q = system(command.c_str());
+    int result = WEXITSTATUS(q);
     if(result == 8){
-        std::cout << "Server issued an HTTP error response." << std::endl;
+        std::cout << "Server issued an HTTP error response. Probably the file does not exist on the server." << std::endl;
         return false;
     }else if(result != 0){
-        std::cout << "Non-HTTP error." << std::endl;
+        if(result == 2){
+            // interrupted! delete the partially-downloaded file
+            command = "rm " + path;
+            q = system(command.c_str());
+            exit(0);
+        }
+        std::cout << "Wget exit status: " << result << std::endl;
         return false;
     }
     return true;
@@ -108,17 +140,19 @@ bool Tile::TryDownload(std::string dir, int lat, int lon){
 bool Tile::DownloadZIP(int lat, int lon){
     if(!TryDownload("Eurasia", lat, lon))
         if(!TryDownload("Africa", lat, lon))
-            if(!TryDownload("North America", lat, lon))
-                if(!TryDownload("South America", lat, lon))
+            if(!TryDownload("North\\ America", lat, lon))
+                if(!TryDownload("South\\ America", lat, lon))
                     if(!TryDownload("Australia", lat, lon))
                         if(!TryDownload("Islands", lat, lon))
                             return false; //pass
     return true;
 }
-void Tile::UnpackZIP(int lat, int lon){
-    std::string command = "unzip -o " + TileHGT(lat,lon) + ".zip -d /tmp/";
+void Tile::UnpackZIP(std::string tmppath, std::string tmpdir){
+    std::string command = "unzip -o " + tmppath + ".zip -d " + tmpdir + " > /dev/null 2> /dev/null";
     int q = system(command.c_str());
-    (void)q;
+    if(q != 0){
+        std::cout << "There were errors while extracting " << tmppath << std::endl;
+    }
 }
 
 void Tile::GenerateNormals(){
@@ -186,8 +220,8 @@ std::string Tile::TileString(int lat, int lon){
 	return ss.str();
 }
 
-std::string Tile::TileHGT(int lat, int lon){
-    return "/tmp/" + Tile::TileString(lat,lon) + ".hgt";
+std::string Tile::TileHGT(std::string dir, int lat, int lon){
+    return dir + "/" + Tile::TileString(lat,lon) + ".hgt";
 }
 
 void Tile::Prepare(){

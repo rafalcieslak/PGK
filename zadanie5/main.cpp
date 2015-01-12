@@ -40,7 +40,7 @@ glm::vec4 FindCenter(){
 void AddTileRange(int lat1, int lat2, int lon1, int lon2){
 	for(int lat = lat1; lat < lat2; lat++)
 		for(int lon = lon1; lon < lon2; lon++){
-			auto t = Tile::Create(lat,lon);
+			auto t = Tile::Create(lat,lon,"");
 			if(t) tiles.push_back(t);
 		}
 }
