@@ -14,7 +14,8 @@ GLuint Tile::positionsbuffer;
 #define RESTART_INDEX ((unsigned int)-1)
 #define HSCALE (1.0/15000.0)
 
-int LODs[] = {1201, 600, 400, 250, 100, 30};
+#define LOD_COUNT 6
+int LODs[] = {1201, 600, 400, 250, 150, 90};
 GLuint Tile::indicesbuffer[6];
 
 Tile::Tile(){
@@ -29,8 +30,8 @@ void Tile::Init(){
     glGenBuffers(1, &positionsbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, positionsbuffer);
     glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(unsigned int), positions.data(), GL_STATIC_DRAW);
-    glGenBuffers(6, indicesbuffer);
-    for(int i = 0; i < 6; i++){
+    glGenBuffers(LOD_COUNT, indicesbuffer);
+    for(int i = 0; i < LOD_COUNT; i++){
         std::vector<unsigned int> indices;
         int n = LODs[i];
         indices.reserve(n*(n+1)*2);
@@ -47,8 +48,17 @@ void Tile::Init(){
     }
 }
 
-std::shared_ptr<Tile> Tile::Create(int lat, int lon, std::string usercache){
-    std::string path = LocateFile(lat,lon,usercache);
+std::shared_ptr<Tile> Tile::Create(int lat, int lon, std::string usercache, bool neverdownload){
+    std::string path = LocateFile(lat,lon,usercache, neverdownload);
+    std::ifstream file(path, std::ios::in|std::ios::binary);
+	if(!file.is_open()) return nullptr;
+	std::shared_ptr<Tile> t = std::shared_ptr<Tile>(new Tile());
+    t->LoadFromHGTFile(file, lat, lon);
+	file.close();
+    t->GenerateNormals();
+	return t;
+}
+std::shared_ptr<Tile> Tile::Create(std::string path, int lat, int lon){
     std::ifstream file(path, std::ios::in|std::ios::binary);
 	if(!file.is_open()) return nullptr;
 	std::shared_ptr<Tile> t = std::shared_ptr<Tile>(new Tile());
@@ -87,9 +97,10 @@ std::ifstream::pos_type filesize(std::string filename)
     return f.tellg();
 }
 
-std::string Tile::LocateFile(int lat, int lon, std::string usercache){
+std::string Tile::LocateFile(int lat, int lon, std::string usercache, bool neverdownload){
     std::string userpath = TileHGT(usercache,lat,lon);
     std::string  tmppath = TileHGT("/tmp",  lat,lon);
+    // Start by searching in user cache
     if(usercache != ""){
         std::cout << "Looking for tile " << TileString(lat,lon) << " in user cache: " << userpath << "...";
         if(exists(userpath)){
@@ -97,20 +108,30 @@ std::string Tile::LocateFile(int lat, int lon, std::string usercache){
             return userpath;
         }
         std::cout << "Not found." << std::endl;
+        // Well maybe the empty .zip is here?
+        if(exists(userpath + ".zip") && filesize(userpath + ".zip") < 1){
+            std::cout << "This tile is empty." << std::endl;
+            return "";
+        }
     }
+    // Then check /tmp cache
     std::cout << "Looking for tile " << TileString(lat,lon) << " in /tmp cache: " << tmppath << "...";
     if(exists(tmppath)){
         std::cout << "Found!" << std::endl;
         return tmppath;
     }
     std::cout << "Not found." << std::endl;
+
+    // Get the zip
     if(!exists(tmppath + ".zip")){
+        if(neverdownload) return "";
         DownloadZIP(lat,lon);
     }
     if(filesize(tmppath + ".zip") < 1){
         std::cout << "This tile is empty." << std::endl;
         return "";
     }
+    // Unzip
     std::cout << "Unzipping " << tmppath << ".zip" << std::endl;
     UnpackZIP(tmppath, "/tmp/");
     return tmppath;
@@ -121,17 +142,17 @@ bool Tile::TryDownload(std::string dir, int lat, int lon){
     std::cout << "Trying to download " << url << " with wget" << std::endl;
     std::string command = "wget " + url + " --quiet -O " + path;
     int q = system(command.c_str());
+    if(q == 2){
+        // interrupted! delete the partially-downloaded file
+        command = "rm " + path;
+        q = system(command.c_str());
+        exit(0);
+    }
     int result = WEXITSTATUS(q);
     if(result == 8){
         std::cout << "Server issued an HTTP error response. Probably the file does not exist on the server." << std::endl;
         return false;
     }else if(result != 0){
-        if(result == 2){
-            // interrupted! delete the partially-downloaded file
-            command = "rm " + path;
-            q = system(command.c_str());
-            exit(0);
-        }
         std::cout << "Wget exit status: " << result << std::endl;
         return false;
     }

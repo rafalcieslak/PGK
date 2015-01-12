@@ -23,7 +23,7 @@ private:
 	inline short& XYnY(int x, int y);
 	void LoadFromHGTFile(std::ifstream& file, int lat, int lon);
 	void GenerateNormals();
-	static std::string LocateFile(int lat, int lon, std::string usercache);
+	static std::string LocateFile(int lat, int lon, std::string usercache, bool neverdownload = false);
 	static bool TryDownload(std::string dir, int lat, int lon);
 	static bool DownloadZIP(int lat, int lon);
 	static void UnpackZIP(std::string path, std::string dir);
@@ -34,7 +34,8 @@ public:
 	static void Init();
 	static int GetTileResolution(int lod);
 
-	static std::shared_ptr<Tile> Create(int lat, int lon,std::string usercache);
+	static std::shared_ptr<Tile> Create(int lat, int lon,std::string usercache, bool neverdownload = false);
+	static std::shared_ptr<Tile> Create(std::string path, int lat, int lon);
 	static std::string TileString(int lat, int lon);
 	inline static std::string TileHGT(std::string dir, int lat, int lon);
 };

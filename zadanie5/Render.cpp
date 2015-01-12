@@ -75,7 +75,7 @@ int Render::Init(){
 		return -1;
 	}
 
-	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_FALSE);
+	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetScrollCallback(window,ScrollCallback);
 

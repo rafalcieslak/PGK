@@ -37,13 +37,6 @@ glm::vec4 FindCenter(){
 	return glm::vec4(xscale*xc, yc, (range+1)/2.0, xscale);
 }
 
-void AddTileRange(int lat1, int lat2, int lon1, int lon2){
-	for(int lat = lat1; lat < lat2; lat++)
-		for(int lon = lon1; lon < lon2; lon++){
-			auto t = Tile::Create(lat,lon,"");
-			if(t) tiles.push_back(t);
-		}
-}
 void ScrollCallback(double x){
 	if(viewmode == VIEWMODE_3D){
 		persp_camera->MoveIn(x*(persp_camera->GetPosition().z-1.0f)*0.2);
@@ -78,15 +71,121 @@ inline bool intersect(float rAx1, float rAy1, float rAx2, float rAy2, float rBx1
 	return (rAx1 < rBx2 && rAx2 > rBx1 && rAy1 < rBy2 && rAy2 > rBy1);
 }
 
-int main(){
+bool BlockToCoords(std::string str, int& /*out*/ lat, int& /*out*/ lon){
+	if(str.length()!=7) return false;
+	int n1 = std::stoi(str.substr(1,2));
+	int n2 = std::stoi(str.substr(4,3));
+	if(str[0] == 'S' || str[0] == 's') n1 *= -1;
+	else if(str[0] == 'N' || str[0] == 'n') n1 *= 1;
+	else return false;
+	if(str[3] == 'W' || str[3] == 'w') n2 *= -1;
+	else if(str[3] == 'E' || str[3] == 'e') n2 *= 1;
+	else return false;
+	lat = n1;
+	lon = n2;
+	return true;
+}
+
+void usage(){
+	std::cout << "zadanie5 [-d USER_DIR [-n]] REGIONS | HGT_FILES" << std::endl;
+	std::cout << "                                          " << std::endl;
+	std::cout << "     HGT_FILES - list of .hgt files to be loaded.                      " << std::endl;
+	std::cout << "     REGIONS   - list of map tiles to be loaded.                       " << std::endl;
+	std::cout << "                 If the corresponding tile is available in USER_DIR,   " << std::endl;
+	std::cout << "                 then that file will be used. Otherwise the application" << std::endl;
+	std::cout << "                 will attempt to download the file from dds.cr.usgs.gov" << std::endl;
+	std::cout << "                 Downloaded files are cached in /tmp.                  " << std::endl;
+	std::cout << "                 A region can be a single tile, or a rectangular area. " << std::endl;
+	std::cout << "                 For single tiles, the only accepted format is:        " << std::endl;
+	std::cout << "                     [S|s|N|n]xx[W|w|E|e]yyy                           " << std::endl;
+	std::cout << "                 where xx represents the latitude, and yyy longitude.  " << std::endl;
+	std::cout << "                 For example, N37W010 is a correct tile.               " << std::endl;
+	std::cout << "                 For rectangular areas, the only accepted format is:   " << std::endl;
+	std::cout << "                     [S|s|N|n]xx[W|w|E|e]yyy-[S|s|N|n]zz[W|w|E|e]www   " << std::endl;
+	std::cout << "                 where xx, yyy, zz and www represent the area edges.   " << std::endl;
+	std::cout << "                 For example, N35W010-N45E000 is a correct area.       " << std::endl;
+	std::cout << "  -d USER_DIR  - patch to a custom directory containing .hgt files.    " << std::endl;
+	std::cout << "                 Useful if you have already downloaded the data.       " << std::endl;
+	std::cout << "                 This directory will be used only to look for REGIONS  " << std::endl;
+	std::cout << "                 files, it has no effect on HGT_FILES.                 " << std::endl;
+	std::cout << "            -n - Never perform any downloads, relay ONLY on USER_DIR  ." << std::endl;
+	exit(0);
+}
+
+int main(int argc, char** argv){
+	std::string userdir = "";
+	bool neverdownload = false;
+
+	// Parse arguments
+	if(argc == 1) usage();
+	int lat, lon;
+	for(int i = 1; i < argc; i++){
+		std::string arg(argv[i]);
+		int k = arg.length();
+		if(arg == "-d"){
+			i++;
+			if(i == argc){
+				std::cout << "Parameter for -d is missing." << std::endl;
+				exit(0);
+			}
+			userdir = argv[i];
+		}else if(arg == "-n"){
+			if(userdir == ""){
+				std::cout << "Downloads disabled, but no user dir was speficied. This makes no sense!" << std::endl;
+				exit(0);
+			}
+			neverdownload = true;
+		}else if(arg.length() >= 4 && arg.substr(k-4) == ".hgt"){
+			// This is a .hgt file
+			if(arg.length() < 11 || !BlockToCoords(arg.substr(k-11,7),lat,lon)){
+				std::cout << "Argument '" << arg << "' does not seem valid." << std::endl;
+				exit(0);
+			}
+			std::cout << "Opening file " << arg << "..." << std::endl;
+			std::shared_ptr<Tile> t = Tile::Create(arg,lat,lon);
+			if(!t){
+				std::cout << "Problem with accessing file " << arg << "." << std::endl;
+				exit(0);
+			}
+			tiles.push_back(t);
+		}else if(k == 7){
+			// single tile
+			if(!BlockToCoords(arg,lat,lon)){
+				std::cout << "Argument '" << arg << "' does not seem valid." << std::endl;
+				exit(0);
+			}
+			std::shared_ptr<Tile> t = Tile::Create(lat,lon,userdir,neverdownload);
+			if(t) tiles.push_back(t);
+		}else if(k == 15){
+			// single tile
+			int lat1, lon1;
+			if(!BlockToCoords(arg.substr(0,7),lat1,lon1)){
+				std::cout << "Argument '" << arg << "' does not seem valid." << std::endl;
+				exit(0);
+			}
+			if(!BlockToCoords(arg.substr(8,7),lat,lon)){
+				std::cout << "Argument '" << arg << "' does not seem valid." << std::endl;
+				exit(0);
+			}
+			for(int x = lat1; x < lat; x++){
+				for(int y = lon1; y < lon; y++){
+					std::shared_ptr<Tile> t = Tile::Create(x,y,userdir,neverdownload);
+					if(t) tiles.push_back(t);
+				}
+			}
+		}else{
+			std::cout << "Argument '" << arg << "' does not seem valid." << std::endl;
+			exit(0);
+		}
+	}
 	std::cout << "Loading data..." << std::endl;
-	AddTileRange(35,45,-10,0);
 
 	// Prepare the renderer.
 	int n = Render::Init();
 	if(n) return n;
 	Tile::Init();
 
+	// Preapare UT text labels
 	auto lod_text = std::make_shared<Text>("1-6: set LOD, 0: auto", glm::vec2(10,22), 16, glm::vec3(1.0,1.0,1.0));
 	auto tab_text = std::make_shared<Text>("TAB: Switch camera mode", glm::vec2(10,42), 16, glm::vec3(1.0,1.0,1.0));
 	auto mov_text = std::make_shared<Text>("W/S/A/D or mouse drag: Move camera", glm::vec2(10,62), 16, glm::vec3(1.0,1.0,1.0));
@@ -104,6 +203,7 @@ int main(){
 	auto lan_text = std::make_shared<Text>("Light angle: ", glm::vec2(680,42), 16, glm::vec3(0.5,0.5,1.0));
 	     fov_text = std::make_shared<Text>("Camera FOV: 0", glm::vec2(680,62), 16, glm::vec3(0.5,0.5,1.0));
 
+	// Setup cameras
 	glm::vec4 center = FindCenter();
 	float xscale = center.w;
 	ortho_camera = std::make_shared<Viewpoint>( glm::vec3(center.x, center.y, center.z) , glm::vec3(0.0,1.0,0.0));
@@ -113,10 +213,10 @@ int main(){
 	ortho_camera->SetAsActive();
 
 	persp_camera = std::make_shared<Viewpoint>( glm::vec3(center.x, center.y, 2.0) , glm::vec3(0.0,1.0,0.0));
-	//persp_camera = std::make_shared<Viewpoint>( glm::vec3(1.0,1.0,2.0) , glm::vec3(0.0,1.0,0.0));
 	persp_camera->pitch = 0.0;
 	persp_camera->yaw = -3.1415926f/2.0f;
 
+	// Prepare tile VBO data
 	std::cout << "Preparing VBOs..." << std::endl;
 	for(auto tile : tiles) tile->Prepare();
 
@@ -124,6 +224,7 @@ int main(){
 	double lasttime = Render::GetTime();
 	double sum10 = 0.0;
 	std::list<double> times;
+	// The main loop
 	do{
 		// Measuring performance
 		double newtime = Render::GetTime();
@@ -176,7 +277,10 @@ int main(){
 			if(Render::IsKeyPressed(GLFW_KEY_E)){
 				light_angle -= mouse.x * 20;
 				lan_text->SetText("Light angle: " + std::to_string((int(light_angle+0.5)+360*1000)%360));
-			}else{
+			}else if(Render::IsMouseDown()){
+				persp_camera->MoveEast (mouse.x * 30.0*(persp_camera->GetPosition().z-1.0f));
+				persp_camera->MoveNorth(mouse.y * 30.0*(persp_camera->GetPosition().z-1.0f));
+			}else {
 				persp_camera->MovePitch(mouse.x);
 				persp_camera->MoveYaw(-mouse.y);
 			}
@@ -224,7 +328,7 @@ int main(){
 		if(Render::IsKeyPressed(GLFW_KEY_P)) { light_intensity = 100.0; lig_text->SetText("Light contrast: none");}
 		persp_camera->DownTo0();
 
-		std::cout << persp_camera->GetPosition().x << " " << persp_camera->GetPosition().y << " " << persp_camera->GetPosition().z << std::endl;
+		//std::cout << persp_camera->GetPosition().x << " " << persp_camera->GetPosition().y << " " << persp_camera->GetPosition().z << std::endl;
 
 
 	}while( !Render::IsKeyPressed(GLFW_KEY_ESCAPE ) && !Render::IsWindowClosed() );
