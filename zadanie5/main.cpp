@@ -108,6 +108,7 @@ void usage(){
 	std::cout << "                 Useful if you have already downloaded the data.       " << std::endl;
 	std::cout << "                 This directory will be used only to look for REGIONS  " << std::endl;
 	std::cout << "                 files, it has no effect on HGT_FILES.                 " << std::endl;
+	std::cout << "                 Nothing is ever written into this directory.          " << std::endl;
 	std::cout << "            -n - Never perform any downloads, relay ONLY on USER_DIR  ." << std::endl;
 	exit(0);
 }
@@ -192,7 +193,7 @@ int main(int argc, char** argv){
 	auto mouse_scroll_text = std::make_shared<Text>("Mouse wheel: Zoom in/out", glm::vec2(10,82), 16, glm::vec3(1.0,1.0,1.0));
 	auto iop_text = std::make_shared<Text>("I/O/P: Set light contrast", glm::vec2(10,102), 16, glm::vec3(1.0,1.0,1.0));
 	auto rot_text = std::make_shared<Text>("E+mouse: Rotate lightning", glm::vec2(10,122), 16, glm::vec3(1.0,1.0,1.0));
-	auto fov_text = std::make_shared<Text>("Z/X: Adjust FOV", glm::vec2(10,142), 16, glm::vec3(1.0,1.0,1.0));
+	auto adjfov_text = std::make_shared<Text>("", glm::vec2(10,142), 16, glm::vec3(1.0,1.0,1.0));
 
 	auto tri_text = std::make_shared<Text>("Triangles: ", glm::vec2(830,22), 16, glm::vec3(1.0,0.5,0.5));
 	auto res_text = std::make_shared<Text>("Tile size: ", glm::vec2(830,42), 16, glm::vec3(1.0,0.5,0.5));
@@ -290,6 +291,7 @@ int main(int argc, char** argv){
 				viewmode = VIEWMODE_ORTHO;
 				ortho_camera->SetAsActive();
 				fov_text->SetText("Camera FOV: 0");
+				adjfov_text->SetText("");
 			}else if(!Render::IsKeyPressed(GLFW_KEY_TAB)) tab_pressed = false;
 		}else{
 			float amount = time_delta * ortho_camera->ortho_range;
@@ -311,8 +313,9 @@ int main(int argc, char** argv){
 				viewmode = VIEWMODE_3D;
 				persp_camera->SetAsActive();
 				fov_text->SetText("Camera FOV: " + std::to_string(int(persp_camera->GetFOVdg()+0.5)));
+				adjfov_text->SetText("Z/X: Adjust FOV");
 				Render::ProbeMousePos(); // Resets mouse position to keep persp camera facing down
-				persp_camera->yaw = 0.0;
+				persp_camera->yaw = -3.141592653/2.0;
 			}else if(!Render::IsKeyPressed(GLFW_KEY_TAB)) tab_pressed = false;
 		}
 		if(Render::IsKeyPressed(GLFW_KEY_1)) {lod = 0; auto_lod = false;}

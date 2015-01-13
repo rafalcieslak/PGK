@@ -40,13 +40,12 @@ glm::vec3 transformcoords(glm::vec3 pos){
     return glm::vec3(sin(pos.x * 0.0174532925)*q,-cos(pos.x * 0.0174532925)*q,sin(pos.y * 0.0174532925))*pos.z;
 }
 glm::mat4 Viewpoint::GetTransform() const{
-	glm::vec3 p;
+	glm::vec3 p = position;
 	if(!ortho) p = transformcoords(position);
-	else p = position;
 	glm::mat4 tr = glm::translate(glm::mat4(1.0),p);
 	glm::quat pitch_quat = glm::angleAxis(pitch,glm::vec3(0.0f,0.0f,1.0f));
 	glm::quat yaw_quat = glm::angleAxis(yaw,glm::rotate(pitch_quat,glm::vec3(1.0f,0.0f,0.0f)));
-	glm::mat4 ro = glm::toMat4( yaw_quat * pitch_quat);
+	glm::mat4 ro = glm::toMat4(rot * yaw_quat * pitch_quat);
 	return tr * ro;
 }
 void Viewpoint::MoveNorth(float t){
@@ -75,5 +74,5 @@ void Viewpoint::MoveYaw(float delta){
 	yaw = glm::clamp(yaw + delta,-3.1415926f/2.0f,3.1415926f/2.0f);
 }
 void Viewpoint::DownTo0(){
-	rot = glm::rotation(glm::vec3(0.0,0.0,1.0), glm::normalize(-position) );
+	rot = glm::rotation(glm::vec3(0.0,0.0,-1.0), glm::normalize(-transformcoords(position)));
 }
