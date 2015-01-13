@@ -22,6 +22,7 @@ private:
 	static GLint uniform_camera_transform, uniform_perspective_transform, uniform_camera_transform_g;
 	static GLint uniform_perspective_transform_g, uniform_light_intensity, uniform_light_angle;
 	static GLint uniform_xscale, uniform_xscale_g, uniform_sphere, uniform_sphere_g;
+	static GLint uniform_terrainscale;
 	// Used for scroll handling
 	static void ScrollCallback(GLFWwindow*, double, double);
 public:
@@ -29,7 +30,7 @@ public:
 	static int Init();
 	static bool inited;
 	// Renders a single frame.
-	static void FrameStart(float light_intensity, float light_angle, float xscale, bool sphere);
+	static void FrameStart(float light_intensity, float light_angle, float xscale, bool sphere, float terrainscale);
 	static void FrameEnd();
 	// Closes the window etc.
 	static void CleanUp();

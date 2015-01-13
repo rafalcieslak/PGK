@@ -14,7 +14,8 @@ GLFWwindow* window;
 // All the static members of Render class.
 GLint Render::uniform_camera_transform, Render::uniform_perspective_transform;
 GLint Render::uniform_camera_transform_g, Render::uniform_perspective_transform_g;
-GLint Render::uniform_pos, Render::uniform_xscale, Render::uniform_xscale_g, Render::uniform_light_intensity;
+GLint Render::uniform_pos, Render::uniform_xscale, Render::uniform_xscale_g;
+GLint Render::uniform_light_intensity, Render::uniform_terrainscale;
 GLint Render::uniform_light_angle, Render::uniform_sphere_g, Render::uniform_sphere;
 GLuint Render::VertexArrayID;
 float Render::pxsizex, Render::pxsizey;
@@ -102,9 +103,10 @@ int Render::Init(){
 	uniform_pos = glGetUniformLocation(shader_program_id, "pos");
 	uniform_light_intensity = glGetUniformLocation(shader_program_id, "light_intensity");
 	uniform_light_angle = glGetUniformLocation(shader_program_id, "light_angle");
+	uniform_terrainscale = glGetUniformLocation(shader_program_id, "terrainscale");
 	if(uniform_camera_transform == -1 || uniform_perspective_transform == -1 || uniform_camera_transform_g == -1
     || uniform_perspective_transform_g == -1 || uniform_pos == -1 || uniform_xscale == -1 || uniform_xscale_g == -1
-    || uniform_light_intensity == -1 || uniform_light_angle == -1 || uniform_sphere == -1 || uniform_sphere_g == -1){
+    || uniform_light_intensity == -1 || uniform_light_angle == -1 || uniform_sphere == -1 || uniform_sphere_g == -1 || uniform_terrainscale == -1){
 		std::cerr << "A uniform is missing from the shader." << std::endl;
 		glfwTerminate();
 		return -1;
@@ -159,7 +161,7 @@ bool Render::IsMouseDown(){
 }
 
 
-void Render::FrameStart(float light_intensity, float light_angle, float xscale, bool sphere){
+void Render::FrameStart(float light_intensity, float light_angle, float xscale, bool sphere, float terrainscale){
 	// Clear the screen
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -181,8 +183,8 @@ void Render::FrameStart(float light_intensity, float light_angle, float xscale, 
 	glUseProgram(grid_program_id);
 	glUniformMatrix4fv(uniform_camera_transform_g, 1, GL_FALSE, &cameraview[0][0]);
 	glUniformMatrix4fv(uniform_perspective_transform_g, 1, GL_FALSE, &perspective[0][0]);
-    glUniform1f(Render::uniform_xscale_g, xscale);
-    glUniform1i(Render::uniform_sphere_g, (int)sphere);
+   	glUniform1f(Render::uniform_xscale_g, xscale);
+   	glUniform1i(Render::uniform_sphere_g, (int)sphere);
 	glEnableVertexAttribArray(0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, gridbuffer);
@@ -194,10 +196,11 @@ void Render::FrameStart(float light_intensity, float light_angle, float xscale, 
 	glUseProgram(shader_program_id);
 	glUniformMatrix4fv(uniform_camera_transform  , 1, GL_FALSE, &cameraview[0][0]);
 	glUniformMatrix4fv(uniform_perspective_transform  , 1, GL_FALSE, &perspective[0][0]);
-    glUniform1f(Render::uniform_light_intensity, light_intensity);
-    glUniform1f(Render::uniform_light_angle, light_angle);
-    glUniform1f(Render::uniform_xscale, xscale);
-    glUniform1i(Render::uniform_sphere, (int)sphere);
+   	glUniform1f(Render::uniform_light_intensity, light_intensity);
+	glUniform1f(Render::uniform_light_angle, light_angle);
+	glUniform1f(Render::uniform_xscale, xscale);
+	glUniform1f(Render::uniform_terrainscale, terrainscale);
+	glUniform1i(Render::uniform_sphere, (int)sphere);
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);

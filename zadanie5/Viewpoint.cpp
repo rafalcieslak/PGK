@@ -62,7 +62,7 @@ void Viewpoint::MoveEast(float t){
 }
 void Viewpoint::MoveIn(float t){
 	position -= glm::vec3(0.0,0.0,1.0)*t;
-	if(position.z < 1.001) position.z = 1.001;
+	if(position.z < 1.001) position.z = 1.0004;
 }
 void Viewpoint::MoveOut(float t){
 	position += glm::vec3(0.0,0.0,1.0)*t;

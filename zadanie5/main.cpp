@@ -13,6 +13,7 @@ bool tab_pressed = false, ctrl_pressed = false;
 float light_intensity = 10.0;
 float light_angle = 0.0;
 bool auto_lod = false;
+float terrainscale = 1.0;
 unsigned int last_lod_change_frames = 0;
 #define MIN_FPS 25
 #define MAX_FPS 90
@@ -191,18 +192,20 @@ int main(int argc, char** argv){
 	auto tab_text = std::make_shared<Text>("TAB: Switch camera mode", glm::vec2(10,42), 16, glm::vec3(1.0,1.0,1.0));
 	auto mov_text = std::make_shared<Text>("W/S/A/D or mouse drag: Move camera", glm::vec2(10,62), 16, glm::vec3(1.0,1.0,1.0));
 	auto mouse_scroll_text = std::make_shared<Text>("Mouse wheel: Zoom in/out", glm::vec2(10,82), 16, glm::vec3(1.0,1.0,1.0));
-	auto iop_text = std::make_shared<Text>("I/O/P: Set light contrast", glm::vec2(10,102), 16, glm::vec3(1.0,1.0,1.0));
-	auto rot_text = std::make_shared<Text>("E+mouse: Rotate lightning", glm::vec2(10,122), 16, glm::vec3(1.0,1.0,1.0));
-	auto adjfov_text = std::make_shared<Text>("", glm::vec2(10,142), 16, glm::vec3(1.0,1.0,1.0));
+	auto rot_text = std::make_shared<Text>("E+mouse: Rotate lightning", glm::vec2(10,102), 16, glm::vec3(1.0,1.0,1.0));
+	auto iop_text = std::make_shared<Text>("I/O/P: Set light contrast", glm::vec2(10,122), 16, glm::vec3(1.0,1.0,1.0));
+	auto jkl_text = std::make_shared<Text>("J/K/L: Switch terrain scale", glm::vec2(10,142), 16, glm::vec3(1.0,1.0,1.0));
+	auto adjfov_text = std::make_shared<Text>("", glm::vec2(10,162), 16, glm::vec3(1.0,1.0,1.0));
 
 	auto tri_text = std::make_shared<Text>("Triangles: ", glm::vec2(830,22), 16, glm::vec3(1.0,0.5,0.5));
 	auto res_text = std::make_shared<Text>("Tile size: ", glm::vec2(830,42), 16, glm::vec3(1.0,0.5,0.5));
 	auto rendertime_text = std::make_shared<Text>("Frame time: ", glm::vec2(830,62), 16, glm::vec3(1.0,0.5,0.5));
 	auto fps_text = std::make_shared<Text>("FPS: ", glm::vec2(830,82), 16, glm::vec3(1.0,0.5,0.5));
 
-	auto lig_text = std::make_shared<Text>("Light contrast: low", glm::vec2(680,22), 16, glm::vec3(0.5,0.5,1.0));
-	auto lan_text = std::make_shared<Text>("Light angle: ", glm::vec2(680,42), 16, glm::vec3(0.5,0.5,1.0));
-	     fov_text = std::make_shared<Text>("Camera FOV: 0", glm::vec2(680,62), 16, glm::vec3(0.5,0.5,1.0));
+	auto lig_text = std::make_shared<Text>("Light contrast: low", glm::vec2(670,22), 16, glm::vec3(0.5,0.5,1.0));
+	auto lan_text = std::make_shared<Text>("Light angle: ", glm::vec2(670,42), 16, glm::vec3(0.5,0.5,1.0));
+	     fov_text = std::make_shared<Text>("Camera FOV: 0", glm::vec2(670,62), 16, glm::vec3(0.5,0.5,1.0));
+	auto tsc_text = std::make_shared<Text>("Terrain scale: realistic", glm::vec2(670,82), 16, glm::vec3(0.5,0.5,1.0));
 
 	// Setup cameras
 	glm::vec4 center = FindCenter();
@@ -250,7 +253,7 @@ int main(int argc, char** argv){
 		float camrange = ortho_camera->ortho_range;
 
 		// Rendering the frame
-		Render::FrameStart(light_intensity, light_angle*0.0174532925, xscale, viewmode==VIEWMODE_3D);
+		Render::FrameStart(light_intensity, light_angle*0.0174532925, xscale, viewmode==VIEWMODE_3D, terrainscale);
 		for(auto tile : tiles){
 			if(viewmode == VIEWMODE_ORTHO){
 				if(!intersect(campos.x - camrange, campos.y - camrange, campos.x + camrange, campos.y + camrange,
@@ -292,6 +295,7 @@ int main(int argc, char** argv){
 				ortho_camera->SetAsActive();
 				fov_text->SetText("Camera FOV: 0");
 				adjfov_text->SetText("");
+				jkl_text->SetText("");
 			}else if(!Render::IsKeyPressed(GLFW_KEY_TAB)) tab_pressed = false;
 		}else{
 			float amount = time_delta * ortho_camera->ortho_range;
@@ -314,6 +318,7 @@ int main(int argc, char** argv){
 				persp_camera->SetAsActive();
 				fov_text->SetText("Camera FOV: " + std::to_string(int(persp_camera->GetFOVdg()+0.5)));
 				adjfov_text->SetText("Z/X: Adjust FOV");
+				jkl_text->SetText("J/K/L: Switch terrain scale");
 				Render::ProbeMousePos(); // Resets mouse position to keep persp camera facing down
 				persp_camera->yaw = -3.141592653/2.0;
 			}else if(!Render::IsKeyPressed(GLFW_KEY_TAB)) tab_pressed = false;
@@ -329,6 +334,9 @@ int main(int argc, char** argv){
 		if(Render::IsKeyPressed(GLFW_KEY_I)) { light_intensity = 4.0;   lig_text->SetText("Light contrast: high");}
 		if(Render::IsKeyPressed(GLFW_KEY_O)) { light_intensity = 10.0;  lig_text->SetText("Light contrast: low");}
 		if(Render::IsKeyPressed(GLFW_KEY_P)) { light_intensity = 100.0; lig_text->SetText("Light contrast: none");}
+		if(Render::IsKeyPressed(GLFW_KEY_J)) { terrainscale = 1.0;   tsc_text->SetText("Terrain scale: realistic");}
+		if(Render::IsKeyPressed(GLFW_KEY_K)) { terrainscale = 3.0;  tsc_text->SetText("Terrain scale: x3");}
+		if(Render::IsKeyPressed(GLFW_KEY_L)) { terrainscale = 8.0;  tsc_text->SetText("Terrain scale: x8");}
 		persp_camera->DownTo0();
 
 		//std::cout << persp_camera->GetPosition().x << " " << persp_camera->GetPosition().y << " " << persp_camera->GetPosition().z << std::endl;
