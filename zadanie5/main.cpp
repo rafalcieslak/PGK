@@ -214,13 +214,13 @@ int main(int argc, char** argv){
 	// Setup cameras
 	glm::vec4 center = FindCenter();
 	float xscale = center.w;
-	ortho_camera = std::make_shared<Viewpoint>( glm::vec3(center.x*xscale, center.y, center.z) , glm::vec3(0.0,1.0,0.0));
+	ortho_camera = std::make_shared<Viewpoint>( glm::vec3(center.x*xscale, center.y, 1.5) , glm::vec3(0.0,1.0,0.0));
 	ortho_camera->ortho = true;
 	ortho_camera->ortho_range = center.z;
 	ortho_camera->yaw = -3.1415926f/2.0f;
 	ortho_camera->SetAsActive();
 
-	persp_camera = std::make_shared<Viewpoint>( glm::vec3(center.x, center.y, 1.2) , glm::vec3(0.0,1.0,0.0));
+	persp_camera = std::make_shared<Viewpoint>( glm::vec3(center.x, center.y, 1.15) , glm::vec3(0.0,1.0,0.0));
 	persp_camera->pitch = 0.0;
 	persp_camera->yaw = -3.1415926f/2.0f;
 
@@ -351,10 +351,10 @@ int main(int argc, char** argv){
 		if(Render::IsKeyPressed(GLFW_KEY_K)) { terrainscale = 3.0;  tsc_text->SetText("Terrain scale: x3");}
 		if(Render::IsKeyPressed(GLFW_KEY_L)) { terrainscale = 8.0;  tsc_text->SetText("Terrain scale: x8");}
 		if(Render::IsKeyPressed(GLFW_KEY_R)) {
-			ortho_camera->SetPosition(glm::vec3(center.x, center.y, center.z));
+			ortho_camera->SetPosition(glm::vec3(center.x*xscale, center.y, 1.5));
 			ortho_camera->ortho_range = center.z;
 			Render::ProbeMousePos();
-			persp_camera->SetPosition(glm::vec3(center.x, center.y, 1.2));
+			persp_camera->SetPosition(glm::vec3(center.x, center.y, 1.15));
 			persp_camera->pitch = 0.0;
 			persp_camera->yaw = -3.141592653/2.0;
 		}
