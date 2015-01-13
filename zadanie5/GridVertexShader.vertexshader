@@ -9,15 +9,15 @@ uniform float xscale;
 uniform int sphere;
 
 vec3 transformcoords(vec3 pos){
-    float q = cos(pos.y * 0.0174532925);
-    return vec3(sin(pos.x * 0.0174532925)*q,-cos(pos.x * 0.0174532925)*q,sin(pos.y * 0.0174532925));
+	float q = cos(pos.y * 0.0174532925);
+	return vec3(sin(pos.x * 0.0174532925)*q,-cos(pos.x * 0.0174532925)*q,sin(pos.y * 0.0174532925));
 }
 
 void main(){
-    vec3 position = vec3(pointpos.x,pointpos.y,0.0);
+	vec3 position = vec3(pointpos.x,pointpos.y,0.0);
 
-    vec3 position2 = (sphere==1)?transformcoords(position):vec3(position.x*xscale,position.y,position.z);
+	vec3 position2 = (sphere==1)?transformcoords(position):vec3(position.x*xscale,position.y,position.z);
 
-    vec4 vertexPosition_cameraspace = camera_transform * vec4(position2,1.0);
-    gl_Position = perspective_transform * vertexPosition_cameraspace;
+	vec4 vertexPosition_cameraspace = camera_transform * vec4(position2,1.0);
+	gl_Position = perspective_transform * vertexPosition_cameraspace;
 }

@@ -4,12 +4,14 @@
 #include "Viewpoint.hpp"
 #include <iostream>
 #include <list>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/rotate_vector.hpp>
 
 std::vector<std::shared_ptr<Tile>> tiles;
 std::shared_ptr<Viewpoint> ortho_camera, persp_camera;
 std::shared_ptr<Text> fov_text;
 short lod = 3;
-bool tab_pressed = false, ctrl_pressed = false;
+bool tab_pressed = false, ctrl_pressed = false, z_pressed = false, x_pressed = false;
 float light_intensity = 10.0;
 float light_angle = 0.0;
 bool auto_lod = false;
@@ -35,7 +37,7 @@ glm::vec4 FindCenter(){
 	float yc = 0.5*(ymin+ymax);
 	float xscale = cos(yc*0.0174532925);
 	float range = std::max(xscale*(xmax-xmin),ymax-ymin);
-	return glm::vec4(xscale*xc, yc, (range+1)/2.0, xscale);
+	return glm::vec4(xc, yc, (range+1)/2.0, xscale);
 }
 
 void ScrollCallback(double x){
@@ -90,8 +92,8 @@ bool BlockToCoords(std::string str, int& /*out*/ lat, int& /*out*/ lon){
 void usage(){
 	std::cout << "zadanie5 [-d USER_DIR [-n]] REGIONS | HGT_FILES" << std::endl;
 	std::cout << "                                          " << std::endl;
-	std::cout << "     HGT_FILES - list of .hgt files to be loaded.                      " << std::endl;
-	std::cout << "     REGIONS   - list of map tiles to be loaded.                       " << std::endl;
+	std::cout << "  HGT_FILES - list of .hgt files to be loaded.                         " << std::endl;
+	std::cout << "  REGIONS   - list of map tiles to be loaded.                          " << std::endl;
 	std::cout << "                 If the corresponding tile is available in USER_DIR,   " << std::endl;
 	std::cout << "                 then that file will be used. Otherwise the application" << std::endl;
 	std::cout << "                 will attempt to download the file from dds.cr.usgs.gov" << std::endl;
@@ -105,12 +107,12 @@ void usage(){
 	std::cout << "                     [S|s|N|n]xx[W|w|E|e]yyy-[S|s|N|n]zz[W|w|E|e]www   " << std::endl;
 	std::cout << "                 where xx, yyy, zz and www represent the area edges.   " << std::endl;
 	std::cout << "                 For example, N35W010-N45E000 is a correct area.       " << std::endl;
-	std::cout << "  -d USER_DIR  - patch to a custom directory containing .hgt files.    " << std::endl;
+	std::cout << "-d USER_DIR - patch to a custom directory containing .hgt files.       " << std::endl;
 	std::cout << "                 Useful if you have already downloaded the data.       " << std::endl;
 	std::cout << "                 This directory will be used only to look for REGIONS  " << std::endl;
 	std::cout << "                 files, it has no effect on HGT_FILES.                 " << std::endl;
 	std::cout << "                 Nothing is ever written into this directory.          " << std::endl;
-	std::cout << "            -n - Never perform any downloads, relay ONLY on USER_DIR  ." << std::endl;
+	std::cout << "         -n - Never perform any downloads, relay ONLY on USER_DIR.     " << std::endl;
 	exit(0);
 }
 
@@ -188,35 +190,37 @@ int main(int argc, char** argv){
 	Tile::Init();
 
 	// Preapare UT text labels
-	auto lod_text = std::make_shared<Text>("1-6: set LOD, 0: auto", glm::vec2(10,22), 16, glm::vec3(1.0,1.0,1.0));
-	auto tab_text = std::make_shared<Text>("TAB: Switch camera mode", glm::vec2(10,42), 16, glm::vec3(1.0,1.0,1.0));
-	auto mov_text = std::make_shared<Text>("W/S/A/D or mouse drag: Move camera", glm::vec2(10,62), 16, glm::vec3(1.0,1.0,1.0));
-	auto mouse_scroll_text = std::make_shared<Text>("Mouse wheel: Zoom in/out", glm::vec2(10,82), 16, glm::vec3(1.0,1.0,1.0));
-	auto rot_text = std::make_shared<Text>("E+mouse: Rotate lightning", glm::vec2(10,102), 16, glm::vec3(1.0,1.0,1.0));
-	auto iop_text = std::make_shared<Text>("I/O/P: Set light contrast", glm::vec2(10,122), 16, glm::vec3(1.0,1.0,1.0));
-	auto jkl_text = std::make_shared<Text>("J/K/L: Switch terrain scale", glm::vec2(10,142), 16, glm::vec3(1.0,1.0,1.0));
-	auto adjfov_text = std::make_shared<Text>("", glm::vec2(10,162), 16, glm::vec3(1.0,1.0,1.0));
+	auto lod_text = std::make_shared<Text>("1-6: set LOD, 0: auto",              glm::vec2(10,22),  16, glm::vec3(1.0,1.0,1.0));
+	auto tab_text = std::make_shared<Text>("TAB: Switch camera mode",            glm::vec2(10,42),  16, glm::vec3(1.0,1.0,1.0));
+	auto mov_text = std::make_shared<Text>("W/S/A/D or mouse drag: Move camera", glm::vec2(10,62),  16, glm::vec3(1.0,1.0,1.0));
+	auto shi_text = std::make_shared<Text>("Hold SHIFT for faster movements",    glm::vec2(10,82),  16, glm::vec3(1.0,1.0,1.0));
+	auto mouse_scroll_text = std::make_shared<Text>("Mouse wheel: Zoom in/out",  glm::vec2(10,102), 16, glm::vec3(1.0,1.0,1.0));
+	auto rca_text = std::make_shared<Text>("R: Reset camera",                    glm::vec2(10,122), 16, glm::vec3(1.0,1.0,1.0));
+	auto rot_text = std::make_shared<Text>("E+mouse: Rotate lightning",          glm::vec2(10,142), 16, glm::vec3(1.0,1.0,1.0));
+	auto iop_text = std::make_shared<Text>("I/O/P: Set light contrast",          glm::vec2(10,162), 16, glm::vec3(1.0,1.0,1.0));
+	auto jkl_text = std::make_shared<Text>("J/K/L: Switch terrain scale",        glm::vec2(10,182), 16, glm::vec3(1.0,1.0,1.0));
+	auto adjfov_text = std::make_shared<Text>("",                                glm::vec2(10,202), 16, glm::vec3(1.0,1.0,1.0));
 
-	auto tri_text = std::make_shared<Text>("Triangles: ", glm::vec2(830,22), 16, glm::vec3(1.0,0.5,0.5));
-	auto res_text = std::make_shared<Text>("Tile size: ", glm::vec2(830,42), 16, glm::vec3(1.0,0.5,0.5));
+	auto tri_text = std::make_shared<Text>("Triangles: ",         glm::vec2(830,22), 16, glm::vec3(1.0,0.5,0.5));
+	auto res_text = std::make_shared<Text>("Tile size: ",         glm::vec2(830,42), 16, glm::vec3(1.0,0.5,0.5));
 	auto rendertime_text = std::make_shared<Text>("Frame time: ", glm::vec2(830,62), 16, glm::vec3(1.0,0.5,0.5));
-	auto fps_text = std::make_shared<Text>("FPS: ", glm::vec2(830,82), 16, glm::vec3(1.0,0.5,0.5));
+	auto fps_text = std::make_shared<Text>("FPS: ",               glm::vec2(830,82), 16, glm::vec3(1.0,0.5,0.5));
 
-	auto lig_text = std::make_shared<Text>("Light contrast: low", glm::vec2(670,22), 16, glm::vec3(0.5,0.5,1.0));
-	auto lan_text = std::make_shared<Text>("Light angle: ", glm::vec2(670,42), 16, glm::vec3(0.5,0.5,1.0));
-	     fov_text = std::make_shared<Text>("Camera FOV: 0", glm::vec2(670,62), 16, glm::vec3(0.5,0.5,1.0));
+	auto lig_text = std::make_shared<Text>("Light contrast: low",      glm::vec2(670,22), 16, glm::vec3(0.5,0.5,1.0));
+	auto lan_text = std::make_shared<Text>("Light angle: ",            glm::vec2(670,42), 16, glm::vec3(0.5,0.5,1.0));
+	     fov_text = std::make_shared<Text>("Camera FOV: 0",            glm::vec2(670,62), 16, glm::vec3(0.5,0.5,1.0));
 	auto tsc_text = std::make_shared<Text>("Terrain scale: realistic", glm::vec2(670,82), 16, glm::vec3(0.5,0.5,1.0));
 
 	// Setup cameras
 	glm::vec4 center = FindCenter();
 	float xscale = center.w;
-	ortho_camera = std::make_shared<Viewpoint>( glm::vec3(center.x, center.y, center.z) , glm::vec3(0.0,1.0,0.0));
+	ortho_camera = std::make_shared<Viewpoint>( glm::vec3(center.x*xscale, center.y, center.z) , glm::vec3(0.0,1.0,0.0));
 	ortho_camera->ortho = true;
 	ortho_camera->ortho_range = center.z;
 	ortho_camera->yaw = -3.1415926f/2.0f;
 	ortho_camera->SetAsActive();
 
-	persp_camera = std::make_shared<Viewpoint>( glm::vec3(center.x, center.y, 2.0) , glm::vec3(0.0,1.0,0.0));
+	persp_camera = std::make_shared<Viewpoint>( glm::vec3(center.x, center.y, 1.2) , glm::vec3(0.0,1.0,0.0));
 	persp_camera->pitch = 0.0;
 	persp_camera->yaw = -3.1415926f/2.0f;
 
@@ -269,21 +273,28 @@ int main(int argc, char** argv){
 
 		// Processing user input
 		if(viewmode == VIEWMODE_3D){
-			float amount = time_delta*30.0*(persp_camera->GetPosition().z-1.0f);
+			float amount = time_delta*22.0*(persp_camera->GetPosition().z-1.0f);
 			if(Render::IsKeyPressed(GLFW_KEY_LEFT_SHIFT)) amount *= 3;
-			if(Render::IsKeyPressed(GLFW_KEY_W)) persp_camera->MoveNorth(amount);
-			if(Render::IsKeyPressed(GLFW_KEY_S)) persp_camera->MoveSouth(amount);
-			if(Render::IsKeyPressed(GLFW_KEY_A)) persp_camera->MoveEast(amount);
-			if(Render::IsKeyPressed(GLFW_KEY_D)) persp_camera->MoveWest(amount);
-			if(Render::IsKeyPressed(GLFW_KEY_Z)) AdjustFov(5);
-			if(Render::IsKeyPressed(GLFW_KEY_X)) AdjustFov(-5);
+			if(Render::IsKeyPressed(GLFW_KEY_W)) persp_camera->MoveForward(amount);
+			if(Render::IsKeyPressed(GLFW_KEY_S)) persp_camera->MoveBackward(amount);
+			if(Render::IsKeyPressed(GLFW_KEY_A)) persp_camera->MoveRight(amount);
+			if(Render::IsKeyPressed(GLFW_KEY_D)) persp_camera->MoveLeft(amount);
+			if(Render::IsKeyPressed(GLFW_KEY_Z) && !z_pressed) {z_pressed = true; AdjustFov(1);}
+			else if(!Render::IsKeyPressed(GLFW_KEY_Z)) z_pressed = false;
+			if(Render::IsKeyPressed(GLFW_KEY_X) && !x_pressed) {x_pressed = true; AdjustFov(-1);}
+			else if(!Render::IsKeyPressed(GLFW_KEY_X)) x_pressed = false;
 			glm::vec2 mouse = Render::ProbeMousePos();
 			if(Render::IsKeyPressed(GLFW_KEY_E)){
 				light_angle -= mouse.x * 20;
 				lan_text->SetText("Light angle: " + std::to_string((int(light_angle+0.5)+360*1000)%360));
 			}else if(Render::IsMouseDown()){
-				persp_camera->MoveEast (mouse.x * 30.0*(persp_camera->GetPosition().z-1.0f));
-				persp_camera->MoveNorth(mouse.y * 30.0*(persp_camera->GetPosition().z-1.0f));
+				// Dragging the map in 3d mode.
+				glm::vec3 v = glm::rotate(glm::vec3(mouse.x * 30.0*(persp_camera->GetPosition().z-1.0f), mouse.y * 30.0*(persp_camera->GetPosition().z-1.0f), 0.0)
+											* (Render::IsKeyPressed(GLFW_KEY_LEFT_SHIFT)?3.0f:1.0f),
+										  -persp_camera->pitch,
+										  glm::vec3(0.0,0.0,1.0));
+				persp_camera->MoveEast (v.x);
+				persp_camera->MoveNorth(v.y);
 			}else {
 				persp_camera->MovePitch(mouse.x);
 				persp_camera->MoveYaw(-mouse.y);
@@ -298,7 +309,8 @@ int main(int argc, char** argv){
 				jkl_text->SetText("");
 			}else if(!Render::IsKeyPressed(GLFW_KEY_TAB)) tab_pressed = false;
 		}else{
-			float amount = time_delta * ortho_camera->ortho_range;
+			float amount = time_delta * ortho_camera->ortho_range * 0.66;
+			if(Render::IsKeyPressed(GLFW_KEY_LEFT_SHIFT)) amount *= 3;
 			if(Render::IsKeyPressed(GLFW_KEY_W)) ortho_camera->MoveNorth(amount);
 			if(Render::IsKeyPressed(GLFW_KEY_S)) ortho_camera->MoveSouth(amount);
 			if(Render::IsKeyPressed(GLFW_KEY_A)) ortho_camera->MoveEast(amount);
@@ -308,8 +320,9 @@ int main(int argc, char** argv){
 				light_angle -= mouse.x * 20;
 				lan_text->SetText("Light angle: " + std::to_string((int(light_angle+0.5)+360*1000)%360));
 			}else if(Render::IsMouseDown()){
-				ortho_camera->MoveEast(mouse.x * camrange);
-				ortho_camera->MoveNorth(mouse.y * camrange);
+				float q = Render::IsKeyPressed(GLFW_KEY_LEFT_SHIFT)?3.0:1.0;
+				ortho_camera->MoveEast (mouse.x * camrange * q);
+				ortho_camera->MoveNorth(mouse.y * camrange * q);
 			}
 			if(Render::IsKeyPressed(GLFW_KEY_TAB) && !tab_pressed){
 				tab_pressed = true;
@@ -337,10 +350,15 @@ int main(int argc, char** argv){
 		if(Render::IsKeyPressed(GLFW_KEY_J)) { terrainscale = 1.0;   tsc_text->SetText("Terrain scale: realistic");}
 		if(Render::IsKeyPressed(GLFW_KEY_K)) { terrainscale = 3.0;  tsc_text->SetText("Terrain scale: x3");}
 		if(Render::IsKeyPressed(GLFW_KEY_L)) { terrainscale = 8.0;  tsc_text->SetText("Terrain scale: x8");}
+		if(Render::IsKeyPressed(GLFW_KEY_R)) {
+			ortho_camera->SetPosition(glm::vec3(center.x, center.y, center.z));
+			ortho_camera->ortho_range = center.z;
+			Render::ProbeMousePos();
+			persp_camera->SetPosition(glm::vec3(center.x, center.y, 1.2));
+			persp_camera->pitch = 0.0;
+			persp_camera->yaw = -3.141592653/2.0;
+		}
 		persp_camera->DownTo0();
-
-		//std::cout << persp_camera->GetPosition().x << " " << persp_camera->GetPosition().y << " " << persp_camera->GetPosition().z << std::endl;
-
 
 	}while( !Render::IsKeyPressed(GLFW_KEY_ESCAPE ) && !Render::IsWindowClosed() );
 

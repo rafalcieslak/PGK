@@ -1,6 +1,7 @@
 #include "Viewpoint.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/rotate_vector.hpp>
+#include <iostream>
 
 std::shared_ptr<Viewpoint> Viewpoint::active_viewpoint;
 
@@ -34,19 +35,43 @@ void Viewpoint::SetPosition(glm::vec3 pos){
 glm::vec3 Viewpoint::GetPosition() const{
 	return position;
 }
-
 glm::vec3 transformcoords(glm::vec3 pos){
-    float q = cos(pos.y * 0.0174532925);
-    return glm::vec3(sin(pos.x * 0.0174532925)*q,-cos(pos.x * 0.0174532925)*q,sin(pos.y * 0.0174532925))*pos.z;
+	float q = cos(pos.y * 0.0174532925);
+	return glm::vec3(sin(pos.x * 0.0174532925)*q,-cos(pos.x * 0.0174532925)*q,sin(pos.y * 0.0174532925))*pos.z;
 }
 glm::mat4 Viewpoint::GetTransform() const{
 	glm::vec3 p = position;
 	if(!ortho) p = transformcoords(position);
 	glm::mat4 tr = glm::translate(glm::mat4(1.0),p);
-	glm::quat pitch_quat = glm::angleAxis(pitch,glm::vec3(0.0f,0.0f,1.0f));
+	glm::quat  pitch_quat = glm::angleAxis(pitch,glm::vec3(0.0f,0.0f,1.0f));
+	if(!ortho) pitch_quat = glm::angleAxis(pitch + glm::mod(position.x, 360.0f*2.0f) * 0.0174532925f,glm::vec3(0.0f,0.0f,1.0f));
 	glm::quat yaw_quat = glm::angleAxis(yaw,glm::rotate(pitch_quat,glm::vec3(1.0f,0.0f,0.0f)));
 	glm::mat4 ro = glm::toMat4(rot * yaw_quat * pitch_quat);
 	return tr * ro;
+}
+void Viewpoint::MoveForward(float t){
+	glm::vec3 pitched_front = glm::rotate(glm::vec3(0.0,1.0,0.0),pitch,glm::vec3(0.0,0.0,1.0));
+	float xscale = cos(position.y *  0.0174532925);
+	pitched_front.x /= xscale;
+	position += pitched_front*t;
+}
+void Viewpoint::MoveBackward(float t){
+	glm::vec3 pitched_front = glm::rotate(glm::vec3(0.0,1.0,0.0),pitch,glm::vec3(0.0,0.0,1.0));
+	float xscale = cos(position.y *  0.0174532925);
+	pitched_front.x /= xscale;
+	position -= pitched_front*t;
+}
+void Viewpoint::MoveRight(float t){
+	glm::vec3 pitched_left = glm::rotate(glm::vec3(1.0,0.0,0.0),pitch,glm::vec3(0.0,0.0,1.0));
+	float xscale = cos(position.y *  0.0174532925);
+	pitched_left.x /= xscale;
+	position -= pitched_left*t;
+}
+void Viewpoint::MoveLeft(float t){
+	glm::vec3 pitched_left = glm::rotate(glm::vec3(1.0,0.0,0.0),pitch,glm::vec3(0.0,0.0,1.0));
+	float xscale = cos(position.y *  0.0174532925);
+	pitched_left.x /= xscale;
+	position += pitched_left*t;
 }
 void Viewpoint::MoveNorth(float t){
 	position += glm::vec3(0.0,1.0,0.0)*t;
@@ -62,7 +87,7 @@ void Viewpoint::MoveEast(float t){
 }
 void Viewpoint::MoveIn(float t){
 	position -= glm::vec3(0.0,0.0,1.0)*t;
-	if(position.z < 1.001) position.z = 1.0004;
+	if(position.z < 1.0004) position.z = 1.0004;
 }
 void Viewpoint::MoveOut(float t){
 	position += glm::vec3(0.0,0.0,1.0)*t;
@@ -71,7 +96,7 @@ void Viewpoint::MovePitch(float delta){
 	pitch -= delta;
 }
 void Viewpoint::MoveYaw(float delta){
-	yaw = glm::clamp(yaw + delta,-3.1415926f/2.0f,3.1415926f/2.0f);
+	yaw = glm::clamp(yaw + delta,-3.1415926f/2.0f,0.0f);
 }
 void Viewpoint::DownTo0(){
 	rot = glm::rotation(glm::vec3(0.0,0.0,-1.0), glm::normalize(-transformcoords(position)));

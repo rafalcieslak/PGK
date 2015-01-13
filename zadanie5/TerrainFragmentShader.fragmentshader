@@ -6,7 +6,6 @@ out vec4 color;
 in vec3 normal_global;
 in vec3 vector_to_light_global;
 in vec3 vector_to_camera_global;
-//in float lightdistance;
 
 void main()
 {
@@ -14,11 +13,10 @@ void main()
 	vec3 V = normalize( vector_to_camera_global );
 	vec3 L = normalize( vector_to_light_global );
 	vec3 R = reflect(-L,N);
-	//float distint = pow(lightdistance, 1.0);
 	vec3 c = vec3(0.0);
 	vec3 light_color = vec3(1.0,1.0,0.7);
-	c +=  1.1f * light_color * max( 0.0f, dot(N,L)) / 1;
-	c +=  0.8f * light_color * pow( max( 0.0f, dot(V,R)) , 30) / 1;
+	c +=  1.3f * light_color * max( 0.0f, dot(N,L)) / 1;
+	c +=  0.3f * light_color * pow( max( 0.0f, dot(V,R)) , 30) / 1;
 	c +=  0.0f * light_color;
 
 	color = vec4( min(c * fcolor.xyz, vec3(1.0)) , fcolor.a);

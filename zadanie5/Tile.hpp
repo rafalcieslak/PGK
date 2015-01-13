@@ -29,8 +29,12 @@ private:
 	static void UnpackZIP(std::string path, std::string dir);
 public:
 	int lon, lat;
+	// Initializes VBOs
 	void Prepare();
+	// Performs drawing
 	unsigned int Render(short lod);
+
+	// Prepares data shared between tiles
 	static void Init();
 	static int GetTileResolution(int lod);
 

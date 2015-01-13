@@ -77,7 +77,7 @@ int Render::Init(){
 	}
 
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetScrollCallback(window,ScrollCallback);
 
 	// Background
@@ -105,16 +105,12 @@ int Render::Init(){
 	uniform_light_angle = glGetUniformLocation(shader_program_id, "light_angle");
 	uniform_terrainscale = glGetUniformLocation(shader_program_id, "terrainscale");
 	if(uniform_camera_transform == -1 || uniform_perspective_transform == -1 || uniform_camera_transform_g == -1
-    || uniform_perspective_transform_g == -1 || uniform_pos == -1 || uniform_xscale == -1 || uniform_xscale_g == -1
-    || uniform_light_intensity == -1 || uniform_light_angle == -1 || uniform_sphere == -1 || uniform_sphere_g == -1 || uniform_terrainscale == -1){
+	|| uniform_perspective_transform_g == -1 || uniform_pos == -1 || uniform_xscale == -1 || uniform_xscale_g == -1
+	|| uniform_light_intensity == -1 || uniform_light_angle == -1 || uniform_sphere == -1 || uniform_sphere_g == -1 || uniform_terrainscale == -1){
 		std::cerr << "A uniform is missing from the shader." << std::endl;
 		glfwTerminate();
 		return -1;
 	}
-
-	// glEnable(GL_BLEND);
-	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//glBlendFunc(GL_ZERO, GL_SRC_COLOR);
 
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
@@ -126,7 +122,7 @@ int Render::Init(){
 
 	std::vector<float> linedata;
 	// horiz
-	for(int y = -75; y <=75; y++)
+	for(int y = -61; y <=61; y++)
 		for(int x = -180; x < 180; x++){
 			linedata.push_back(x);
 			linedata.push_back(y);
@@ -135,15 +131,15 @@ int Render::Init(){
 		}
 	// vert
 	for(int x = -180; x <= 180; x++)
-		for(int y = -75; y <75; y++){
+		for(int y = -61; y <61; y++){
 			linedata.push_back(x);
 			linedata.push_back(y);
 			linedata.push_back(x);
 			linedata.push_back(y+1);
 		}
 	glGenBuffers(1,&gridbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, gridbuffer);
-    glBufferData(GL_ARRAY_BUFFER, linedata.size() * sizeof(float), linedata.data(), GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, gridbuffer);
+	glBufferData(GL_ARRAY_BUFFER, linedata.size() * sizeof(float), linedata.data(), GL_STATIC_DRAW);
 	gridno = linedata.size();
 
 	inited = true;
