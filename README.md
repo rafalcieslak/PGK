@@ -12,7 +12,11 @@ make
 </pre>
 
 To speed up the process, use: `make -jN`
-where N is twice then number of your CPU cores.
+where N is twice the number of your CPU cores.
+
+It is possible to force cmake scripts to never detect system libraries (glew,
+glfw, freetype and glm). In order to do so, run cmake with `ForceNoLibs` option
+enabled, e.g. `cmake -DForceNoLibs=ON ..`
 
 Running
 ===

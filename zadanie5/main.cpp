@@ -18,7 +18,7 @@ bool auto_lod = false;
 float terrainscale = 1.0;
 unsigned int last_lod_change_frames = 0;
 #define MIN_FPS 25
-#define MAX_FPS 90
+#define MAX_FPS 55
 
 enum {
 	VIEWMODE_ORTHO,

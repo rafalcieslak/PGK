@@ -6,6 +6,8 @@ find_package(PkgConfig REQUIRED)
 pkg_search_module(GLFW glfw3)
 find_package(GLEW)
 
+option(ForceNoLibs "Forces downloading/compiling all external libraries. Useful to ensure compatibility." OFF)
+
 add_definitions(
 	-DTW_STATIC
 	-DTW_NO_LIB_PRAGMA
@@ -14,14 +16,14 @@ add_definitions(
 	-D_CRT_SECURE_NO_WARNINGS
 )
 
-if(GLFW_FOUND AND GLEW_FOUND)
+if(GLFW_FOUND AND GLEW_FOUND AND (NOT ForceNoLibs))
 	message("-- GLFW 3 and GLEW found.")
 	set(GLFW_GLEW_INCLUDE_DIRS ${GLFW_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS} PARENT_SCOPE)
 	set(GLFW_GLEW_LIBRARIES ${GLFW_LIBRARIES} ${GLEW_LIBRARIES} PARENT_SCOPE)
 	set(GLFW_GLEW_LIBRARY_DIRS ${GLFW_LIBDIR} PARENT_SCOPE)
 
 
-else(GLFW_FOUND AND GLEW_FOUND)
+else(GLFW_FOUND AND GLEW_FOUND AND (NOT ForceNoLibs))
 	message("!!! GLFW 3 and/or GLEW development headers NOT FOUND!")
 	message("!!! GLFW 3 and/or GLEW will be compiled automatically during build process!!!")
 
@@ -43,12 +45,12 @@ else(GLFW_FOUND AND GLEW_FOUND)
 	)
 
 	set(GLFW_GLEW_INCLUDE_DIRS external/glfw-3.0.3/include/ external/glew-1.9.0/include/ PARENT_SCOPE)
-	set(GLFW_GLEW_LIBRARIES glfw3 GLEW ${GLFW_LIBRARIES} PARENT_SCOPE)
+	set(GLFW_GLEW_LIBRARIES glfw3 GLEW Xxf86vm pthread Xi ${GLFW_LIBRARIES} PARENT_SCOPE)
 	set(GLFW_GLEW_LIBRARY_DIRS ${CMAKE_BINARY_DIR}/external/glfw-3.0.3/src/ ${CMAKE_BINARY_DIR}/external/ PARENT_SCOPE)
 
 	set(GLFW_DEPS "GLFW GLEW GLFW_303 " PARENT_SCOPE)
 
-endif(GLFW_FOUND AND GLEW_FOUND)
+endif(GLFW_FOUND AND GLEW_FOUND AND (NOT ForceNoLibs))
 
 ## GLM ##
 find_path(GLM_INCLUDE_DIRS "glm/glm.hpp"
@@ -64,10 +66,10 @@ include(FindPackageHandleStandardArgs)
 	GLM_INCLUDE_DIRS
 )
 
-if(GLM_FOUND)
+if(GLM_FOUND AND (NOT ForceNoLibs))
 	message("-- GLM found.")
 	set(GLM_INCLUDE_DIRS "${GLM_INCLUDE_DIR}" PARENT_SCOPE)
-else(GLM_FOUND)
+else(GLM_FOUND AND (NOT ForceNoLibs))
 	message("!!! GLM development headers NOT FOUND!")
 	message("!!! GLM will be downloaded automatically during build process!!!")
 
@@ -84,18 +86,18 @@ else(GLM_FOUND)
 	ExternalProject_Get_Property(GLM install_dir)
 	set(GLM_INCLUDE_DIRS "${install_dir}/" PARENT_SCOPE)
 	set(GLM_DEPS "GLM " PARENT_SCOPE)
-endif(GLM_FOUND)
+endif(GLM_FOUND AND (NOT ForceNoLibs))
 
 ## FREETYPE ##
 
 find_package(Freetype QUIET)
 
-if(FREETYPE_FOUND)
+if(FREETYPE_FOUND AND (NOT ForceNoLibs))
 	message("-- Freetype found.")
 	set(FREETYPE_INCLUDE_DIRS "${FREETYPE_INCLUDE_DIR_ft2build}" PARENT_SCOPE)
 	set(FREETYPE_LIBRARIES "${FREETYPE_LIBRARIES}" PARENT_SCOPE)
 
-else(FREETYPE_FOUND)
+else(FREETYPE_FOUND AND (NOT ForceNoLibs))
 
 	message("!!! Freetype development headers NOT FOUND!")
 	message("!!! Freetype will be downloaded and compiled automatically during build process!!!")
@@ -115,4 +117,4 @@ else(FREETYPE_FOUND)
 	set(FREETYPE_LIBRARIES "freetype" PARENT_SCOPE)
 	set(FREETYPE_DEPS "Freetype " PARENT_SCOPE)
 
-endif(FREETYPE_FOUND)
+endif(FREETYPE_FOUND AND (NOT ForceNoLibs))
