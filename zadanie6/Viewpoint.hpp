@@ -29,16 +29,6 @@ public:
 	float GetFOV() const {return fov;}
 	float GetFOVdg() const {return fov*360.0/(2.0*3.1415926);}
 	glm::mat4 GetTransform() const;
-	// Camera controls
-	void MoveForward(float t);
-	void MoveBackward(float t);
-	void MoveLeft(float t);
-	void MoveRight(float t);
-	void MoveIn(float t);
-	void MoveOut(float t);
-	void MovePitch(float delta);
-	void MoveYaw(float delta);
-
 	static std::shared_ptr<Viewpoint> active_viewpoint;
 };
 

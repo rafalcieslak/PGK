@@ -18,10 +18,10 @@ void update_camera_pos(){
 
 	float scale = glm::cos(yaw*0.0174532925);
 	float xpos  = glm::sin(pitch*0.0174532925);
-	float ypos  = glm::cos(pitch*0.0174532925);
-	float zpos  = glm::sin(yaw*0.0174532925);
+	float zpos  = glm::cos(pitch*0.0174532925);
+	float ypos  = glm::sin(yaw*0.0174532925);
 
-	camera->SetPosition(distance*glm::vec3(xpos*scale,ypos*scale,zpos));
+	camera->SetPosition(distance*glm::vec3(xpos*scale,ypos,scale*zpos));
 
 	camera->LookAt(glm::vec3(0.0,0.0,0.0));
 }
@@ -74,7 +74,7 @@ int main(int argc, char** argv){
 			glm::vec2 drag = Render::GetMousePos();
 			float dx = drag.x - drag_start_pos.x;
 			float dy = drag.y - drag_start_pos.y;
-			pitch = start_pitch + dx*200;
+			pitch = start_pitch - dx*200;
 			yaw   = start_yaw   + dy*200;
 			update_camera_pos();
 

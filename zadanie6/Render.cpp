@@ -75,7 +75,7 @@ int Render::Init(){
 	glfwSetScrollCallback(window,ScrollCallback);
 
 	// Background
-	glClearColor(30/255.0,30.0/255.0,0.5,1.0);
+	glClearColor(0.2,0.2,0.2,1.0);
 
 	// Prepare main vertex array.
 	glGenVertexArrays(1, &VertexArrayID);
@@ -133,7 +133,7 @@ void Render::Frame(const std::vector<std::shared_ptr<Mesh>> &meshes, float near,
 	glm::mat4 perspective;
 	glm::mat4 cameraview;
 	if(Viewpoint::active_viewpoint){
-		cameraview =  glm::lookAt(glm::vec3(0.0) , 1.0f* Viewpoint::active_viewpoint->GetDirection(), glm::vec3(0.0,0.0,1.0)) * glm::inverse(Viewpoint::active_viewpoint->GetTransform());
+		cameraview =  glm::lookAt(glm::vec3(0.0) , 1.0f* Viewpoint::active_viewpoint->GetDirection(), glm::vec3(0.0,1.0,0.0)) * glm::inverse(Viewpoint::active_viewpoint->GetTransform());
 		perspective = glm::perspective(Viewpoint::active_viewpoint->GetFOV(), 1.0f, near, far);
 	}
 	glUniformMatrix4fv(uniform_camera_transform  , 1, GL_FALSE, &cameraview[0][0]);
