@@ -73,7 +73,7 @@ int Render::Init(){
 	glfwSetScrollCallback(window,ScrollCallback);
 
 	// Background
-	glClearColor(30/255.0,30.0/255.0,0.7,1.0);
+	glClearColor(30/255.0,30.0/255.0,0.5,1.0);
 
 	// Prepare main vertex array.
 	glGenVertexArrays(1, &VertexArrayID);
@@ -115,7 +115,7 @@ bool Render::IsMouseDown(){
 }
 
 
-void Render::Frame(std::shared_ptr<Model> model){
+void Render::Frame(const std::vector<std::shared_ptr<Mesh>> &meshes){
 
 	// Clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -134,7 +134,21 @@ void Render::Frame(std::shared_ptr<Model> model){
 
 	glUniform1i(uniform_texsampler, 0);
 
-	model->Render();
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+
+	//int i = 0;
+	for(auto m : meshes){
+		if(m->hidden) continue;
+		//i++;
+		m->Render();
+	}
+	//std::cout << "Rendered " << i << " meshes." <<std::endl;
+
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(2);
 
 	glUseProgram(0);
 

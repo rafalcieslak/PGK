@@ -26,12 +26,12 @@ void update_camera_pos(){
 }
 
 void usage(){
-
+	std::cout << "USAGE:   ./zadanie6 FILE.OBJ" << std::endl;
 	exit(0);
 }
 
 int main(int argc, char** argv){
-	if(argc < 3) usage();
+	if(argc < 2) usage();
 
 	ObjParser p(argv[1]);
 	p.Parse();
@@ -42,18 +42,19 @@ int main(int argc, char** argv){
 	int n = Render::Init();
 	if(n) return n;
 
-	auto model = Model::Create(argv[1], argv[2]);
-	if(!model) return -1;
+	for(auto m : p.meshes){
+		std::cout << m->name << ": " << m->faces.size() << std::endl;
+		m->PrepareBuffers();
+	}
 
-
-	model->Prepare();
+	//p.meshes[1]->hidden = false;
 
 	camera = std::make_shared<Viewpoint>( glm::vec3(0.0, -10.0, 0.0) , glm::vec3(2.0,1.0,0.0));
 	camera->SetAsActive();
 	update_camera_pos();
 
 	do{
-		Render::Frame(model);
+		Render::Frame(p.meshes);
 
 		if(!mouse_down && Render::IsMouseDown()){
 			// mouse button was just pressed

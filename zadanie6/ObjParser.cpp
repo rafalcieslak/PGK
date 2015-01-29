@@ -18,8 +18,10 @@ void ObjParser::Parse(){
 
 void ObjParser::StartNewMeshIfNotEmpty(){
 	if(mesh_nonempty){
+		std::cout << "Starting a new mesh." << std::endl;
 		meshes.push_back(current_mesh);
 		current_mesh = std::make_shared<Mesh>();
+		mesh_nonempty = false;
 	}
 }
 
@@ -33,7 +35,7 @@ std::vector<std::string> SplitString(std::string str, std::string delimiter){
         if(token != "") res.push_back(token);
         str.erase(0, pos + delimiter.length());
     }
-    res.push_back(str);
+    if(str != "") res.push_back(str);
     return res;
 }
 std::string GetDir(const std::string& str)
@@ -49,7 +51,7 @@ bool ObjParser::Step(){
 	std::string line;
 	if(!std::getline(file, line)) return false;
 	lineno++;
-	line.erase( std::remove(line.begin(), line.end(), '\r'), line.end() );
+	line.erase( std::remove_if(line.begin(), line.end(), [](char c){return c=='\r'||c=='\t';}), line.end() );
 	auto split = SplitString(line, " ");
 	if(split.size() < 1) return true;
 	if(split[0][0] == '#' || split[0][0] == '\n' || split[0][0] == '\r'){
@@ -69,7 +71,6 @@ bool ObjParser::Step(){
 	}else if(split[0] == "o"){
 		StartNewMeshIfNotEmpty();
 		current_mesh->name = split[1];
-		mesh_nonempty = true;
 	}else if(split[0] == "g"){
 		// new group.
 		StartNewMeshIfNotEmpty();
@@ -83,6 +84,7 @@ bool ObjParser::Step(){
 			current_mtllib->Parse();
 		}
 	}else if(split[0] == "usemtl"){
+		StartNewMeshIfNotEmpty();
 		if(current_mtllib == nullptr){
 			std::cout << "ObjParser " << lineno << ": Ignoring usemtl because no material library has been loaded." << std::endl;
 		}else{
@@ -94,8 +96,9 @@ bool ObjParser::Step(){
 			}
 		}
 	}else if(split[0] == "f"){
-		if(split.size() <= 3  || split.size() >= 5){
+		if(split.size() <= 3  || split.size() >= 6){
 			std::cout << "ObjParser " << lineno << ": Invaild number of vetex entries in a face!" << std::endl;
+			std::cout << line << std::endl;
 			return false;
 		}
 		if(split.size() == 4){
@@ -105,6 +108,21 @@ bool ObjParser::Step(){
 			trig t = {fv1,fv2,fv3};
 			t = FixMissingNormals(t);
 			current_mesh->faces.push_back(t);
+			mesh_nonempty = true;
+		}else{ //5
+
+			face_vertex fv1 = ParseFW(split[1]);
+			face_vertex fv2 = ParseFW(split[2]);
+			face_vertex fv3 = ParseFW(split[3]);
+			face_vertex fv4 = ParseFW(split[4]);
+			trig t1 = {fv1,fv2,fv3};
+			trig t2 = {fv3,fv4,fv1};
+			t1 = FixMissingNormals(t1);
+			t2 = FixMissingNormals(t2);
+			current_mesh->faces.push_back(t1);
+			current_mesh->faces.push_back(t2);
+			mesh_nonempty = true;
+
 		}
 	}else{
 		std::cout << "ObjParser " << lineno << ": ignoring unknown entry '" << split[0] << "'" << std::endl;
@@ -172,7 +190,7 @@ void MaterialLibrary::Parse(){
 bool MaterialLibrary::Step(){
 	std::string line;
 	if(!std::getline(file, line)) return false;
-	line.erase( std::remove(line.begin(), line.end(), '\r'), line.end() );
+	line.erase( std::remove_if(line.begin(), line.end(), [](char c){return c=='\r'||c=='\t';}), line.end() );
 	auto split = SplitString(line, " ");
 	if(split.size() < 1) return true;
 	if(split[0][0] == '#'  || split[0][0] == '\n' || split[0][0] == '\r'){

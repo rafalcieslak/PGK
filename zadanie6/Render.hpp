@@ -7,7 +7,7 @@
 #include <glm/glm.hpp>
 #include <functional>
 #include <memory>
-#include "Model.hpp"
+#include "Mesh.hpp"
 
 class Render{
 private:
@@ -26,7 +26,7 @@ public:
 	static int Init();
 	static bool inited;
 	// Renders a single frame.
-	static void Frame(std::shared_ptr<Model> model);
+	static void Frame(const std::vector<std::shared_ptr<Mesh>> &);
 	// Closes the window etc.
 	static void CleanUp();
 	// Returns current time (in secs) since the program was launched.

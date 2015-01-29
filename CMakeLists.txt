@@ -306,6 +306,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie6")
 		zadanie6/Model.cpp
 		zadanie6/Viewpoint.cpp
 		zadanie6/ObjParser.cpp
+		zadanie6/Mesh.cpp
 	)
 
 	# Files needed by zadanie6 on runtime.
