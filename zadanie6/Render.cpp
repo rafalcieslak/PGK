@@ -122,7 +122,7 @@ bool Render::IsMouseDown(){
 }
 
 
-void Render::Frame(const std::vector<std::shared_ptr<Mesh>> &meshes){
+void Render::Frame(const std::vector<std::shared_ptr<Mesh>> &meshes, float near, float far){
 
 	// Clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -134,7 +134,7 @@ void Render::Frame(const std::vector<std::shared_ptr<Mesh>> &meshes){
 	glm::mat4 cameraview;
 	if(Viewpoint::active_viewpoint){
 		cameraview =  glm::lookAt(glm::vec3(0.0) , 1.0f* Viewpoint::active_viewpoint->GetDirection(), glm::vec3(0.0,0.0,1.0)) * glm::inverse(Viewpoint::active_viewpoint->GetTransform());
-		perspective = glm::perspective(Viewpoint::active_viewpoint->GetFOV(), 1.0f, 0.5f, 10.0f);
+		perspective = glm::perspective(Viewpoint::active_viewpoint->GetFOV(), 1.0f, near, far);
 	}
 	glUniformMatrix4fv(uniform_camera_transform  , 1, GL_FALSE, &cameraview[0][0]);
 	glUniformMatrix4fv(uniform_perspective_transform  , 1, GL_FALSE, &perspective[0][0]);

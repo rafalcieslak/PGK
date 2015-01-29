@@ -11,6 +11,7 @@ float pitch = 0.0, yaw = 0.0;
 float start_pitch, start_yaw;
 float distance = 4.0;
 std::shared_ptr<Viewpoint> camera;
+float near, far;
 
 void update_camera_pos(){
 	yaw = std::max(-90.0f, std::min(90.0f, yaw));
@@ -42,12 +43,17 @@ int main(int argc, char** argv){
 	int n = Render::Init();
 	if(n) return n;
 
+	float max = 0.0;
+	std::cout << "Mesh list: "<< std::endl;
 	for(auto m : p.meshes){
 		std::cout << m->name << ": " << m->faces.size() << std::endl;
 		m->PrepareBuffers();
+		float d = m->GetMaximumDistanceFromOriginSquared();
+		if(d > max) max = d;
 	}
-
-	std::cout << p.meshes[1]->material->diffuse.r << std::endl;
+	distance = glm::pow(max,0.5f)*1.3;
+	near = distance*0.01;
+	far = distance*2;
 	//p.meshes[1]->hidden = false;
 
 	camera = std::make_shared<Viewpoint>( glm::vec3(0.0, -10.0, 0.0) , glm::vec3(2.0,1.0,0.0));
@@ -55,7 +61,7 @@ int main(int argc, char** argv){
 	update_camera_pos();
 
 	do{
-		Render::Frame(p.meshes);
+		Render::Frame(p.meshes, near, far);
 
 		if(!mouse_down && Render::IsMouseDown()){
 			// mouse button was just pressed

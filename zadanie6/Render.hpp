@@ -28,7 +28,7 @@ public:
 	static int Init();
 	static bool inited;
 	// Renders a single frame.
-	static void Frame(const std::vector<std::shared_ptr<Mesh>> &);
+	static void Frame(const std::vector<std::shared_ptr<Mesh>> &, float near, float far);
 	// Closes the window etc.
 	static void CleanUp();
 	// Returns current time (in secs) since the program was launched.

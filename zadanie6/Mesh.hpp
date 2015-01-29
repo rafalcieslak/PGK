@@ -36,6 +36,7 @@ public:
 	void PrepareBuffers();
 	std::string name;
 	bool hidden = false;
+	float GetMaximumDistanceFromOriginSquared();
 private:
 	std::vector<glm::vec3> positions;
 	std::vector<glm::vec2> uvs;

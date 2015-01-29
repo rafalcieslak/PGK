@@ -18,7 +18,7 @@ void ObjParser::Parse(){
 
 void ObjParser::StartNewMeshIfNotEmpty(){
 	if(mesh_nonempty){
-		std::cout << "Starting a new mesh." << std::endl;
+		//std::cout << "Starting a new mesh." << std::endl;
 		meshes.push_back(current_mesh);
 		current_mesh = std::make_shared<Mesh>();
 		mesh_nonempty = false;
@@ -67,7 +67,7 @@ bool ObjParser::Step(){
 		// vertex texture
 		textures.push_back(vert_tex(std::stof(split[1]),std::stof(split[2])));
 	}else if(split[0] == "s"){
-		std::cout << "ObjParser " << lineno << ": ignoring smoothing group." << std::endl;
+		//std::cout << "ObjParser " << lineno << ": ignoring smoothing group." << std::endl;
 	}else if(split[0] == "o"){
 		StartNewMeshIfNotEmpty();
 		current_mesh->name = split[1];
@@ -151,13 +151,13 @@ face_vertex ObjParser::ParseFW(std::string s){
 	face_vertex res;
 	if(i1 == 0) res.v = vert(0.0,0.0,0.0);
 	if(i1 >  0) res.v = vertices[i1-1];
-	if(i1 <  0) res.v = vertices[vertices.size() - i1];
+	if(i1 <  0) res.v = vertices[vertices.size() + i1];
 	if(i2 == 0) res.vt = vert_tex(0.0,0.0);
 	if(i2 >  0) res.vt = textures[i2-1];
-	if(i2 <  0) res.vt = textures[textures.size() - i2];
+	if(i2 <  0) res.vt = textures[textures.size() + i2];
 	if(i3 == 0) res.vn = vert_normal(0.0,0.0,0.0);
 	if(i3 >  0) res.vn = normals[i3-1];
-	if(i3 <  0) res.vn = normals[normals.size() - i3];
+	if(i3 <  0) res.vn = normals[normals.size() + i3];
 	res.no_normal = (i3==0);
 	return res;
 }
@@ -184,11 +184,6 @@ bool MaterialLibrary::Good(){
 }
 void MaterialLibrary::Parse(){
 	while(Step());
-std::cout << "Materials:" << std::endl;
-for(auto it = material_map.cbegin(); it != material_map.cend(); ++it)
-{
-    std::cout << it->first << " " << it->second->diffuse.r << "\n";
-}
 }
 
 bool MaterialLibrary::Step(){

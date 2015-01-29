@@ -1,6 +1,7 @@
 #include "Mesh.hpp"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <iostream>
 
 void Mesh::PrepareBuffers(){
 	for(const trig &t : faces){
@@ -41,4 +42,17 @@ void Mesh::Render(){
 	glDrawArrays(GL_TRIANGLES, 0, positions.size());
 
 
+}
+
+float Mesh::GetMaximumDistanceFromOriginSquared(){
+	float max = 0.0;
+	for(auto t: positions){
+		float d = t.x*t.x + t.y*t.y + t.z*t.z;
+		if(d > 100000.0){
+		//	std::cout << "Warning: a suspicious point found: " << t.x << " " << t.y << " " << t.z << std::endl;
+			continue;
+		}
+		if(d > max) max = d;
+	}
+	return max;
 }
