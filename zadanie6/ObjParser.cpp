@@ -184,7 +184,11 @@ bool MaterialLibrary::Good(){
 }
 void MaterialLibrary::Parse(){
 	while(Step());
-
+std::cout << "Materials:" << std::endl;
+for(auto it = material_map.cbegin(); it != material_map.cend(); ++it)
+{
+    std::cout << it->first << " " << it->second->diffuse.r << "\n";
+}
 }
 
 bool MaterialLibrary::Step(){

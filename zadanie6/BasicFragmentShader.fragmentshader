@@ -1,10 +1,24 @@
 #version 330 core
 
-out vec4 color;
+out vec4 out_color;
 in vec2 UV;
-uniform sampler2D texturesampler;
+uniform sampler2D tex_sampler_diffuse;
+uniform sampler2D tex_sampler_ambient;
+uniform sampler2D tex_sampler_spectral;
+
+uniform vec3 color_diffuse;
+uniform vec3 color_ambient;
+uniform vec3 color_spectral;
+
+uniform int use_diffuse_texture;
+uniform int use_ambient_texture;
+uniform int use_spectral_texture;
 
 void main()
 {
-	color = vec4( texture2D( texturesampler, UV ).rgb , 1.0);
+
+	vec3 color = color_diffuse;
+
+	out_color = vec4( color , 1.0);
+
 }

@@ -11,7 +11,9 @@
 
 GLFWwindow* window;
 
-GLint Render::uniform_camera_transform, Render::uniform_perspective_transform, Render::uniform_texsampler;
+GLint Render::uniform_camera_transform, Render::uniform_perspective_transform;
+GLint Render::uniform_color_diffuse, Render::uniform_color_spectral, Render::uniform_color_ambient;
+GLint Render::uniform_tex_spec, Render::uniform_tex_amb, Render::uniform_tex_diff;
 GLuint Render::VertexArrayID;
 float Render::pxsizex, Render::pxsizey;
 GLuint Render::shader_program_id;
@@ -85,9 +87,14 @@ int Render::Init(){
 	// Prepare uniforms of the vertex shader
 	uniform_camera_transform = glGetUniformLocation(shader_program_id, "camera_transform");
 	uniform_perspective_transform = glGetUniformLocation(shader_program_id, "perspective_transform");
-	uniform_texsampler = glGetUniformLocation(shader_program_id, "texturesampler");
+	uniform_color_ambient  = glGetUniformLocation(shader_program_id, "color_ambient");
+	uniform_color_diffuse  = glGetUniformLocation(shader_program_id, "color_diffuse");
+	uniform_color_spectral = glGetUniformLocation(shader_program_id, "color_spectral");
+	uniform_tex_amb  = glGetUniformLocation(shader_program_id, "tex_sampler_ambient");
+	uniform_tex_spec  = glGetUniformLocation(shader_program_id, "tex_sampler_spectral");
+	uniform_tex_diff  = glGetUniformLocation(shader_program_id, "tex_sampler_diffuse");
 	if(uniform_camera_transform == -1 || uniform_perspective_transform == -1){
-		std::cerr << "A uniform is missing from the shader." << std::endl;
+		std::cerr << "An essential uniform is missing from the shader." << std::endl;
 		glfwTerminate();
 		return -1;
 	}
@@ -132,7 +139,9 @@ void Render::Frame(const std::vector<std::shared_ptr<Mesh>> &meshes){
 	glUniformMatrix4fv(uniform_camera_transform  , 1, GL_FALSE, &cameraview[0][0]);
 	glUniformMatrix4fv(uniform_perspective_transform  , 1, GL_FALSE, &perspective[0][0]);
 
-	glUniform1i(uniform_texsampler, 0);
+	glUniform1i(uniform_tex_amb, 0);
+	glUniform1i(uniform_tex_diff, 0);
+	glUniform1i(uniform_tex_spec, 0);
 
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
@@ -141,6 +150,10 @@ void Render::Frame(const std::vector<std::shared_ptr<Mesh>> &meshes){
 	//int i = 0;
 	for(auto m : meshes){
 		if(m->hidden) continue;
+
+		glUniform3fv(uniform_color_ambient, 1, glm::value_ptr(m->material->ambient));
+		glUniform3fv(uniform_color_diffuse, 1, glm::value_ptr(m->material->diffuse));
+		glUniform3fv(uniform_color_spectral, 1, glm::value_ptr(m->material->spectral));
 		//i++;
 		m->Render();
 	}

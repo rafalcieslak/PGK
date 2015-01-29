@@ -47,6 +47,7 @@ int main(int argc, char** argv){
 		m->PrepareBuffers();
 	}
 
+	std::cout << p.meshes[1]->material->diffuse.r << std::endl;
 	//p.meshes[1]->hidden = false;
 
 	camera = std::make_shared<Viewpoint>( glm::vec3(0.0, -10.0, 0.0) , glm::vec3(2.0,1.0,0.0));
