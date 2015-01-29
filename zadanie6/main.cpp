@@ -46,10 +46,10 @@ int main(int argc, char** argv){
 	float max = 0.0;
 	std::cout << "Mesh list: "<< std::endl;
 	for(auto m : p.meshes){
-		std::cout << m->name << ": " << m->faces.size() << std::endl;
 		m->PrepareBuffers();
 		float d = m->GetMaximumDistanceFromOriginSquared();
 		if(d > max) max = d;
+		std::cout << m->name << ": " << m->faces.size() << " triangles, size: " << d << std::endl;
 	}
 	distance = glm::pow(max,0.5f)*1.3;
 	near = distance*0.01;

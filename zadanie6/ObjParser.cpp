@@ -24,7 +24,9 @@ void ObjParser::StartNewMeshIfNotEmpty(){
 	if(mesh_nonempty){
 		//std::cout << "Starting a new mesh." << std::endl;
 		meshes.push_back(current_mesh);
+		std::shared_ptr<Material> m = current_mesh->material;
 		current_mesh = std::make_shared<Mesh>();
+		current_mesh->material = m;
 		mesh_nonempty = false;
 	}
 }
