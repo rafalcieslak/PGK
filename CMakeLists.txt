@@ -299,10 +299,15 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie6")
 	add_executable(zadanie6
 		zadanie6/main.cpp
 		zadanie6/Text.cpp
+		zadanie6/Render.cpp
+		zadanie6/Shader.cpp
+		zadanie6/Fonts.cpp
 	)
 
 	# Files needed by zadanie6 on runtime.
 	set( ZAD6_RUNTIME_FILES
+		zadanie6/BasicFragmentShader.fragmentshader
+		zadanie6/BasicVertexShader.vertexshader
 		zadanie6/TextFragmentShader.fragmentshader
 		zadanie6/TextVertexShader.vertexshader
 		zadanie6/Ubuntu.ttf
