@@ -1,5 +1,6 @@
 #include "Render.hpp"
 #include "Viewpoint.hpp"
+#include "ObjParser.hpp"
 #include <iostream>
 #include <cstdlib>
 
@@ -32,6 +33,10 @@ void usage(){
 int main(int argc, char** argv){
 	if(argc < 3) usage();
 
+	ObjParser p(argv[1]);
+	p.Parse();
+
+	std::cout << "Parsed!" << std::endl;
 
 	// Prepare the renderer.
 	int n = Render::Init();
