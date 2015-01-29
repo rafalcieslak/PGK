@@ -11,8 +11,7 @@
 
 GLFWwindow* window;
 
-// All the static members of Render class.
-GLint Render::uniform_camera_transform, Render::uniform_perspective_transform;
+GLint Render::uniform_camera_transform, Render::uniform_perspective_transform, Render::uniform_texsampler;
 GLuint Render::VertexArrayID;
 float Render::pxsizex, Render::pxsizey;
 GLuint Render::shader_program_id;
@@ -86,6 +85,7 @@ int Render::Init(){
 	// Prepare uniforms of the vertex shader
 	uniform_camera_transform = glGetUniformLocation(shader_program_id, "camera_transform");
 	uniform_perspective_transform = glGetUniformLocation(shader_program_id, "perspective_transform");
+	uniform_texsampler = glGetUniformLocation(shader_program_id, "texturesampler");
 	if(uniform_camera_transform == -1 || uniform_perspective_transform == -1){
 		std::cerr << "A uniform is missing from the shader." << std::endl;
 		glfwTerminate();
@@ -131,6 +131,8 @@ void Render::Frame(std::shared_ptr<Model> model){
 	}
 	glUniformMatrix4fv(uniform_camera_transform  , 1, GL_FALSE, &cameraview[0][0]);
 	glUniformMatrix4fv(uniform_perspective_transform  , 1, GL_FALSE, &perspective[0][0]);
+
+	glUniform1i(uniform_texsampler, 0);
 
 	model->Render();
 

@@ -30,13 +30,16 @@ void usage(){
 }
 
 int main(int argc, char** argv){
-	if(argc < 2) usage();
-	auto model = Model::Create(argv[1]);
-	if(!model) return -1;
+	if(argc < 3) usage();
+
 
 	// Prepare the renderer.
 	int n = Render::Init();
 	if(n) return n;
+
+	auto model = Model::Create(argv[1], argv[2]);
+	if(!model) return -1;
+
 
 	model->Prepare();
 

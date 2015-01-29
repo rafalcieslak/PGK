@@ -12,7 +12,7 @@
 
 class Model{
 public:
-	static std::shared_ptr<Model> Create(std::string objpath);
+	static std::shared_ptr<Model> Create(std::string objpath, std::string texpath);
 	void Prepare();
 	void Render();
 private:
@@ -21,6 +21,7 @@ private:
 	std::vector<glm::vec2> uvs;
 	std::vector<glm::vec3> normals;
 	GLuint vertexbuffer, uvbuffer, normalbuffer;
+	GLuint texture;
 };
 
 #endif //MODEL_HPP

@@ -2,13 +2,14 @@
 #include "ObjLoader.hpp"
 #include <iostream>
 
-std::shared_ptr<Model> Model::Create(std::string objpath){
+std::shared_ptr<Model> Model::Create(std::string objpath, std::string texpath){
 
 
 	std::shared_ptr<Model> m(new Model());
 	if(!LoadObj(objpath.c_str(),m->vertices,m->uvs,m->normals)){
 		return nullptr;
 	}
+	m->texture = LoadDDS(texpath.c_str()); //###TODO: BMP
 	return m;
 }
 
@@ -37,6 +38,9 @@ void Model::Render(){
 	glVertexAttribPointer(1,2,GL_FLOAT,GL_FALSE,0,0);
 	glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
 	glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,0,0);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture);
 
 	glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 

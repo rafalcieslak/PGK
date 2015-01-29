@@ -8,8 +8,10 @@ layout(location = 2) in vec3 vertexNormal;
 uniform mat4 camera_transform;
 uniform mat4 perspective_transform;
 
+out vec2 UV;
+
 void main(){
 
 	gl_Position = perspective_transform * camera_transform * vec4(vertexPosition,1.0);
-
+	UV = vertexUV;
 }

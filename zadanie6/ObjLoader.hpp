@@ -8,4 +8,7 @@ bool LoadObj(
 	std::vector<glm::vec3> & out_normals
 );
 
+GLuint LoadBMP(const char * imagepath);
+GLuint LoadDDS(const char * imagepath);
+
 #endif
