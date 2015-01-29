@@ -292,3 +292,53 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie5")
 	endforeach( file )
 
 endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie5")
+
+
+# ZADANIE6
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie6")
+	add_executable(zadanie6
+		zadanie6/main.cpp
+		zadanie6/Text.cpp
+	)
+
+	# Files needed by zadanie6 on runtime.
+	set( ZAD6_RUNTIME_FILES
+		zadanie6/TextFragmentShader.fragmentshader
+		zadanie6/TextVertexShader.vertexshader
+		zadanie6/Ubuntu.ttf
+	)
+
+	if(GLFW_DEPS)
+	add_dependencies(zadanie6 GLEW GLFW_303)
+	endif()
+	if(GLM_DEPS)
+	add_dependencies(zadanie6 GLM)
+	endif()
+	if(FREETYPE_DEPS)
+	add_dependencies(zadanie6 Freetype)
+	endif()
+
+
+	target_link_libraries(zadanie6
+		${GLFW_GLEW_LIBRARIES}
+		${FREETYPE_LIBRARIES}
+		${OPENGL_LIBRARY}
+		${CMAKE_DL_LIBS}
+	)
+
+	# Copy the binary
+	add_custom_command(
+		TARGET zadanie6 POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/zadanie6${CMAKE_EXECUTABLE_SUFFIX}" "${CMAKE_CURRENT_SOURCE_DIR}/zadanie6/"
+	)
+
+	# Copy runtime files
+	foreach( file ${ZAD6_RUNTIME_FILES})
+		add_custom_command(
+			TARGET zadanie6 POST_BUILD
+			COMMAND ${CMAKE_COMMAND}
+			ARGS -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${file}" "${CMAKE_CURRENT_BINARY_DIR}"
+	)
+	endforeach( file )
+
+endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie6")
