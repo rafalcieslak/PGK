@@ -51,7 +51,7 @@ int Render::Init(){
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 	// Open a window and create its OpenGL context
-	window = glfwCreateWindow( 1000, 1000, "Terrain", NULL, NULL);
+	window = glfwCreateWindow( 1000, 1000, "Model viewer", NULL, NULL);
 	pxsizex = 2.0 / 1000;
 	pxsizey = 2.0 / 1000;
 	if( window == NULL ){
@@ -74,7 +74,7 @@ int Render::Init(){
 	glfwSetScrollCallback(window,ScrollCallback);
 
 	// Background
-	glClearColor(50/255.0,80.0/255.0,0.7,1.0);
+	glClearColor(30/255.0,30.0/255.0,0.7,1.0);
 
 	// Prepare main vertex array.
 	glGenVertexArrays(1, &VertexArrayID);
@@ -115,9 +115,26 @@ bool Render::IsMouseDown(){
 }
 
 
-void Render::Frame(){
+void Render::Frame(std::shared_ptr<Model> model){
 
+	// Clear the screen
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	glUseProgram(shader_program_id);
+
+	// Prepare camera
+	glm::mat4 perspective;
+	glm::mat4 cameraview;
+	if(Viewpoint::active_viewpoint){
+		cameraview =  glm::lookAt(glm::vec3(0.0) , 1.0f* Viewpoint::active_viewpoint->GetDirection(), glm::vec3(0.0,0.0,1.0)) * glm::inverse(Viewpoint::active_viewpoint->GetTransform());
+		perspective = glm::perspective(Viewpoint::active_viewpoint->GetFOV(), 1.0f, 0.5f, 10.0f);
+	}
+	glUniformMatrix4fv(uniform_camera_transform  , 1, GL_FALSE, &cameraview[0][0]);
+	glUniformMatrix4fv(uniform_perspective_transform  , 1, GL_FALSE, &perspective[0][0]);
+
+	model->Render();
+
+	glUseProgram(0);
 
 	// Swap buffers
 	glfwSwapBuffers(window);

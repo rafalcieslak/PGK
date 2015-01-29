@@ -19,7 +19,7 @@ add_definitions(
 	-DGLEW_STATIC
 	-D_CRT_SECURE_NO_WARNINGS
 	-std=c++11
-	-O3
+	-g
 	-Wall
 	-Wextra
 	-Werror
@@ -302,6 +302,9 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie6")
 		zadanie6/Render.cpp
 		zadanie6/Shader.cpp
 		zadanie6/Fonts.cpp
+		zadanie6/ObjLoader.cpp
+		zadanie6/Model.cpp
+		zadanie6/Viewpoint.cpp
 	)
 
 	# Files needed by zadanie6 on runtime.

@@ -6,6 +6,8 @@
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include <functional>
+#include <memory>
+#include "Model.hpp"
 
 class Render{
 private:
@@ -24,7 +26,7 @@ public:
 	static int Init();
 	static bool inited;
 	// Renders a single frame.
-	static void Frame();
+	static void Frame(std::shared_ptr<Model> model);
 	// Closes the window etc.
 	static void CleanUp();
 	// Returns current time (in secs) since the program was launched.
