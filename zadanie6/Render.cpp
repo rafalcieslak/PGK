@@ -8,12 +8,14 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "Viewpoint.hpp"
+#include "TextureLoader.hpp"
 
 GLFWwindow* window;
 
 GLint Render::uniform_camera_transform, Render::uniform_perspective_transform;
 GLint Render::uniform_color_diffuse, Render::uniform_color_spectral, Render::uniform_color_ambient;
 GLint Render::uniform_tex_spec, Render::uniform_tex_amb, Render::uniform_tex_diff;
+GLint Render::uniform_use_tex_spec, Render::uniform_use_tex_amb, Render::uniform_use_tex_diff;
 GLuint Render::VertexArrayID;
 float Render::pxsizex, Render::pxsizey;
 GLuint Render::shader_program_id;
@@ -93,6 +95,9 @@ int Render::Init(){
 	uniform_tex_amb  = glGetUniformLocation(shader_program_id, "tex_sampler_ambient");
 	uniform_tex_spec  = glGetUniformLocation(shader_program_id, "tex_sampler_spectral");
 	uniform_tex_diff  = glGetUniformLocation(shader_program_id, "tex_sampler_diffuse");
+	uniform_use_tex_amb  = glGetUniformLocation(shader_program_id, "use_ambient_texture");
+	uniform_use_tex_spec  = glGetUniformLocation(shader_program_id, "use_spectral_texture");
+	uniform_use_tex_diff  = glGetUniformLocation(shader_program_id, "use_diffuse_texture");
 	if(uniform_camera_transform == -1 || uniform_perspective_transform == -1){
 		std::cerr << "An essential uniform is missing from the shader." << std::endl;
 		glfwTerminate();
@@ -140,20 +145,38 @@ void Render::Frame(const std::vector<std::shared_ptr<Mesh>> &meshes, float near,
 	glUniformMatrix4fv(uniform_perspective_transform  , 1, GL_FALSE, &perspective[0][0]);
 
 	glUniform1i(uniform_tex_amb, 0);
-	glUniform1i(uniform_tex_diff, 0);
-	glUniform1i(uniform_tex_spec, 0);
+	glUniform1i(uniform_tex_diff, 1);
+	glUniform1i(uniform_tex_spec, 2);
 
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
 
 	//int i = 0;
+	int id, use_tex;
 	for(auto m : meshes){
 		if(m->hidden) continue;
 
 		glUniform3fv(uniform_color_ambient, 1, glm::value_ptr(m->material->ambient));
 		glUniform3fv(uniform_color_diffuse, 1, glm::value_ptr(m->material->diffuse));
 		glUniform3fv(uniform_color_spectral, 1, glm::value_ptr(m->material->spectral));
+
+		if(m->material->ambient_tex_path != "") id = GetTexture(m->material->ambient_tex_path);
+		use_tex = (m->material->ambient_tex_path != "" && id != GL_INVALID_VALUE);
+		glUniform1i(uniform_use_tex_amb,use_tex);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, id);
+		if(m->material->diffuse_tex_path != "") id = GetTexture(m->material->diffuse_tex_path);
+		use_tex = (m->material->diffuse_tex_path != "" && id != GL_INVALID_VALUE);
+		glUniform1i(uniform_use_tex_diff,use_tex);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, id);
+		if(m->material->spectral_tex_path != "") id = GetTexture(m->material->spectral_tex_path);
+		use_tex = (m->material->spectral_tex_path != "" && id != GL_INVALID_VALUE);
+		glUniform1i(uniform_use_tex_spec,use_tex);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, id);
+
 		//i++;
 		m->Render();
 	}

@@ -17,7 +17,11 @@ uniform int use_spectral_texture;
 void main()
 {
 
-	vec3 color = color_diffuse;
+	vec3 color;
+ 	if(use_diffuse_texture == 0)
+		color = color_diffuse;
+	else
+		color = texture2D( tex_sampler_diffuse, UV ).rgb;
 
 	out_color = vec4( color , 1.0);
 

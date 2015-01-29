@@ -1,7 +1,6 @@
 #ifndef TEXTURELOADER_H
 #define TEXTURELOADER_H
 
-GLuint LoadBMP(const char * imagepath);
-GLuint LoadDDS(const char * imagepath);
+GLuint GetTexture(std::string path);
 
 #endif //TEXTURELOADER_H

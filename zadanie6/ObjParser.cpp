@@ -2,8 +2,12 @@
 #include <iostream>
 #include <algorithm>
 
+std::vector<std::string> SplitString(std::string str, std::string delimiter);
+std::string GetDir(const std::string& str);
+
 ObjParser::ObjParser(std::string objname) : file(objname){
 	path = objname;
+	dir = GetDir(path);
 	current_mesh = std::make_shared<Mesh>();
 }
 
@@ -25,27 +29,6 @@ void ObjParser::StartNewMeshIfNotEmpty(){
 	}
 }
 
-std::vector<std::string> SplitString(std::string str, std::string delimiter){
-    std::vector<std::string> res;
-
-    size_t pos = 0;
-    std::string token;
-    while ((pos = str.find(delimiter)) != std::string::npos) {
-        token = str.substr(0, pos);
-        if(token != "") res.push_back(token);
-        str.erase(0, pos + delimiter.length());
-    }
-    if(str != "") res.push_back(str);
-    return res;
-}
-std::string GetDir(const std::string& str)
-{
-  	size_t found=str.find_last_of("/\\");
-  	if(found == std::string::npos){
-		return "";
-	}
-  	return str.substr(0,found);
-}
 
 bool ObjParser::Step(){
 	std::string line;
@@ -75,6 +58,7 @@ bool ObjParser::Step(){
 		// new group.
 		StartNewMeshIfNotEmpty();
 	}else if(split[0] == "mtllib"){
+		std::replace( split[1].begin(), split[1].end(), '\\', '/');
 		std::string mtlfile = GetDir(path) + "/" + split[1];
 		current_mtllib = std::make_shared<MaterialLibrary>(mtlfile);
 		if(current_mtllib->Good() == false){
@@ -176,7 +160,11 @@ ObjParser::~ObjParser(){
 }
 
 MaterialLibrary::MaterialLibrary(std::string mtlname) : file(mtlname){
-
+	path = mtlname;
+	dir = GetDir(path);
+}
+MaterialLibrary::~MaterialLibrary(){
+	file.close();
 }
 
 bool MaterialLibrary::Good(){
@@ -205,6 +193,15 @@ bool MaterialLibrary::Step(){
 		current_material->spectral = mat_color(std::stof(split[1]),std::stof(split[2]),std::stof(split[3]));
 	}else if(split[0] == "Ns"){
 		current_material->spectral_exponent = std::stof(split[1]);
+	}else if(split[0] == "map_Ka"){
+		std::replace( split[1].begin(), split[1].end(), '\\', '/');
+		current_material->ambient_tex_path = dir + "/" + split[1];
+	}else if(split[0] == "map_Kd"){
+		std::replace( split[1].begin(), split[1].end(), '\\', '/');
+		current_material->diffuse_tex_path = dir + "/" + split[1];
+	}else if(split[0] == "map_Ks"){
+		std::replace( split[1].begin(), split[1].end(), '\\', '/');
+		current_material->spectral_tex_path = dir + "/" + split[1];
 	}else if(split[0] == "Ni"){
 		std::cout << "MtlParser: Ignoring refraction index." << std::endl;
 	}else if(split[0] == "d" || split[0] == "Tr"){
@@ -227,4 +224,26 @@ std::shared_ptr<Material> MaterialLibrary::GetMaterial(std::string name){
 	auto it = material_map.find(name);
 	if(it == material_map.end()) return nullptr;
 	return it->second;
+}
+
+std::vector<std::string> SplitString(std::string str, std::string delimiter){
+    std::vector<std::string> res;
+
+    size_t pos = 0;
+    std::string token;
+    while ((pos = str.find(delimiter)) != std::string::npos) {
+        token = str.substr(0, pos);
+        if(token != "") res.push_back(token);
+        str.erase(0, pos + delimiter.length());
+    }
+    if(str != "") res.push_back(str);
+    return res;
+}
+std::string GetDir(const std::string& str)
+{
+  	size_t found=str.find_last_of("/\\");
+  	if(found == std::string::npos){
+		return "";
+	}
+  	return str.substr(0,found);
 }

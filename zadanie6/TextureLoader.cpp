@@ -3,12 +3,42 @@
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
+#include <map>
+#include <iostream>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
 #include "TextureLoader.hpp"
+
+std::map<std::string,GLuint> loaded_textures;
+
+GLuint LoadBMP(const char * imagepath);
+GLuint LoadDDS(const char * imagepath);
+
+GLuint GetTexture(std::string path){
+	auto it = loaded_textures.find(path);
+	if(it != loaded_textures.end()){
+		return it->second;
+	}
+	std::string ext = path.substr(path.size()-3);
+	GLuint id;
+	if(ext == "bmp" || ext == "BMP"){
+		id = LoadBMP(path.c_str());
+	}else if(ext == "dds" || ext == "DDS"){
+		id = LoadDDS(path.c_str());
+	}else{
+		std::cout << "Unable to load texture " << path << ": unsupported format" << std::endl;
+		id = GL_INVALID_VALUE;
+	}
+	if(id != GL_INVALID_VALUE) std::cout << "Loaded texture: " << path << std::endl;
+	loaded_textures[path] = id;
+	return id;
+}
+
+
+// Code below was borrowed from the tutorial
 
 GLuint LoadBMP(const char * imagepath){
 
@@ -24,23 +54,23 @@ GLuint LoadBMP(const char * imagepath){
 
 	// Open the file
 	FILE * file = fopen(imagepath,"rb");
-	if (!file)							    {printf("%s could not be opened. Are you in the right directory ? Don't forget to read the FAQ !\n", imagepath); getchar(); return 0;}
+	if (!file)							    {printf("%s could not be opened.\n", imagepath); return GL_INVALID_VALUE;}
 
 	// Read the header, i.e. the 54 first bytes
 
 	// If less than 54 bytes are read, problem
 	if ( fread(header, 1, 54, file)!=54 ){
 		printf("Not a correct BMP file\n");
-		return 0;
+		return GL_INVALID_VALUE;
 	}
 	// A BMP files always begins with "BM"
 	if ( header[0]!='B' || header[1]!='M' ){
 		printf("Not a correct BMP file\n");
-		return -1;
+		return GL_INVALID_VALUE;
 	}
 	// Make sure this is a 24bpp file
-	if ( *(int*)&(header[0x1E])!=0  )         {printf("Not a correct BMP file\n");    return -1;}
-	if ( *(int*)&(header[0x1C])!=24 )         {printf("Not a correct BMP file\n");    return -1;}
+	if ( *(int*)&(header[0x1E])!=0  )         {printf("Not a correct BMP file\n");    return GL_INVALID_VALUE;}
+	if ( *(int*)&(header[0x1C])!=24 )         {printf("Not a correct BMP file\n");    return GL_INVALID_VALUE;}
 
 	// Read the information about the image
 	dataPos    = *(int*)&(header[0x0A]);
@@ -102,8 +132,8 @@ GLuint LoadDDS(const char * imagepath){
 	/* try to open the file */
 	fp = fopen(imagepath, "rb");
 	if (fp == NULL){
-		printf("%s could not be opened. Are you in the right directory ? Don't forget to read the FAQ !\n", imagepath); getchar();
-		return 0;
+		printf("%s could not be opened.\n", imagepath);
+		return GL_INVALID_VALUE;
 	}
 
 	/* verify the type of file */
@@ -111,7 +141,7 @@ GLuint LoadDDS(const char * imagepath){
 	fread(filecode, 1, 4, fp);
 	if (strncmp(filecode, "DDS ", 4) != 0) {
 		fclose(fp);
-		return 0;
+		return GL_INVALID_VALUE;
 	}
 
 	/* get the surface desc */
@@ -148,7 +178,7 @@ GLuint LoadDDS(const char * imagepath){
 		break;
 	default:
 		free(buffer);
-		return 0;
+		return GL_INVALID_VALUE;
 	}
 
 	// Create one OpenGL texture
