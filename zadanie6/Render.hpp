@@ -22,7 +22,7 @@ private:
 	static GLint uniform_color_diffuse, uniform_color_spectral, uniform_color_ambient;
 	static GLint uniform_tex_spec, uniform_tex_amb, uniform_tex_diff;
 	static GLint uniform_use_tex_spec, uniform_use_tex_amb, uniform_use_tex_diff;
-	static GLint uniform_specular_hardness;
+	static GLint uniform_specular_hardness, uniform_lightpos;
 	// Used for scroll handling
 	static void ScrollCallback(GLFWwindow*, double, double);
 public:
@@ -30,7 +30,7 @@ public:
 	static int Init();
 	static bool inited;
 	// Renders a single frame.
-	static void Frame(const std::vector<std::shared_ptr<Mesh>> &, float near, float far);
+	static void Frame(const std::vector<std::shared_ptr<Mesh>> &, glm::vec3 lightpos, float near, float far);
 	// Closes the window etc.
 	static void CleanUp();
 	// Returns current time (in secs) since the program was launched.
@@ -39,9 +39,9 @@ public:
 	static bool IsKeyPressed(int key);
 	// Returns true iff the user has closed the window.
 	static bool IsWindowClosed();
-	// Resets the mouse to window center and returns it's previous position, scaled to -1,1
+	// Returns mouse pointer position scaled to [-1,1].
 	static glm::vec2 GetMousePos();
-	static bool IsMouseDown();
+	static bool IsMouseDown(int button);
 	static GLint uniform_pos;
 	// Scroll callback
 	static std::function<void(double)> scroll_callback;

@@ -16,7 +16,7 @@ GLint Render::uniform_camera_transform, Render::uniform_perspective_transform;
 GLint Render::uniform_color_diffuse, Render::uniform_color_spectral, Render::uniform_color_ambient;
 GLint Render::uniform_tex_spec, Render::uniform_tex_amb, Render::uniform_tex_diff;
 GLint Render::uniform_use_tex_spec, Render::uniform_use_tex_amb, Render::uniform_use_tex_diff;
-GLint Render::uniform_specular_hardness;
+GLint Render::uniform_specular_hardness, Render::uniform_lightpos;
 GLuint Render::VertexArrayID;
 float Render::pxsizex, Render::pxsizey;
 GLuint Render::shader_program_id;
@@ -100,6 +100,7 @@ int Render::Init(){
 	uniform_use_tex_spec  = glGetUniformLocation(shader_program_id, "use_spectral_texture");
 	uniform_use_tex_diff  = glGetUniformLocation(shader_program_id, "use_diffuse_texture");
 	uniform_specular_hardness  = glGetUniformLocation(shader_program_id, "specular_hardness");
+	uniform_lightpos  = glGetUniformLocation(shader_program_id, "lightpos_global");
 	if(uniform_camera_transform == -1 || uniform_perspective_transform == -1){
 		std::cerr << "An essential uniform is missing from the shader." << std::endl;
 		glfwTerminate();
@@ -124,12 +125,12 @@ glm::vec2 Render::GetMousePos(){
 	//glfwSetCursorPos(window,500.0,500.0);
 	return glm::vec2((x-500)/500,(y-500)/500);
 }
-bool Render::IsMouseDown(){
-	return glfwGetMouseButton(window,0)==GLFW_PRESS;
+bool Render::IsMouseDown(int button){
+	return glfwGetMouseButton(window,button)==GLFW_PRESS;
 }
 
 
-void Render::Frame(const std::vector<std::shared_ptr<Mesh>> &meshes, float near, float far){
+void Render::Frame(const std::vector<std::shared_ptr<Mesh>> &meshes, glm::vec3 lightpos, float near, float far){
 
 	// Clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -161,6 +162,8 @@ void Render::Frame(const std::vector<std::shared_ptr<Mesh>> &meshes, float near,
 		glUniform3fv(uniform_color_ambient, 1, glm::value_ptr(m->material->ambient));
 		glUniform3fv(uniform_color_diffuse, 1, glm::value_ptr(m->material->diffuse));
 		glUniform3fv(uniform_color_spectral, 1, glm::value_ptr(m->material->spectral));
+
+		glUniform3fv(uniform_lightpos, 1, glm::value_ptr(lightpos));
 
 		if(m->material->ambient_tex_path != "") id = GetTexture(m->material->ambient_tex_path);
 		use_tex = (m->material->ambient_tex_path != "" && id != GL_INVALID_VALUE);
