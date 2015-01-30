@@ -60,8 +60,10 @@ bool ObjParser::Step(){
 		// new group.
 		// StartNewMeshIfNotEmpty();
 	}else if(split[0] == "mtllib"){
-		std::replace( split[1].begin(), split[1].end(), '\\', '/');
-		std::string mtlfile = GetDir(path) + "/" + split[1];
+		size_t pos = line.find("mtllib") + 7;
+		std::string mtlpath = line.substr(pos);
+		std::replace( mtlpath.begin(), mtlpath.end(), '\\', '/');
+		std::string mtlfile = GetDir(path) + "/" + mtlpath;
 		current_mtllib = std::make_shared<MaterialLibrary>(mtlfile);
 		if(current_mtllib->Good() == false){
 			std::cout << "ObjParser " << lineno << ": Problems opening mtllib " << mtlfile << std::endl;
@@ -193,14 +195,20 @@ bool MaterialLibrary::Step(){
 	}else if(split[0] == "Ns"){
 		current_material->spectral_exponent = (float)std::stod(split[1]);
 	}else if(split[0] == "map_Ka"){
-		std::replace( split[1].begin(), split[1].end(), '\\', '/');
-		current_material->ambient_tex_path = dir + "/" + split[1];
+		size_t pos = line.find("map_Ka") + 7;
+		std::string texpath = line.substr(pos);
+		std::replace( texpath.begin(), texpath.end(), '\\', '/');
+		current_material->ambient_tex_path = texpath;
 	}else if(split[0] == "map_Kd"){
-		std::replace( split[1].begin(), split[1].end(), '\\', '/');
-		current_material->diffuse_tex_path = dir + "/" + split[1];
+		size_t pos = line.find("map_Kd") + 7;
+		std::string texpath = line.substr(pos);
+		std::replace( texpath.begin(), texpath.end(), '\\', '/');
+		current_material->diffuse_tex_path = texpath;
 	}else if(split[0] == "map_Ks"){
-		std::replace( split[1].begin(), split[1].end(), '\\', '/');
-		current_material->spectral_tex_path = dir + "/" + split[1];
+		size_t pos = line.find("map_Ks") + 7;
+		std::string texpath = line.substr(pos);
+		std::replace( texpath.begin(), texpath.end(), '\\', '/');
+		current_material->spectral_tex_path = texpath;
 	}else if(split[0] == "Ni"){
 		std::cout << "MtlParser: Ignoring refraction index." << std::endl;
 	}else if(split[0] == "d" || split[0] == "Tr"){
@@ -218,6 +226,7 @@ void MaterialLibrary::StartNewMaterial(std::string name){
 	current_material = std::make_shared<Material>();
 	material_map[name] = current_material;
 	current_material->name = name;
+	current_material->base_dir = dir;
 }
 std::shared_ptr<Material> MaterialLibrary::GetMaterial(std::string name){
 	auto it = material_map.find(name);

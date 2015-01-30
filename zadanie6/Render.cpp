@@ -169,17 +169,17 @@ void Render::Frame(const std::vector<std::shared_ptr<Mesh>> &meshes, glm::vec3 l
 
 		glUniform3fv(uniform_lightpos, 1, glm::value_ptr(lightpos));
 
-		if(m->material->ambient_tex_path != "") id = GetTexture(m->material->ambient_tex_path);
+		if(m->material->ambient_tex_path != "") id = GetTexture(m->material->base_dir, m->material->ambient_tex_path);
 		use_tex = (m->material->ambient_tex_path != "" && id != GL_INVALID_VALUE);
 		glUniform1i(uniform_use_tex_amb,use_tex);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, id);
-		if(m->material->diffuse_tex_path != "") id = GetTexture(m->material->diffuse_tex_path);
+		if(m->material->diffuse_tex_path != "") id = GetTexture(m->material->base_dir, m->material->diffuse_tex_path);
 		use_tex = (m->material->diffuse_tex_path != "" && id != GL_INVALID_VALUE);
 		glUniform1i(uniform_use_tex_diff,use_tex);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, id);
-		if(m->material->spectral_tex_path != "") id = GetTexture(m->material->spectral_tex_path);
+		if(m->material->spectral_tex_path != "") id = GetTexture(m->material->base_dir, m->material->spectral_tex_path);
 		use_tex = (m->material->spectral_tex_path != "" && id != GL_INVALID_VALUE);
 		glUniform1i(uniform_use_tex_spec,use_tex);
 		glActiveTexture(GL_TEXTURE2);

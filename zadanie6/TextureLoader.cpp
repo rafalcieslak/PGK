@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <map>
 #include <iostream>
+#include <fstream>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -12,28 +13,68 @@
 
 #include "TextureLoader.hpp"
 
-std::map<std::string,GLuint> loaded_textures;
+std::map<std::pair<std::string, std::string>,GLuint> loaded_textures;
 
 GLuint LoadBMP(const char * imagepath);
 GLuint LoadDDS(const char * imagepath);
 
-GLuint GetTexture(std::string path){
-	auto it = loaded_textures.find(path);
+extern bool auto_convert;
+
+inline bool exists(std::string filename){
+	std::ifstream f(filename.c_str());
+	if(f.good()){
+		f.close(); return true;
+	}else{
+		f.close(); return false;
+	}
+}
+
+GLuint GetTexture(std::string dir, std::string path){
+	auto it = loaded_textures.find(std::make_pair(dir,path));
 	if(it != loaded_textures.end()){
 		return it->second;
 	}
 	std::string ext = path.substr(path.size()-3);
-	GLuint id;
-	if(ext == "bmp" || ext == "BMP"){
-		id = LoadBMP(path.c_str());
-	}else if(ext == "dds" || ext == "DDS"){
-		id = LoadDDS(path.c_str());
-	}else{
-		std::cout << "Unable to load texture " << path << ": unsupported format" << std::endl;
-		id = GL_INVALID_VALUE;
+	GLuint id = GL_INVALID_VALUE;
+
+	std::string fullpath = dir + "/" + path;
+
+	if(path[0] == '/' || (path[1] == ':' && path[2] == '/')){
+		std::cout << "Texture path " << path << " looks like an incorrectly exported absolute path." << std::endl;
+		size_t pos = path.find_last_of('/')+1;
+		fullpath = dir + "/" + path.substr(pos);
+		std::cout << "  Will try " << fullpath << " instead." << std::endl;
 	}
-	if(id != GL_INVALID_VALUE) std::cout << "Loaded texture: " << path << std::endl;
-	loaded_textures[path] = id;
+
+
+	if(exists(fullpath)){
+		if(ext == "bmp" || ext == "BMP"){
+			id = LoadBMP(fullpath.c_str());
+		}else if(ext == "dds" || ext == "DDS"){
+			id = LoadDDS(fullpath.c_str());
+		}else{
+			std::cout << "Unable to load texture " << fullpath << ": unsupported format" << std::endl;
+			std::string alternative_path = fullpath.substr(0,fullpath.size()-3) + "bmp";
+			if(exists(alternative_path)){
+				id = LoadBMP(alternative_path.c_str());
+			}else{
+				if(!auto_convert){
+					std::cout << " ----- Texture format " << fullpath.substr(fullpath.size()-3) << " is not supported, but if you convert " << fullpath << " to " << alternative_path << " (24bpp) it will be used instead." << std::endl;
+					std::cout << " ----- For example, you may run `convert +matte " << fullpath << " " << alternative_path << "`" << std::endl;
+				}else{
+					// perform autoconversion and retry
+					std::string command = "convert +matte " + fullpath + " " + alternative_path;
+					std::cout << "Running conversion: " << command << std::endl;
+					system(command.c_str());
+					id = LoadBMP(alternative_path.c_str());
+				}
+			}
+		}
+	}else{
+		std::cout << "Unable to load " << fullpath << " - file does not exist!" << std::endl;
+	}
+	if(id != GL_INVALID_VALUE) std::cout << "Loaded texture: " << fullpath << std::endl;
+	loaded_textures[std::make_pair(dir,path)] = id;
 	return id;
 }
 

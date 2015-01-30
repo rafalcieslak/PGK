@@ -41,6 +41,7 @@ struct Material{
 	mat_color ambient;
 	mat_color diffuse;
 	mat_color spectral;
+	std::string base_dir;
 	std::string  ambient_tex_path;
 	std::string  diffuse_tex_path;
 	std::string spectral_tex_path;

@@ -12,11 +12,12 @@ float camera_pitch = 0.0, camera_yaw = 0.0;
 float camera_start_pitch, camera_start_yaw;
 float light_pitch = 0.0, light_yaw = 60.0;
 float light_start_pitch, light_start_yaw;
-float distance = 4.0;
+float distance = 4.0 ,camera_distance;
 std::shared_ptr<Viewpoint> camera;
 float near, far;
 glm::vec3 lightpos(100.0,100.0,100.0);
 float zoom = 0;
+bool auto_convert = false;
 
 void update_camera_light_pos(){
 	camera_yaw = std::max(-90.0f, std::min(90.0f, camera_yaw));
@@ -26,30 +27,46 @@ void update_camera_light_pos(){
 	float xpos  = glm::sin(camera_pitch*0.0174532925);
 	float zpos  = glm::cos(camera_pitch*0.0174532925);
 	float ypos  = glm::sin(camera_yaw*0.0174532925);
-	camera->SetPosition(glm::pow(1.1f,zoom)*distance*glm::vec3(xpos*scale,ypos,scale*zpos));
+	float zoomed_distance = glm::pow(1.1f,zoom)*distance;
+	camera->SetPosition(zoomed_distance*glm::vec3(xpos*scale,ypos,scale*zpos));
 	camera->LookAt(glm::vec3(0.0,0.0,0.0));
+
+	near = zoomed_distance*0.1;
+	far = distance*6;
 
 	scale = glm::cos(light_yaw*0.0174532925);
 	xpos  = glm::sin(light_pitch*0.0174532925);
 	zpos  = glm::cos(light_pitch*0.0174532925);
 	ypos  = glm::sin(light_yaw*0.0174532925);
-	lightpos = distance*1.5f*glm::vec3(xpos*scale,ypos,scale*zpos);
+	lightpos = camera_distance*glm::vec3(xpos*scale,ypos,scale*zpos);
 }
 
 void scroll_callback(double x){
-	zoom += x;
+	zoom -= x;
 	update_camera_light_pos();
 }
 
 void usage(){
-	std::cout << "USAGE:   ./zadanie6 FILE.OBJ" << std::endl;
+	std::cout << "USAGE:   ./zadanie6 [-a] FILE.OBJ" << std::endl;
+	std::cout << "   -a  - enables automatic conversion from unknown texture formats to bmp." << std::endl;
+	std::cout << "         Requires the standard `convert` utility." << std::endl;
 	exit(0);
 }
 
 int main(int argc, char** argv){
 	if(argc < 2) usage();
 
-	ObjParser p(argv[1]);
+	std::string objpath;
+	if(std::string(argv[1]) == "-a"){
+		if(argc < 3) usage();
+		std::cout << "Auto conversion mode enabled." << std::endl;
+		auto_convert = true;
+		objpath = argv[2];
+	}else{
+		objpath = argv[1];
+	}
+
+	ObjParser p(objpath);
 	p.Parse();
 	std::cout << "Parsed!" << std::endl;
 
@@ -71,9 +88,7 @@ int main(int argc, char** argv){
 		m->Translate( -b.Center() );
 		m->PrepareBuffers();
 	}
-	distance = b.Radius()*1.3f;
-	near = distance*0.01;
-	far = distance*2;
+	camera_distance = 1.5* ( distance = b.Radius()*1.3f );
 	std::partition(p.meshes.begin(), p.meshes.end(), [](const std::shared_ptr<Mesh> m){return m->material->alpha > 0.99;});
 
 	camera = std::make_shared<Viewpoint>( glm::vec3(0.0, -10.0, 0.0) , glm::vec3(2.0,1.0,0.0));
@@ -125,6 +140,7 @@ int main(int argc, char** argv){
 		if(Render::IsKeyPressed(GLFW_KEY_T)){
 			light_yaw = camera_yaw;
 			light_pitch = camera_pitch;
+			camera_distance = glm::pow(1.1f,zoom)*distance;
 			update_camera_light_pos();
 		}
 
