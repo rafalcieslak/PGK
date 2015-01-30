@@ -1,0 +1,55 @@
+#version 330 core
+
+layout(triangles) in;
+layout(triangle_strip,max_vertices=9) out;
+
+uniform mat4 camera_transform;
+uniform mat4 perspective_transform;
+uniform vec3 lightpos_global = vec3(100.0,100.0,100.0);
+uniform float contour_scale = 1.0;
+
+in vertexData{
+	vec2 UV;
+	vec3 normal_global;
+} vertices[];
+
+out fragmentData{
+	vec2 UV;
+	vec3 normal_global;
+	vec3 vector_to_camera_global;
+	vec3 vector_to_light_global;
+    float colormult;
+} frag;
+
+void main()
+{
+    vec3 camerapos_global = -transpose(mat3(camera_transform)) * camera_transform[3].xyz;
+    for(int i=0; i<3; i++){
+        vec3 position_global = gl_in[i].gl_Position.xyz;
+    	frag.vector_to_light_global = lightpos_global - position_global;
+    	frag.vector_to_camera_global = camerapos_global - position_global;
+
+        frag.normal_global = vertices[i].normal_global;
+        frag.colormult = 1.0;
+        frag.UV = vertices[i].UV;
+        gl_Position =  perspective_transform * camera_transform * vec4(position_global, 1.0);
+        EmitVertex();
+    }
+    EndPrimitive();
+
+    for(int i=2; i>=0; i--){ // reverse order
+        // moved towards normal
+        vec4 position_global = gl_in[i].gl_Position + vec4(contour_scale * 0.01 * normalize( vertices[i].normal_global), 0.0);
+
+        frag.vector_to_light_global = lightpos_global - position_global.xyz;
+        frag.vector_to_camera_global = camerapos_global - position_global.xyz;
+        frag.normal_global = vertices[i].normal_global;
+        frag.UV = vertices[i].UV;
+
+        frag.colormult = 0.0;
+        gl_Position =  perspective_transform * camera_transform * position_global;
+        EmitVertex();
+    }
+    EndPrimitive();
+    EndPrimitive();
+}

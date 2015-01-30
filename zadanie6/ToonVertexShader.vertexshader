@@ -1,0 +1,26 @@
+#version 330 core
+
+
+layout(location = 0) in vec3 vertexPosition;
+layout(location = 1) in vec2 vertexUV;
+layout(location = 2) in vec3 vertexNormal;
+
+uniform mat4 camera_transform;
+uniform mat4 perspective_transform;
+uniform vec3 lightpos_global = vec3(100.0,100.0,100.0);
+
+out vec2 UV;
+out vec3 normal_global;
+out vec3 vector_to_camera_global;
+out vec3 vector_to_light_global;
+
+void main(){
+
+	vec3 camerapos_global = -transpose(mat3(camera_transform)) * camera_transform[3].xyz;
+	vector_to_light_global = lightpos_global - vertexPosition;
+	vector_to_camera_global = camerapos_global - vertexPosition;
+
+	gl_Position = perspective_transform * camera_transform * vec4(vertexPosition,1.0);
+	UV = vertexUV;
+	normal_global = vertexNormal;
+}

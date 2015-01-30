@@ -1,0 +1,53 @@
+#version 330 core
+
+out vec4 out_color;
+
+in fragmentData{
+	vec2 UV;
+	vec3 normal_global;
+	vec3 vector_to_camera_global;
+	vec3 vector_to_light_global;
+	float colormult;
+} frag;
+
+
+uniform sampler2D tex_sampler_diffuse;
+uniform sampler2D tex_sampler_ambient;
+uniform sampler2D tex_sampler_spectral;
+
+uniform vec3 color_diffuse;
+uniform vec3 color_ambient;
+uniform vec3 color_spectral;
+
+uniform int use_diffuse_texture;
+uniform int use_ambient_texture;
+uniform int use_spectral_texture;
+
+uniform float specular_hardness;
+uniform float alpha;
+
+void main()
+{
+	vec3 N = normalize( frag.normal_global );
+	vec3 V = normalize( frag.vector_to_camera_global );
+	vec3 L = normalize( frag.vector_to_light_global );
+	vec3 R = reflect(-L,N);
+
+	vec3 colorD, colorA, colorS;
+
+	colorD = color_diffuse;
+	colorA = color_ambient;
+	colorS = color_spectral;
+
+	float diffusemult = max( 0.0f, dot(N,L)) / 1.0;
+	diffusemult = diffusemult*0.8 + 0.2;
+	diffusemult = 0.2*ceil(5.0*diffusemult);
+	float spectralmult = pow( max( 0.0f, dot(V,R)) , 20.0) / 1.0;
+	spectralmult = step(0.8, spectralmult);
+
+	colorD *= diffusemult;
+	colorS *= spectralmult;
+	if(specular_hardness < 1.0) colorS = vec3(0.0);
+
+	out_color = vec4( (colorD*1.3f + colorS*1.0f) * frag.colormult, alpha);
+}

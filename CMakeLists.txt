@@ -314,6 +314,14 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie6")
 		zadanie6/BasicVertexShader.vertexshader
 		zadanie6/TextFragmentShader.fragmentshader
 		zadanie6/TextVertexShader.vertexshader
+		zadanie6/ToonFragmentShader.fragmentshader
+		zadanie6/ToonVertexShader.vertexshader
+		zadanie6/Toon2FragmentShader.fragmentshader
+		zadanie6/Toon2GeometryShader.geometryshader
+		zadanie6/Toon2VertexShader.vertexshader
+		zadanie6/Toon3FragmentShader.fragmentshader
+		zadanie6/Toon3GeometryShader.geometryshader
+		zadanie6/Toon3VertexShader.vertexshader
 		zadanie6/Ubuntu.ttf
 	)
 

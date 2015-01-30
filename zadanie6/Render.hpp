@@ -9,11 +9,20 @@
 #include <memory>
 #include "Mesh.hpp"
 
+typedef enum ShaderMode{
+	SHADER_MODE_BASIC,
+	SHADER_MODE_TOON,
+	SHADER_MODE_TOON2,
+	SHADER_MODE_TOON3
+} ShaderMode;
+
 class Render{
 private:
 	Render() = delete; // static class
 	// Shader program ID.
-	static GLuint shader_program_id;
+	static GLuint current_shader;
+	static GLuint basic_shader;
+	static GLuint toon_shader, toon2_shader, toon3_shader;
 	// The vertex array's ID.
 	static GLuint VertexArrayID;
 	// Pixel sizes. Needed for perfect text alignment.
@@ -23,6 +32,7 @@ private:
 	static GLint uniform_tex_spec, uniform_tex_amb, uniform_tex_diff;
 	static GLint uniform_use_tex_spec, uniform_use_tex_amb, uniform_use_tex_diff;
 	static GLint uniform_specular_hardness, uniform_lightpos, uniform_alpha;
+	static GLint uniform_contour_scale;
 	// Used for scroll handling
 	static void ScrollCallback(GLFWwindow*, double, double);
 public:
@@ -30,7 +40,7 @@ public:
 	static int Init();
 	static bool inited;
 	// Renders a single frame.
-	static void Frame(const std::vector<std::shared_ptr<Mesh>> &, glm::vec3 lightpos, float near, float far);
+	static void Frame(const std::vector<std::shared_ptr<Mesh>> &, glm::vec3 lightpos, float near, float far, float contour_scale);
 	// Closes the window etc.
 	static void CleanUp();
 	// Returns current time (in secs) since the program was launched.
@@ -45,6 +55,8 @@ public:
 	static GLint uniform_pos;
 	// Scroll callback
 	static std::function<void(double)> scroll_callback;
+	// Shader selection
+	static void SetShaderMode(ShaderMode);
 };
 
 

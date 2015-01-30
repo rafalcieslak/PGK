@@ -17,9 +17,10 @@ GLint Render::uniform_color_diffuse, Render::uniform_color_spectral, Render::uni
 GLint Render::uniform_tex_spec, Render::uniform_tex_amb, Render::uniform_tex_diff;
 GLint Render::uniform_use_tex_spec, Render::uniform_use_tex_amb, Render::uniform_use_tex_diff;
 GLint Render::uniform_specular_hardness, Render::uniform_lightpos, Render::uniform_alpha;
+GLint Render::uniform_contour_scale;
 GLuint Render::VertexArrayID;
 float Render::pxsizex, Render::pxsizey;
-GLuint Render::shader_program_id;
+GLuint Render::current_shader, Render::basic_shader, Render::toon_shader, Render::toon2_shader, Render::toon3_shader;
 bool Render::inited = false;
 std::function<void(double)> Render::scroll_callback;
 
@@ -39,6 +40,44 @@ bool Render::IsWindowClosed(){
 void Render::ScrollCallback(GLFWwindow*, double, double x){
 	if(scroll_callback)
 		scroll_callback(x);
+}
+
+void Render::SetShaderMode(ShaderMode s){
+	switch(s){
+		case SHADER_MODE_BASIC:
+			current_shader = basic_shader;
+			break;
+		case SHADER_MODE_TOON:
+			current_shader = toon_shader;
+			break;
+		case SHADER_MODE_TOON2:
+			current_shader = toon2_shader;
+			break;
+		case SHADER_MODE_TOON3:
+			current_shader = toon3_shader;
+			break;
+	}
+	// Prepare uniforms of the vertex shader
+	uniform_camera_transform = glGetUniformLocation(current_shader, "camera_transform");
+	uniform_perspective_transform = glGetUniformLocation(current_shader, "perspective_transform");
+	uniform_color_ambient  = glGetUniformLocation(current_shader, "color_ambient");
+	uniform_color_diffuse  = glGetUniformLocation(current_shader, "color_diffuse");
+	uniform_color_spectral = glGetUniformLocation(current_shader, "color_spectral");
+	uniform_tex_amb  = glGetUniformLocation(current_shader, "tex_sampler_ambient");
+	uniform_tex_spec  = glGetUniformLocation(current_shader, "tex_sampler_spectral");
+	uniform_tex_diff  = glGetUniformLocation(current_shader, "tex_sampler_diffuse");
+	uniform_use_tex_amb  = glGetUniformLocation(current_shader, "use_ambient_texture");
+	uniform_use_tex_spec  = glGetUniformLocation(current_shader, "use_spectral_texture");
+	uniform_use_tex_diff  = glGetUniformLocation(current_shader, "use_diffuse_texture");
+	uniform_specular_hardness  = glGetUniformLocation(current_shader, "specular_hardness");
+	uniform_lightpos  = glGetUniformLocation(current_shader, "lightpos_global");
+	uniform_alpha  = glGetUniformLocation(current_shader, "alpha");
+	uniform_contour_scale  = glGetUniformLocation(current_shader, "contour_scale");
+	if(uniform_camera_transform == -1 || uniform_perspective_transform == -1){
+		std::cerr << "An essential uniform is missing from the shader." << std::endl;
+		glfwTerminate();
+		exit(1);
+	}
 }
 
 int Render::Init(){
@@ -85,28 +124,12 @@ int Render::Init(){
 	glBindVertexArray(VertexArrayID);
 
 	// Create and compile our GLSL program from the shaders
-	shader_program_id = LoadShaders( "BasicVertexShader.vertexshader", "BasicFragmentShader.fragmentshader" );
+	basic_shader = LoadShaders( "BasicVertexShader.vertexshader", "BasicFragmentShader.fragmentshader" );
+	toon_shader = LoadShaders( "ToonVertexShader.vertexshader", "ToonFragmentShader.fragmentshader" );
+	toon2_shader = LoadShaders( "Toon2VertexShader.vertexshader", "Toon2GeometryShader.geometryshader", "Toon2FragmentShader.fragmentshader" );
+	toon3_shader = LoadShaders( "Toon3VertexShader.vertexshader", "Toon3GeometryShader.geometryshader", "Toon3FragmentShader.fragmentshader" );
 
-	// Prepare uniforms of the vertex shader
-	uniform_camera_transform = glGetUniformLocation(shader_program_id, "camera_transform");
-	uniform_perspective_transform = glGetUniformLocation(shader_program_id, "perspective_transform");
-	uniform_color_ambient  = glGetUniformLocation(shader_program_id, "color_ambient");
-	uniform_color_diffuse  = glGetUniformLocation(shader_program_id, "color_diffuse");
-	uniform_color_spectral = glGetUniformLocation(shader_program_id, "color_spectral");
-	uniform_tex_amb  = glGetUniformLocation(shader_program_id, "tex_sampler_ambient");
-	uniform_tex_spec  = glGetUniformLocation(shader_program_id, "tex_sampler_spectral");
-	uniform_tex_diff  = glGetUniformLocation(shader_program_id, "tex_sampler_diffuse");
-	uniform_use_tex_amb  = glGetUniformLocation(shader_program_id, "use_ambient_texture");
-	uniform_use_tex_spec  = glGetUniformLocation(shader_program_id, "use_spectral_texture");
-	uniform_use_tex_diff  = glGetUniformLocation(shader_program_id, "use_diffuse_texture");
-	uniform_specular_hardness  = glGetUniformLocation(shader_program_id, "specular_hardness");
-	uniform_lightpos  = glGetUniformLocation(shader_program_id, "lightpos_global");
-	uniform_alpha  = glGetUniformLocation(shader_program_id, "alpha");
-	if(uniform_camera_transform == -1 || uniform_perspective_transform == -1){
-		std::cerr << "An essential uniform is missing from the shader." << std::endl;
-		glfwTerminate();
-		return -1;
-	}
+	SetShaderMode(SHADER_MODE_BASIC);
 
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
@@ -134,12 +157,13 @@ bool Render::IsMouseDown(int button){
 }
 
 
-void Render::Frame(const std::vector<std::shared_ptr<Mesh>> &meshes, glm::vec3 lightpos, float near, float far){
+void Render::Frame(const std::vector<std::shared_ptr<Mesh>> &meshes, glm::vec3 lightpos, float near, float far, float contour_scale){
 
 	// Clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
 
-	glUseProgram(shader_program_id);
+	glUseProgram(current_shader);
 
 	// Prepare camera
 	glm::mat4 perspective;
@@ -158,6 +182,8 @@ void Render::Frame(const std::vector<std::shared_ptr<Mesh>> &meshes, glm::vec3 l
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
+
+	glUniform1f(uniform_contour_scale, contour_scale);
 
 	int id, use_tex;
 	for(auto m : meshes){
@@ -195,6 +221,15 @@ void Render::Frame(const std::vector<std::shared_ptr<Mesh>> &meshes, glm::vec3 l
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);
 
+	glDisable(GL_DEPTH_TEST); // Force text to always stay on top
+	for(auto t : Text::texts){
+		if(!t->active) continue;
+		glm::vec2 off = t->px_offset;
+		glm::vec3 color = t->color;
+
+		render_text(t->text.c_str(), -1.0 + off.x*pxsizex, 1.0 - off.y*pxsizey, color.r, color.g, color.b, t->size, pxsizex, pxsizey);
+	}
+
 	glUseProgram(0);
 
 	// Swap buffers
@@ -206,7 +241,10 @@ void Render::Frame(const std::vector<std::shared_ptr<Mesh>> &meshes, glm::vec3 l
 
 void Render::CleanUp(){
 	glDeleteVertexArrays(1, &VertexArrayID);
-	glDeleteProgram(shader_program_id);
+	glDeleteProgram(basic_shader);
+	glDeleteProgram(toon_shader);
+	glDeleteProgram(toon2_shader);
+	glDeleteProgram(toon3_shader);
 
 	// Close the window.
 	glfwTerminate();

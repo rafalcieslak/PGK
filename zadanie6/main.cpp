@@ -1,6 +1,7 @@
 #include "Render.hpp"
 #include "Viewpoint.hpp"
 #include "ObjParser.hpp"
+#include "Text.hpp"
 #include <iostream>
 #include <cstdlib>
 #include <algorithm>
@@ -27,11 +28,10 @@ void update_camera_light_pos(){
 	float xpos  = glm::sin(camera_pitch*0.0174532925);
 	float zpos  = glm::cos(camera_pitch*0.0174532925);
 	float ypos  = glm::sin(camera_yaw*0.0174532925);
-	float zoomed_distance = glm::pow(1.1f,zoom)*distance;
-	camera->SetPosition(zoomed_distance*glm::vec3(xpos*scale,ypos,scale*zpos));
+	camera->SetPosition(camera_distance*glm::vec3(xpos*scale,ypos,scale*zpos));
 	camera->LookAt(glm::vec3(0.0,0.0,0.0));
 
-	near = zoomed_distance*0.1;
+	near = camera_distance*0.1;
 	far = distance*50;
 
 	scale = glm::cos(light_yaw*0.0174532925);
@@ -43,6 +43,7 @@ void update_camera_light_pos(){
 
 void scroll_callback(double x){
 	zoom -= x;
+	camera_distance = glm::pow(1.1f,zoom)*distance;
 	update_camera_light_pos();
 }
 
@@ -103,8 +104,11 @@ int main(int argc, char** argv){
 	camera->SetAsActive();
 	update_camera_light_pos();
 
+	auto shaders_text = std::make_shared<Text>("1-4: select shader", glm::vec2(10,22),  16, glm::vec3(1.0,1.0,1.0));
+	auto current_text = std::make_shared<Text>("Current shader: basic",  glm::vec2(10,42),  16, glm::vec3(1.0,1.0,1.0));
+
 	do{
-		Render::Frame(p.meshes, lightpos, near, far);
+		Render::Frame(p.meshes, lightpos, near, far, camera_distance);
 
 		if(!mouse_left_down && Render::IsMouseDown(0)){
 			// mouse button was just pressed
@@ -151,6 +155,10 @@ int main(int argc, char** argv){
 			camera_distance = glm::pow(1.1f,zoom)*distance;
 			update_camera_light_pos();
 		}
+		if(Render::IsKeyPressed(GLFW_KEY_1)) { Render::SetShaderMode(SHADER_MODE_BASIC); current_text->SetText("Current shader: basic"); }
+		if(Render::IsKeyPressed(GLFW_KEY_2)) { Render::SetShaderMode(SHADER_MODE_TOON);  current_text->SetText("Current shader: toon "); }
+		if(Render::IsKeyPressed(GLFW_KEY_3)) { Render::SetShaderMode(SHADER_MODE_TOON2); current_text->SetText("Current shader: toon2"); }
+		if(Render::IsKeyPressed(GLFW_KEY_4)) { Render::SetShaderMode(SHADER_MODE_TOON3); current_text->SetText("Current shader: toon3"); }
 
 	}while( !Render::IsKeyPressed(GLFW_KEY_ESCAPE ) && !Render::IsWindowClosed() );
 
