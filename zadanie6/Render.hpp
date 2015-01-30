@@ -22,7 +22,7 @@ private:
 	static GLint uniform_color_diffuse, uniform_color_spectral, uniform_color_ambient;
 	static GLint uniform_tex_spec, uniform_tex_amb, uniform_tex_diff;
 	static GLint uniform_use_tex_spec, uniform_use_tex_amb, uniform_use_tex_diff;
-	static GLint uniform_specular_hardness, uniform_lightpos;
+	static GLint uniform_specular_hardness, uniform_lightpos, uniform_alpha;
 	// Used for scroll handling
 	static void ScrollCallback(GLFWwindow*, double, double);
 public:

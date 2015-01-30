@@ -16,7 +16,7 @@ GLint Render::uniform_camera_transform, Render::uniform_perspective_transform;
 GLint Render::uniform_color_diffuse, Render::uniform_color_spectral, Render::uniform_color_ambient;
 GLint Render::uniform_tex_spec, Render::uniform_tex_amb, Render::uniform_tex_diff;
 GLint Render::uniform_use_tex_spec, Render::uniform_use_tex_amb, Render::uniform_use_tex_diff;
-GLint Render::uniform_specular_hardness, Render::uniform_lightpos;
+GLint Render::uniform_specular_hardness, Render::uniform_lightpos, Render::uniform_alpha;
 GLuint Render::VertexArrayID;
 float Render::pxsizex, Render::pxsizey;
 GLuint Render::shader_program_id;
@@ -101,6 +101,7 @@ int Render::Init(){
 	uniform_use_tex_diff  = glGetUniformLocation(shader_program_id, "use_diffuse_texture");
 	uniform_specular_hardness  = glGetUniformLocation(shader_program_id, "specular_hardness");
 	uniform_lightpos  = glGetUniformLocation(shader_program_id, "lightpos_global");
+	uniform_alpha  = glGetUniformLocation(shader_program_id, "alpha");
 	if(uniform_camera_transform == -1 || uniform_perspective_transform == -1){
 		std::cerr << "An essential uniform is missing from the shader." << std::endl;
 		glfwTerminate();
@@ -185,6 +186,7 @@ void Render::Frame(const std::vector<std::shared_ptr<Mesh>> &meshes, glm::vec3 l
 		glBindTexture(GL_TEXTURE_2D, id);
 
 		glUniform1f(uniform_specular_hardness, m->material->spectral_exponent);
+		glUniform1f(uniform_alpha, m->material->alpha);
 
 		m->Render();
 	}

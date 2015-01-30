@@ -46,6 +46,7 @@ struct Material{
 	std::string spectral_tex_path;
 	float spectral_exponent = 25.0;
 	std::string name;
+	float alpha = 1.0f;
 };
 
 class Mesh{

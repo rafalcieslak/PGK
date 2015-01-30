@@ -204,7 +204,7 @@ bool MaterialLibrary::Step(){
 	}else if(split[0] == "Ni"){
 		std::cout << "MtlParser: Ignoring refraction index." << std::endl;
 	}else if(split[0] == "d" || split[0] == "Tr"){
-		std::cout << "MtlParser: Ignoring transparency." << std::endl;
+		current_material->alpha = (float)std::stod(split[1]);
 	}else if(split[0] == "illum"){
 		std::cout << "MtlParser: Ignoring illumination mode." << std::endl;
 	}else{

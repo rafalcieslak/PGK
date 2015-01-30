@@ -3,14 +3,14 @@
 #include "ObjParser.hpp"
 #include <iostream>
 #include <cstdlib>
-
+#include <algorithm>
 
 bool mouse_left_down = false, mouse_right_down = false;
 glm::vec2 drag_start_camera_pos;
 glm::vec2 drag_start_light_pos;
 float camera_pitch = 0.0, camera_yaw = 0.0;
 float camera_start_pitch, camera_start_yaw;
-float light_pitch = 0.0, light_yaw = 0.0;
+float light_pitch = 0.0, light_yaw = 60.0;
 float light_start_pitch, light_start_yaw;
 float distance = 4.0;
 std::shared_ptr<Viewpoint> camera;
@@ -74,6 +74,7 @@ int main(int argc, char** argv){
 	distance = b.Radius()*1.3f;
 	near = distance*0.01;
 	far = distance*2;
+	std::partition(p.meshes.begin(), p.meshes.end(), [](const std::shared_ptr<Mesh> m){return m->material->alpha > 0.99;});
 
 	camera = std::make_shared<Viewpoint>( glm::vec3(0.0, -10.0, 0.0) , glm::vec3(2.0,1.0,0.0));
 	camera->SetAsActive();
