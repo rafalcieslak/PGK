@@ -2,7 +2,7 @@
 #include <iostream>
 #include <algorithm>
 
-std::vector<std::string> SplitString(std::string str, std::string delimiter);
+std::vector<std::string> SplitString(std::string str, std::string delimiter, bool skipempty = true);
 std::string GetDir(const std::string& str);
 
 ObjParser::ObjParser(std::string objname) : file(objname){
@@ -58,7 +58,7 @@ bool ObjParser::Step(){
 		current_mesh->name = split[1];
 	}else if(split[0] == "g"){
 		// new group.
-		StartNewMeshIfNotEmpty();
+		// StartNewMeshIfNotEmpty();
 	}else if(split[0] == "mtllib"){
 		std::replace( split[1].begin(), split[1].end(), '\\', '/');
 		std::string mtlfile = GetDir(path) + "/" + split[1];
@@ -83,9 +83,9 @@ bool ObjParser::Step(){
 		}
 	}else if(split[0] == "f"){
 		if(split.size() <= 3  || split.size() >= 6){
-			std::cout << "ObjParser " << lineno << ": Invaild number of vetex entries in a face!" << std::endl;
+			std::cout << "ObjParser " << lineno << ": Unsupported number of vetex entries in a face!" << std::endl;
 			std::cout << line << std::endl;
-			return false;
+			//return false;
 		}
 		if(split.size() == 4){
 			face_vertex fv1 = ParseFW(split[1]);
@@ -96,7 +96,6 @@ bool ObjParser::Step(){
 			current_mesh->faces.push_back(t);
 			mesh_nonempty = true;
 		}else{ //5
-
 			face_vertex fv1 = ParseFW(split[1]);
 			face_vertex fv2 = ParseFW(split[2]);
 			face_vertex fv3 = ParseFW(split[3]);
@@ -108,7 +107,6 @@ bool ObjParser::Step(){
 			current_mesh->faces.push_back(t1);
 			current_mesh->faces.push_back(t2);
 			mesh_nonempty = true;
-
 		}
 	}else{
 		std::cout << "ObjParser " << lineno << ": ignoring unknown entry '" << split[0] << "'" << std::endl;
@@ -119,7 +117,7 @@ bool ObjParser::Step(){
 
 face_vertex ObjParser::ParseFW(std::string s){
 	int i1, i2, i3;
-	auto split = SplitString(s,"/");
+	auto split = SplitString(s,"/",false);
 	if(split.size() == 1){
 		i1 = std::stoi(split[0]);
 		i2 = 0;
@@ -130,7 +128,7 @@ face_vertex ObjParser::ParseFW(std::string s){
 		i3 = 0;
 	}else if(split.size() == 3){
 		i1 = std::stoi(split[0]);
-		i2 = std::stoi(split[1]);
+		i2 = (split[1]=="")?0:std::stoi(split[1]);
 		i3 = std::stoi(split[2]);
 	}
 
@@ -228,17 +226,17 @@ std::shared_ptr<Material> MaterialLibrary::GetMaterial(std::string name){
 	return it->second;
 }
 
-std::vector<std::string> SplitString(std::string str, std::string delimiter){
+std::vector<std::string> SplitString(std::string str, std::string delimiter, bool skipempty){
     std::vector<std::string> res;
 
     size_t pos = 0;
     std::string token;
     while ((pos = str.find(delimiter)) != std::string::npos) {
         token = str.substr(0, pos);
-        if(token != "") res.push_back(token);
+        if( !(skipempty && token == "") ) res.push_back(token);
         str.erase(0, pos + delimiter.length());
     }
-    if(str != "") res.push_back(str);
+    if( !(skipempty && str == "") ) res.push_back(str);
     return res;
 }
 std::string GetDir(const std::string& str)

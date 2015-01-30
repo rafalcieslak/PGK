@@ -27,7 +27,7 @@ struct Material{
 	std::string  ambient_tex_path;
 	std::string  diffuse_tex_path;
 	std::string spectral_tex_path;
-	float spectral_exponent;
+	float spectral_exponent = 25.0;
 	std::string name;
 };
 

@@ -1,7 +1,12 @@
 #version 330 core
 
 out vec4 out_color;
+
 in vec2 UV;
+in vec3 normal_global;
+in vec3 vector_to_camera_global;
+in vec3 vector_to_light_global;
+
 uniform sampler2D tex_sampler_diffuse;
 uniform sampler2D tex_sampler_ambient;
 uniform sampler2D tex_sampler_spectral;
@@ -14,15 +19,24 @@ uniform int use_diffuse_texture;
 uniform int use_ambient_texture;
 uniform int use_spectral_texture;
 
+uniform float specular_hardness;
+
 void main()
 {
+	vec3 N = normalize( normal_global );
+	vec3 V = normalize( vector_to_camera_global );
+	vec3 L = normalize( vector_to_light_global );
+	vec3 R = reflect(-L,N);
 
-	vec3 color;
- 	if(use_diffuse_texture == 0)
-		color = color_diffuse;
-	else
-		color = texture2D( tex_sampler_diffuse, UV ).rgb;
+	vec3 colorD, colorA, colorS;
+	colorD = (use_diffuse_texture  == 0)? color_diffuse  : texture2D( tex_sampler_diffuse,  UV ).rgb;
+	colorA = (use_ambient_texture  == 0)? color_ambient  : texture2D( tex_sampler_ambient,  UV ).rgb;
+	colorS = (use_spectral_texture == 0)? color_spectral : texture2D( tex_sampler_spectral, UV ).rgb;
 
-	out_color = vec4( color , 1.0);
 
+	colorD *= max( 0.0f, dot(N,L)) / 1.0;
+	colorS *= pow( max( 0.0f, dot(V,R)) , specular_hardness) / 1.0;
+	colorA *= 1.0;
+
+	out_color = vec4( colorD*0.8f + colorS*0.8f + colorA*0.1f , 1.0);
 }

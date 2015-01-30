@@ -303,7 +303,6 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zadanie6")
 		zadanie6/Shader.cpp
 		zadanie6/Fonts.cpp
 		zadanie6/TextureLoader.cpp
-		zadanie6/Model.cpp
 		zadanie6/Viewpoint.cpp
 		zadanie6/ObjParser.cpp
 		zadanie6/Mesh.cpp

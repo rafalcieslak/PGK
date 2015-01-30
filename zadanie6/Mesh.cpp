@@ -36,9 +36,6 @@ void Mesh::Render(){
 	glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
 	glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,0,0);
 
-	//glActiveTexture(GL_TEXTURE0);
-	//glBindTexture(GL_TEXTURE_2D, texture);
-
 	glDrawArrays(GL_TRIANGLES, 0, positions.size());
 
 
@@ -48,10 +45,6 @@ float Mesh::GetMaximumDistanceFromOriginSquared(){
 	float max = 0.0;
 	for(auto t: positions){
 		float d = t.x*t.x + t.y*t.y + t.z*t.z;
-		if(d > 100000.0){
-		//	std::cout << "Warning: a suspicious point found: " << t.x << " " << t.y << " " << t.z << std::endl;
-			continue;
-		}
 		if(d > max) max = d;
 	}
 	return max;

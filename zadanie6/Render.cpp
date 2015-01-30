@@ -16,6 +16,7 @@ GLint Render::uniform_camera_transform, Render::uniform_perspective_transform;
 GLint Render::uniform_color_diffuse, Render::uniform_color_spectral, Render::uniform_color_ambient;
 GLint Render::uniform_tex_spec, Render::uniform_tex_amb, Render::uniform_tex_diff;
 GLint Render::uniform_use_tex_spec, Render::uniform_use_tex_amb, Render::uniform_use_tex_diff;
+GLint Render::uniform_specular_hardness;
 GLuint Render::VertexArrayID;
 float Render::pxsizex, Render::pxsizey;
 GLuint Render::shader_program_id;
@@ -98,6 +99,7 @@ int Render::Init(){
 	uniform_use_tex_amb  = glGetUniformLocation(shader_program_id, "use_ambient_texture");
 	uniform_use_tex_spec  = glGetUniformLocation(shader_program_id, "use_spectral_texture");
 	uniform_use_tex_diff  = glGetUniformLocation(shader_program_id, "use_diffuse_texture");
+	uniform_specular_hardness  = glGetUniformLocation(shader_program_id, "specular_hardness");
 	if(uniform_camera_transform == -1 || uniform_perspective_transform == -1){
 		std::cerr << "An essential uniform is missing from the shader." << std::endl;
 		glfwTerminate();
@@ -152,7 +154,6 @@ void Render::Frame(const std::vector<std::shared_ptr<Mesh>> &meshes, float near,
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
 
-	//int i = 0;
 	int id, use_tex;
 	for(auto m : meshes){
 		if(m->hidden) continue;
@@ -177,10 +178,10 @@ void Render::Frame(const std::vector<std::shared_ptr<Mesh>> &meshes, float near,
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, id);
 
-		//i++;
+		glUniform1f(uniform_specular_hardness, m->material->spectral_exponent);
+
 		m->Render();
 	}
-	//std::cout << "Rendered " << i << " meshes." <<std::endl;
 
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
