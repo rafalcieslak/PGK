@@ -44,13 +44,13 @@ bool ObjParser::Step(){
 		return true;
 	}else if(split[0] == "v"){
 		// vertex entry
-		vertices.push_back(vert(std::stof(split[1]),std::stof(split[2]),std::stof(split[3])));
+		vertices.push_back(vert((float)std::stod(split[1]),(float)std::stod(split[2]),(float)std::stod(split[3])));
 	}else if(split[0] == "vn"){
 		// vertex normal entry
-		normals.push_back(vert_normal(std::stof(split[1]),std::stof(split[2]),std::stof(split[3])));
+		normals.push_back(vert_normal((float)std::stod(split[1]),(float)std::stod(split[2]),(float)std::stod(split[3])));
 	}else if(split[0] == "vt"){
 		// vertex texture
-		textures.push_back(vert_tex(std::stof(split[1]),std::stof(split[2])));
+		textures.push_back(vert_tex((float)std::stod(split[1]),(float)std::stod(split[2])));
 	}else if(split[0] == "s"){
 		//std::cout << "ObjParser " << lineno << ": ignoring smoothing group." << std::endl;
 	}else if(split[0] == "o"){
@@ -82,7 +82,7 @@ bool ObjParser::Step(){
 			}
 		}
 	}else if(split[0] == "f"){
-		if(split.size() <= 3  || split.size() >= 6){
+		if(split.size() <= 3 ){
 			std::cout << "ObjParser " << lineno << ": Unsupported number of vetex entries in a face!" << std::endl;
 			std::cout << line << std::endl;
 			//return false;
@@ -95,17 +95,16 @@ bool ObjParser::Step(){
 			t = FixMissingNormals(t);
 			current_mesh->faces.push_back(t);
 			mesh_nonempty = true;
-		}else{ //5
-			face_vertex fv1 = ParseFW(split[1]);
-			face_vertex fv2 = ParseFW(split[2]);
-			face_vertex fv3 = ParseFW(split[3]);
-			face_vertex fv4 = ParseFW(split[4]);
-			trig t1 = {fv1,fv2,fv3};
-			trig t2 = {fv3,fv4,fv1};
-			t1 = FixMissingNormals(t1);
-			t2 = FixMissingNormals(t2);
-			current_mesh->faces.push_back(t1);
-			current_mesh->faces.push_back(t2);
+		}else{ //5 or more
+			face_vertex first = ParseFW(split[1]);
+			face_vertex prev = ParseFW(split[2]);
+			for(unsigned int i = 3; i < split.size(); i++){
+				face_vertex curr = ParseFW(split[i]);
+				trig t = {first, prev, curr};
+				t = FixMissingNormals(t);
+				current_mesh->faces.push_back(t);
+				prev = curr;
+			}
 			mesh_nonempty = true;
 		}
 	}else{
@@ -186,13 +185,13 @@ bool MaterialLibrary::Step(){
 	}else if(split[0] == "newmtl"){
 		StartNewMaterial(split[1]);
 	}else if(split[0] == "Ka"){
-		current_material->ambient = mat_color(std::stof(split[1]),std::stof(split[2]),std::stof(split[3]));
+		current_material->ambient = mat_color((float)std::stod(split[1]),(float)std::stod(split[2]),(float)std::stod(split[3]));
 	}else if(split[0] == "Kd"){
-		current_material->diffuse = mat_color(std::stof(split[1]),std::stof(split[2]),std::stof(split[3]));
+		current_material->diffuse = mat_color((float)std::stod(split[1]),(float)std::stod(split[2]),(float)std::stod(split[3]));
 	}else if(split[0] == "Ks"){
-		current_material->spectral = mat_color(std::stof(split[1]),std::stof(split[2]),std::stof(split[3]));
+		current_material->spectral = mat_color((float)std::stod(split[1]),(float)std::stod(split[2]),(float)std::stod(split[3]));
 	}else if(split[0] == "Ns"){
-		current_material->spectral_exponent = std::stof(split[1]);
+		current_material->spectral_exponent = (float)std::stod(split[1]);
 	}else if(split[0] == "map_Ka"){
 		std::replace( split[1].begin(), split[1].end(), '\\', '/');
 		current_material->ambient_tex_path = dir + "/" + split[1];

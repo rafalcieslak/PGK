@@ -38,5 +38,5 @@ void main()
 	colorS *= pow( max( 0.0f, dot(V,R)) , specular_hardness) / 1.0;
 	colorA *= 1.0;
 
-	out_color = vec4( colorD*0.8f + colorS*0.8f + colorA*0.1f , 1.0);
+	out_color = vec4( colorD*0.8f + colorS*0.8f + colorA*0.8f , 1.0);
 }

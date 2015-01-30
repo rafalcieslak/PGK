@@ -32,7 +32,7 @@ void update_camera_light_pos(){
 	xpos  = glm::sin(light_pitch*0.0174532925);
 	zpos  = glm::cos(light_pitch*0.0174532925);
 	ypos  = glm::sin(light_yaw*0.0174532925);
-	lightpos = distance*glm::vec3(xpos*scale,ypos,scale*zpos);
+	lightpos = distance*1.5f*glm::vec3(xpos*scale,ypos,scale*zpos);
 }
 
 void usage(){
@@ -108,6 +108,13 @@ int main(int argc, char** argv){
 		}else if(mouse_right_down && !Render::IsMouseDown(1)){
 			mouse_right_down = false;
 		}
+
+		if(Render::IsKeyPressed(GLFW_KEY_T)){
+			light_yaw = camera_yaw;
+			light_pitch = camera_pitch;
+			update_camera_light_pos();
+		}
+
 	}while( !Render::IsKeyPressed(GLFW_KEY_ESCAPE ) && !Render::IsWindowClosed() );
 
 }
