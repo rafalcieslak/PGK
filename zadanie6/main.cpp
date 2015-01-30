@@ -32,7 +32,7 @@ void update_camera_light_pos(){
 	camera->LookAt(glm::vec3(0.0,0.0,0.0));
 
 	near = zoomed_distance*0.1;
-	far = distance*6;
+	far = distance*50;
 
 	scale = glm::cos(light_yaw*0.0174532925);
 	xpos  = glm::sin(light_pitch*0.0174532925);
@@ -67,8 +67,16 @@ int main(int argc, char** argv){
 	}
 
 	ObjParser p(objpath);
+	if(!p.Good()){
+		std::cout << "Problem opening file " << objpath << std::endl;
+		return 0;
+	}
 	p.Parse();
 	std::cout << "Parsed!" << std::endl;
+	if(p.meshes.size() < 1){
+		std::cout << "No meshes found." << std::endl;
+		return 0;
+	}
 
 	// Prepare the renderer.
 	int n = Render::Init();

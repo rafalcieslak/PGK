@@ -28,6 +28,15 @@ inline bool exists(std::string filename){
 		f.close(); return false;
 	}
 }
+void ReplaceAll(std::string& str, const std::string& from, const std::string& to) {
+    if(from.empty())
+        return;
+    size_t start_pos = 0;
+    while((start_pos = str.find(from, start_pos)) != std::string::npos) {
+        str.replace(start_pos, from.length(), to);
+        start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
+    }
+}
 
 GLuint GetTexture(std::string dir, std::string path){
 	auto it = loaded_textures.find(std::make_pair(dir,path));
@@ -63,7 +72,10 @@ GLuint GetTexture(std::string dir, std::string path){
 					std::cout << " ----- For example, you may run `convert +matte " << fullpath << " " << alternative_path << "`" << std::endl;
 				}else{
 					// perform autoconversion and retry
-					std::string command = "convert +matte " + fullpath + " " + alternative_path;
+					std::string p1 = fullpath, p2 = alternative_path;
+					ReplaceAll(p1," ","\\ ");
+					ReplaceAll(p2," ","\\ ");
+					std::string command = "convert +matte " + p1 + " " + p2;
 					std::cout << "Running conversion: " << command << std::endl;
 					system(command.c_str());
 					id = LoadBMP(alternative_path.c_str());
