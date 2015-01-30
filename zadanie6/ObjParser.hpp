@@ -14,7 +14,7 @@ public:
 	// Parses a single line. Returns true if there is more data available.
 	bool Step();
 	// Tests whether the file exists and is readable
-	bool Good();
+	bool Good() const;
 	// Returns a pointer to a material by its name
 	std::shared_ptr<Material> GetMaterial(std::string);
 private:
@@ -43,7 +43,7 @@ public:
 	// Parses a single line.  Returns true if there is more data available.
 	bool Step();
 	// Tests whether the file exists and is readable
-	bool Good();
+	bool Good() const;
 
 	// Parsed meshes land here
 	std::vector<std::shared_ptr<Mesh>> meshes;

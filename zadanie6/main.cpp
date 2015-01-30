@@ -16,6 +16,7 @@ float distance = 4.0;
 std::shared_ptr<Viewpoint> camera;
 float near, far;
 glm::vec3 lightpos(100.0,100.0,100.0);
+float zoom = 0;
 
 void update_camera_light_pos(){
 	camera_yaw = std::max(-90.0f, std::min(90.0f, camera_yaw));
@@ -25,7 +26,7 @@ void update_camera_light_pos(){
 	float xpos  = glm::sin(camera_pitch*0.0174532925);
 	float zpos  = glm::cos(camera_pitch*0.0174532925);
 	float ypos  = glm::sin(camera_yaw*0.0174532925);
-	camera->SetPosition(distance*glm::vec3(xpos*scale,ypos,scale*zpos));
+	camera->SetPosition(glm::pow(1.1f,zoom)*distance*glm::vec3(xpos*scale,ypos,scale*zpos));
 	camera->LookAt(glm::vec3(0.0,0.0,0.0));
 
 	scale = glm::cos(light_yaw*0.0174532925);
@@ -33,6 +34,11 @@ void update_camera_light_pos(){
 	zpos  = glm::cos(light_pitch*0.0174532925);
 	ypos  = glm::sin(light_yaw*0.0174532925);
 	lightpos = distance*1.5f*glm::vec3(xpos*scale,ypos,scale*zpos);
+}
+
+void scroll_callback(double x){
+	zoom += x;
+	update_camera_light_pos();
 }
 
 void usage(){
@@ -51,15 +57,21 @@ int main(int argc, char** argv){
 	int n = Render::Init();
 	if(n) return n;
 
-	float max = 0.0;
+	Render::scroll_callback = scroll_callback;
+
+	bounds b;
 	std::cout << "Mesh list: "<< std::endl;
 	for(auto m : p.meshes){
-		m->PrepareBuffers();
-		float d = m->GetMaximumDistanceFromOriginSquared();
-		if(d > max) max = d;
-		std::cout << m->name << ": " << m->faces.size() << " triangles, size: " << d << std::endl;
+		m->PrepareData();
+		bounds d = m->GetBounds();
+		b.Update(d.min); b.Update(d.max);
+		std::cout << m->name << ": " << m->faces.size() << " triangles" <<  std::endl;
 	}
-	distance = glm::pow(max,0.5f)*1.3;
+	for(auto m : p.meshes){
+		m->Translate( -b.Center() );
+		m->PrepareBuffers();
+	}
+	distance = b.Radius()*1.3f;
 	near = distance*0.01;
 	far = distance*2;
 

@@ -3,7 +3,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
-void Mesh::PrepareBuffers(){
+void Mesh::PrepareData(){
 	for(const trig &t : faces){
 		positions.push_back(t[0].v);
 		positions.push_back(t[1].v);
@@ -15,7 +15,9 @@ void Mesh::PrepareBuffers(){
 		normals.push_back(t[1].vn);
 		normals.push_back(t[2].vn);
 	}
+}
 
+void Mesh::PrepareBuffers(){
 	glGenBuffers(1, &vertexbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 	glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(glm::vec3), &positions[0], GL_STATIC_DRAW);
@@ -27,25 +29,22 @@ void Mesh::PrepareBuffers(){
 	glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
 }
 
-void Mesh::Render(){
-
+void Mesh::Render() const{
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 	glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,0,0);
 	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 	glVertexAttribPointer(1,2,GL_FLOAT,GL_FALSE,0,0);
 	glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
 	glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,0,0);
-
 	glDrawArrays(GL_TRIANGLES, 0, positions.size());
-
-
 }
 
-float Mesh::GetMaximumDistanceFromOriginSquared(){
-	float max = 0.0;
-	for(auto t: positions){
-		float d = t.x*t.x + t.y*t.y + t.z*t.z;
-		if(d > max) max = d;
-	}
-	return max;
+bounds Mesh::GetBounds() const{
+	bounds b;
+	for(auto t: positions) b.Update(t);
+	return b;
+}
+
+void Mesh::Translate(glm::vec3 t){
+	for(auto &v : positions) v += t;
 }

@@ -111,6 +111,9 @@ int Render::Init(){
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
+
+	glEnable(GL_CULL_FACE);
+
 	// Prepare for rendering fonts.
 	int res = init_font();
 	if(res < 0) return res;

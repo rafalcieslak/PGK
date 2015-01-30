@@ -19,6 +19,23 @@ typedef struct{
 } face_vertex;
 typedef std::array<face_vertex,3> trig;
 typedef glm::vec3 mat_color;
+typedef struct{
+	glm::vec3 min = glm::vec3(1e30,1e30,1e30);
+	glm::vec3 max = glm::vec3(-1e30,-1e30,-1e30);
+	void Update(glm::vec3 t){
+		if(t.x > max.x) max.x = t.x;
+		if(t.x < min.x) min.x = t.x;
+		if(t.y > max.y) max.y = t.y;
+		if(t.y < min.y) min.y = t.y;
+		if(t.z > max.z) max.z = t.z;
+		if(t.z < min.z) min.z = t.z;
+	}
+	glm::vec3 Center() const{ return 0.5f*(max+min); }
+	float Radius() const{
+		glm::vec3 q = Center() - max;
+		return glm::pow(q.x*q.x + q.z*q.z + q.y*q.y, 0.5f);
+	}
+} bounds;
 
 struct Material{
 	mat_color ambient;
@@ -35,11 +52,13 @@ class Mesh{
 public:
 	std::vector<trig> faces;
 	std::shared_ptr<Material> material;
-	void Render();
+	void Render() const;
+	void PrepareData();
 	void PrepareBuffers();
 	std::string name;
 	bool hidden = false;
-	float GetMaximumDistanceFromOriginSquared();
+	bounds GetBounds() const;
+	void Translate(glm::vec3);
 private:
 	std::vector<glm::vec3> positions;
 	std::vector<glm::vec2> uvs;

@@ -11,7 +11,7 @@ ObjParser::ObjParser(std::string objname) : file(objname){
 	current_mesh = std::make_shared<Mesh>();
 }
 
-bool ObjParser::Good(){
+bool ObjParser::Good() const{
 	return (bool)file;
 }
 
@@ -166,7 +166,7 @@ MaterialLibrary::~MaterialLibrary(){
 	file.close();
 }
 
-bool MaterialLibrary::Good(){
+bool MaterialLibrary::Good() const{
 	return (bool)file;
 }
 void MaterialLibrary::Parse(){
