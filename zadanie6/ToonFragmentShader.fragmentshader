@@ -40,9 +40,9 @@ void main()
 	colorS = color_spectral;
 
 	float diffusemult = max( 0.0f, dot(N,L)) / 1.0;
-	diffusemult = 0.165*ceil(8.0*diffusemult) * pow(dot(N,V),0.1);
+	//diffusemult = 0.165*ceil(8.0*diffusemult) * pow(dot(N,V),0.1);
 	float spectralmult = pow( max( 0.0f, dot(V,R)) , 30.0) / 1.0;
-	spectralmult = step(0.8, spectralmult);
+	spectralmult = smoothstep(0.5,0.9, spectralmult);
 
 	colorD *= diffusemult;
 	colorS *= spectralmult;
@@ -50,5 +50,7 @@ void main()
 	colorA *= 1.0;
 
 	out_color = vec4( colorD*1.3f + colorS*1.0f + colorA*0.2f, alpha);
-	if( dot(N,V) < 0.2f) out_color = vec4(0.0,0.0,0.0,1.0);
+	float dark = smoothstep(0.3,0.55,dot(N,V));
+	dark = pow(dark,4.0);
+	out_color = mix(vec4(0.0,0.0,0.0,1.0),out_color,dark);
 }

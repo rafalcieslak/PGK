@@ -66,6 +66,9 @@ void render_text(const char *text, float x, float y, float colorr, float colorg,
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
 
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tex);
+
 	for(p = text; *p; p++) {
 		if(FT_Load_Char(face, *p, FT_LOAD_RENDER))
 			continue;

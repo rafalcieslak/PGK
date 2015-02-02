@@ -106,6 +106,10 @@ int main(int argc, char** argv){
 
 	auto shaders_text = std::make_shared<Text>("1-4: select shader", glm::vec2(10,22),  16, glm::vec3(1.0,1.0,1.0));
 	auto current_text = std::make_shared<Text>("Current shader: basic",  glm::vec2(10,42),  16, glm::vec3(1.0,1.0,1.0));
+	auto movecam_text = std::make_shared<Text>("Mouse drag: rotate object/camera", glm::vec2(10,62),  16, glm::vec3(1.0,1.0,1.0));
+	auto scroll_text  = std::make_shared<Text>("Mouse wheel: zoom in/out", glm::vec2(10,82),  16, glm::vec3(1.0,1.0,1.0));
+	auto light_text   = std::make_shared<Text>("Right mouse drag: rotate light source", glm::vec2(10,102),  16, glm::vec3(1.0,1.0,1.0));
+	auto     t_text   = std::make_shared<Text>("T: move light source to camera", glm::vec2(10,122),  16, glm::vec3(1.0,1.0,1.0));
 
 	do{
 		Render::Frame(p.meshes, lightpos, near, far, camera_distance);

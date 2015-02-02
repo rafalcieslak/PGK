@@ -46,7 +46,7 @@ void main()
         vec3 position_cameraspace = (camera_transform * position_global).xyz;
         vec3 normal_cameraspace = (camera_transform * vec4(vertices[i].normal_global, 0.0)).xyz;
         vec3 flattened_normal = normalize(vec3(normal_cameraspace.x , 0.0,  0.0));
-        position_cameraspace += flattened_normal * contour_scale * 0.01;
+        position_cameraspace += flattened_normal * contour_scale * 0.008;
 
         frag.vector_to_light_global = lightpos_global - position_global.xyz;
         frag.vector_to_camera_global = camerapos_global - position_global.xyz;
@@ -68,7 +68,7 @@ void main()
         vec3 position_cameraspace = (camera_transform * position_global).xyz;
         vec3 normal_cameraspace = (camera_transform * vec4(vertices[i].normal_global, 0.0)).xyz;
         vec3 flattened_normal = normalize(vec3(0.0, normal_cameraspace.y,  0.0));
-        position_cameraspace += flattened_normal * contour_scale * 0.01;
+        position_cameraspace += flattened_normal * contour_scale * 0.008;
 
         frag.vector_to_light_global = lightpos_global - position_global.xyz;
         frag.vector_to_camera_global = camerapos_global - position_global.xyz;

@@ -162,6 +162,7 @@ void Render::Frame(const std::vector<std::shared_ptr<Mesh>> &meshes, glm::vec3 l
 	// Clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
 
 	glUseProgram(current_shader);
 
@@ -222,6 +223,8 @@ void Render::Frame(const std::vector<std::shared_ptr<Mesh>> &meshes, glm::vec3 l
 	glDisableVertexAttribArray(2);
 
 	glDisable(GL_DEPTH_TEST); // Force text to always stay on top
+	glDisable(GL_CULL_FACE);
+
 	for(auto t : Text::texts){
 		if(!t->active) continue;
 		glm::vec2 off = t->px_offset;
