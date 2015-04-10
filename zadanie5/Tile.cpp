@@ -162,8 +162,8 @@ bool Tile::TryDownload(std::string dir, int lat, int lon){
 bool Tile::DownloadZIP(int lat, int lon){
 	if(!TryDownload("Eurasia", lat, lon))
 		if(!TryDownload("Africa", lat, lon))
-			if(!TryDownload("North\\ America", lat, lon))
-				if(!TryDownload("South\\ America", lat, lon))
+			if(!TryDownload("North_America", lat, lon))
+				if(!TryDownload("South_America", lat, lon))
 					if(!TryDownload("Australia", lat, lon))
 						if(!TryDownload("Islands", lat, lon))
 							return false; //pass
