@@ -48,8 +48,8 @@ vec3 getcolor(float ht){
 void main(){
 	float a = 1.0;
 	if(attrData == -32768) a = -1e20;
-	uint posXi = attrPosition >> 16;
-	uint posYi = attrPosition & uint(0xffff);
+	uint posXi = uint(uint(attrPosition) >> uint(16));
+	uint posYi = uint(attrPosition & uint(0xffff));
 	float posX = float(posXi)/1200.0 + pos.x;
 	float posY = float(posYi)/-1200.0 + pos.y;
 
