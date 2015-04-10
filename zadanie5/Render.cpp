@@ -69,8 +69,8 @@ int Render::Init(){
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 	// Open a window and create its OpenGL context
-	window = glfwCreateWindow( 1000, 1000, "Terrain", NULL, NULL);
-	pxsizex = 2.0 / 1000;
+	window = glfwCreateWindow( 1400, 1000, "Terrain", NULL, NULL);
+	pxsizex = 2.0 / 1400;
 	pxsizey = 2.0 / 1000;
 	if( window == NULL ){
 		std::cerr << "Failed to open GLFW window." << std::endl;
@@ -181,9 +181,9 @@ void Render::FrameStart(float light_intensity, float light_angle, float xscale, 
 		cameraview =  glm::lookAt(glm::vec3(0.0) , 1.0f* Viewpoint::active_viewpoint->GetDirection(), glm::vec3(0.0,0.0,1.0)) * glm::inverse(Viewpoint::active_viewpoint->GetTransform());
 		if(Viewpoint::active_viewpoint->ortho){
 			float r = Viewpoint::active_viewpoint->ortho_range;
-			perspective = glm::ortho(-r,r,-r,r,0.1f,20.0f);
+			perspective = glm::ortho(-r*1.4f,r*1.4f,-r,r,0.1f,20.0f);
  		}else{
-			perspective = glm::perspective(Viewpoint::active_viewpoint->GetFOV(), 1.0f, 0.0005f, 4.0f);
+			perspective = glm::perspective(Viewpoint::active_viewpoint->GetFOV(), 1.4f, 0.0005f, 4.0f);
 		}
 	}
 

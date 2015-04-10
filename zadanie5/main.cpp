@@ -202,15 +202,15 @@ int main(int argc, char** argv){
 	auto jkl_text = std::make_shared<Text>("",        													 glm::vec2(10,202), 16, glm::vec3(1.0,1.0,1.0));
 	auto adjfov_text = std::make_shared<Text>("",                                glm::vec2(10,222), 16, glm::vec3(1.0,1.0,1.0));
 
-	auto tri_text = std::make_shared<Text>("Triangles: ",         glm::vec2(830,22), 16, glm::vec3(1.0,0.5,0.5));
-	auto res_text = std::make_shared<Text>("Tile size: ",         glm::vec2(830,42), 16, glm::vec3(1.0,0.5,0.5));
-	auto rendertime_text = std::make_shared<Text>("Frame time: ", glm::vec2(830,62), 16, glm::vec3(1.0,0.5,0.5));
-	auto fps_text = std::make_shared<Text>("FPS: ",               glm::vec2(830,82), 16, glm::vec3(1.0,0.5,0.5));
+	auto tri_text = std::make_shared<Text>("Triangles: ",         glm::vec2(1230,22), 16, glm::vec3(1.0,0.5,0.5));
+	auto res_text = std::make_shared<Text>("Tile size: ",         glm::vec2(1230,42), 16, glm::vec3(1.0,0.5,0.5));
+	auto rendertime_text = std::make_shared<Text>("Frame time: ", glm::vec2(1230,62), 16, glm::vec3(1.0,0.5,0.5));
+	auto fps_text = std::make_shared<Text>("FPS: ",               glm::vec2(1230,82), 16, glm::vec3(1.0,0.5,0.5));
 
-	auto lig_text = std::make_shared<Text>("Light contrast: low",      glm::vec2(670,22), 16, glm::vec3(0.5,0.5,1.0));
-	auto lan_text = std::make_shared<Text>("Light angle: ",            glm::vec2(670,42), 16, glm::vec3(0.5,0.5,1.0));
-	     fov_text = std::make_shared<Text>("Camera FOV: 0",            glm::vec2(670,62), 16, glm::vec3(0.5,0.5,1.0));
-	auto tsc_text = std::make_shared<Text>("Terrain scale: realistic", glm::vec2(670,82), 16, glm::vec3(0.5,0.5,1.0));
+	auto lig_text = std::make_shared<Text>("Light contrast: low",      glm::vec2(1070,22), 16, glm::vec3(0.5,0.5,1.0));
+	auto lan_text = std::make_shared<Text>("Light angle: ",            glm::vec2(1070,42), 16, glm::vec3(0.5,0.5,1.0));
+	     fov_text = std::make_shared<Text>("Camera FOV: 0",            glm::vec2(1070,62), 16, glm::vec3(0.5,0.5,1.0));
+	auto tsc_text = std::make_shared<Text>("Terrain scale: realistic", glm::vec2(1070,82), 16, glm::vec3(0.5,0.5,1.0));
 
 	// Setup cameras
 	glm::vec4 center = FindCenter();
@@ -263,7 +263,7 @@ int main(int argc, char** argv){
 		Render::FrameStart(light_intensity, light_angle*0.0174532925, xscale, viewmode==VIEWMODE_3D, terrainscale);
 		for(auto tile : tiles){
 			if(viewmode == VIEWMODE_ORTHO){
-				if(!intersect(campos.x - camrange, campos.y - camrange, campos.x + camrange, campos.y + camrange,
+				if(!intersect(campos.x - camrange*1.4f, campos.y - camrange, campos.x + camrange*1.4f, campos.y + camrange,
 							  tile->lon*xscale, tile->lat-1.0, (tile->lon+1.0)*xscale, tile->lat)) continue;
 			}
 			triangles += tile->Render(lod);
