@@ -22,6 +22,7 @@ float Render::pxsizex, Render::pxsizey;
 GLuint Render::shader_program_id;
 GLuint Render::grid_program_id;
 GLuint Render::gridbuffer;
+bool Render::mouse_captured = false;
 int Render::gridno;
 bool Render::inited = false;
 std::function<void(double)> Render::scroll_callback;
@@ -39,9 +40,19 @@ bool Render::IsWindowClosed(){
 }
 
 
+
 void Render::ScrollCallback(GLFWwindow*, double, double x){
 	if(scroll_callback)
 		scroll_callback(x);
+}
+
+void Render::CaptureMouse(){
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	mouse_captured = true;
+}
+void Render::FreeMouse(){
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	mouse_captured = false;
 }
 
 int Render::Init(){
@@ -77,7 +88,6 @@ int Render::Init(){
 	}
 
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetScrollCallback(window,ScrollCallback);
 
 	// Background
@@ -147,6 +157,7 @@ int Render::Init(){
 }
 
 glm::vec2 Render::ProbeMousePos(){
+	if(!mouse_captured) return glm::vec2(0,0);
 	double x,y;
 	glfwGetCursorPos(window,&x,&y);
 	glfwSetCursorPos(window,500.0,500.0);

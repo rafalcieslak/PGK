@@ -25,6 +25,7 @@ private:
 	static GLint uniform_terrainscale;
 	// Used for scroll handling
 	static void ScrollCallback(GLFWwindow*, double, double);
+	static bool mouse_captured;
 public:
 	// Prepares for rendering, sets up the window, prepares buffers.
 	static int Init();
@@ -44,6 +45,9 @@ public:
 	static glm::vec2 ProbeMousePos();
 	static bool IsMouseDown();
 	static GLint uniform_pos;
+	// For cursor control
+	static void CaptureMouse();
+	static void FreeMouse();
 	// Scroll callback
 	static std::function<void(double)> scroll_callback;
 };

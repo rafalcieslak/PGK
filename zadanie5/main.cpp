@@ -12,7 +12,7 @@ std::shared_ptr<Viewpoint> ortho_camera, persp_camera;
 std::shared_ptr<Text> fov_text;
 short lod = 3;
 bool tab_pressed = false, ctrl_pressed = false, z_pressed = false, x_pressed = false;
-float light_intensity = 10.0;
+float light_intensity = 100.0;
 float light_angle = 0.0;
 bool auto_lod = false;
 float terrainscale = 1.0;
@@ -198,8 +198,9 @@ int main(int argc, char** argv){
 	auto rca_text = std::make_shared<Text>("R: Reset camera",                    glm::vec2(10,122), 16, glm::vec3(1.0,1.0,1.0));
 	auto rot_text = std::make_shared<Text>("E+mouse: Rotate lightning",          glm::vec2(10,142), 16, glm::vec3(1.0,1.0,1.0));
 	auto iop_text = std::make_shared<Text>("I/O/P: Set light contrast",          glm::vec2(10,162), 16, glm::vec3(1.0,1.0,1.0));
-	auto jkl_text = std::make_shared<Text>("J/K/L: Switch terrain scale",        glm::vec2(10,182), 16, glm::vec3(1.0,1.0,1.0));
-	auto adjfov_text = std::make_shared<Text>("",                                glm::vec2(10,202), 16, glm::vec3(1.0,1.0,1.0));
+	auto  nm_text = std::make_shared<Text>("N/M: Capture/free mouse pointer",    glm::vec2(10,182), 16, glm::vec3(1.0,1.0,1.0));
+	auto jkl_text = std::make_shared<Text>("",        													 glm::vec2(10,202), 16, glm::vec3(1.0,1.0,1.0));
+	auto adjfov_text = std::make_shared<Text>("",                                glm::vec2(10,222), 16, glm::vec3(1.0,1.0,1.0));
 
 	auto tri_text = std::make_shared<Text>("Triangles: ",         glm::vec2(830,22), 16, glm::vec3(1.0,0.5,0.5));
 	auto res_text = std::make_shared<Text>("Tile size: ",         glm::vec2(830,42), 16, glm::vec3(1.0,0.5,0.5));
@@ -227,6 +228,8 @@ int main(int argc, char** argv){
 	// Prepare tile VBO data
 	std::cout << "Preparing VBOs..." << std::endl;
 	for(auto tile : tiles) tile->Prepare();
+
+	Render::CaptureMouse();
 
 	Render::scroll_callback = ScrollCallback;
 	double lasttime = Render::GetTime();
@@ -343,6 +346,9 @@ int main(int argc, char** argv){
 		if(Render::IsKeyPressed(GLFW_KEY_5)) {lod = 4; auto_lod = false;}
 		if(Render::IsKeyPressed(GLFW_KEY_6)) {lod = 5; auto_lod = false;}
 		if(Render::IsKeyPressed(GLFW_KEY_0)) auto_lod = true;
+
+		if(Render::IsKeyPressed(GLFW_KEY_N)) {Render::CaptureMouse();}
+		if(Render::IsKeyPressed(GLFW_KEY_M)) {Render::FreeMouse();}
 
 		if(Render::IsKeyPressed(GLFW_KEY_I)) { light_intensity = 4.0;   lig_text->SetText("Light contrast: high");}
 		if(Render::IsKeyPressed(GLFW_KEY_O)) { light_intensity = 10.0;  lig_text->SetText("Light contrast: low");}
