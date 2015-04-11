@@ -263,7 +263,7 @@ int main(int argc, char** argv){
 		Render::FrameStart(light_intensity, light_angle*0.0174532925, xscale, viewmode==VIEWMODE_3D, terrainscale);
 		for(auto tile : tiles){
 			if(viewmode == VIEWMODE_ORTHO){
-				if(!intersect(campos.x - camrange*1.4f, campos.y - camrange, campos.x + camrange*1.4f, campos.y + camrange,
+				if(!intersect(campos.x - camrange*Render::WINDOW_SIZE_RATIO, campos.y - camrange, campos.x + camrange*Render::WINDOW_SIZE_RATIO, campos.y + camrange,
 							  tile->lon*xscale, tile->lat-1.0, (tile->lon+1.0)*xscale, tile->lat)) continue;
 			}
 			triangles += tile->Render(lod);

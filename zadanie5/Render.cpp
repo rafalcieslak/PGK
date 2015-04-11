@@ -25,6 +25,8 @@ GLuint Render::gridbuffer;
 bool Render::mouse_captured = false;
 int Render::gridno;
 bool Render::inited = false;
+int Render::WINDOW_SIZE_X = 1400, Render::WINDOW_SIZE_Y = 1000;
+float Render::WINDOW_SIZE_RATIO = 1.4;
 std::function<void(double)> Render::scroll_callback;
 
 double Render::GetTime(){
@@ -69,9 +71,9 @@ int Render::Init(){
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 	// Open a window and create its OpenGL context
-	window = glfwCreateWindow( 1400, 1000, "Terrain", NULL, NULL);
-	pxsizex = 2.0 / 1400;
-	pxsizey = 2.0 / 1000;
+	window = glfwCreateWindow( WINDOW_SIZE_X, WINDOW_SIZE_Y, "Terrain", NULL, NULL);
+	pxsizex = 2.0 / WINDOW_SIZE_X;
+	pxsizey = 2.0 / WINDOW_SIZE_Y;
 	if( window == NULL ){
 		std::cerr << "Failed to open GLFW window." << std::endl;
 		glfwTerminate();
@@ -181,9 +183,9 @@ void Render::FrameStart(float light_intensity, float light_angle, float xscale, 
 		cameraview =  glm::lookAt(glm::vec3(0.0) , 1.0f* Viewpoint::active_viewpoint->GetDirection(), glm::vec3(0.0,0.0,1.0)) * glm::inverse(Viewpoint::active_viewpoint->GetTransform());
 		if(Viewpoint::active_viewpoint->ortho){
 			float r = Viewpoint::active_viewpoint->ortho_range;
-			perspective = glm::ortho(-r*1.4f,r*1.4f,-r,r,0.1f,20.0f);
+			perspective = glm::ortho(-r*WINDOW_SIZE_RATIO,r*WINDOW_SIZE_RATIO,-r,r,0.1f,20.0f);
  		}else{
-			perspective = glm::perspective(Viewpoint::active_viewpoint->GetFOV(), 1.4f, 0.0005f, 4.0f);
+			perspective = glm::perspective(Viewpoint::active_viewpoint->GetFOV(), WINDOW_SIZE_RATIO, 0.0005f, 4.0f);
 		}
 	}
 

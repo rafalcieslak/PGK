@@ -30,6 +30,8 @@ public:
 	// Prepares for rendering, sets up the window, prepares buffers.
 	static int Init();
 	static bool inited;
+	static int WINDOW_SIZE_X, WINDOW_SIZE_Y;
+	static float WINDOW_SIZE_RATIO;
 	// Renders a single frame.
 	static void FrameStart(float light_intensity, float light_angle, float xscale, bool sphere, float terrainscale);
 	static void FrameEnd();
