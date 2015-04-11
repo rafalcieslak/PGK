@@ -25,7 +25,7 @@ GLuint Render::gridbuffer;
 bool Render::mouse_captured = false;
 int Render::gridno;
 bool Render::inited = false;
-int Render::WINDOW_SIZE_X = 1400, Render::WINDOW_SIZE_Y = 1000;
+int Render::WINDOW_SIZE_X = 0, Render::WINDOW_SIZE_Y = 0;
 float Render::WINDOW_SIZE_RATIO = 1.4;
 std::function<void(double)> Render::scroll_callback;
 
@@ -71,6 +71,7 @@ int Render::Init(){
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 	// Open a window and create its OpenGL context
+	std::cout << "Opening window: " << WINDOW_SIZE_X << ", " << WINDOW_SIZE_Y << std::endl;
 	window = glfwCreateWindow( WINDOW_SIZE_X, WINDOW_SIZE_Y, "Terrain", NULL, NULL);
 	pxsizex = 2.0 / WINDOW_SIZE_X;
 	pxsizey = 2.0 / WINDOW_SIZE_Y;

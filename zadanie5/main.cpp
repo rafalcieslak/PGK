@@ -112,7 +112,8 @@ void usage(){
 	std::cout << "                 This directory will be used only to look for REGIONS  " << std::endl;
 	std::cout << "                 files, it has no effect on HGT_FILES.                 " << std::endl;
 	std::cout << "                 Nothing is ever written into this directory.          " << std::endl;
-	std::cout << "         -n - Never perform any downloads, relay ONLY on USER_DIR.     " << std::endl;
+	std::cout << "         -n - Never perform any downloads, rely ONLY on USER_DIR.      " << std::endl;
+	std::cout << "     -w ,-h - Specify window width/height.                             " << std::endl;
 	exit(0);
 }
 
@@ -133,6 +134,20 @@ int main(int argc, char** argv){
 				exit(0);
 			}
 			userdir = argv[i];
+		}else if(arg == "-w"){
+			i++;
+			if(i == argc){
+				std::cout << "Parameter for -w is missing." << std::endl;
+				exit(0);
+			}
+			Render::WINDOW_SIZE_X = std::atoi(argv[i]);
+		}else if(arg == "-h"){
+			i++;
+			if(i == argc){
+				std::cout << "Parameter for -h is missing." << std::endl;
+				exit(0);
+			}
+			Render::WINDOW_SIZE_Y = std::atoi(argv[i]);
 		}else if(arg == "-n"){
 			if(userdir == ""){
 				std::cout << "Downloads disabled, but no user dir was speficied. This makes no sense!" << std::endl;
@@ -185,6 +200,16 @@ int main(int argc, char** argv){
 	std::cout << "Loading data..." << std::endl;
 
 	// Prepare the renderer.
+	if(Render::WINDOW_SIZE_X == 0 && Render::WINDOW_SIZE_Y == 0){
+			Render::WINDOW_SIZE_X = 1400;
+			Render::WINDOW_SIZE_Y = 1000;
+	}else if(Render::WINDOW_SIZE_X != 0 && Render::WINDOW_SIZE_Y == 0){
+			Render::WINDOW_SIZE_Y = Render::WINDOW_SIZE_X / 1.4f;
+	}else if(Render::WINDOW_SIZE_Y != 0 && Render::WINDOW_SIZE_X == 0){
+			Render::WINDOW_SIZE_X = Render::WINDOW_SIZE_Y * 1.4f;
+	}
+	Render::WINDOW_SIZE_RATIO = float(Render::WINDOW_SIZE_X)/Render::WINDOW_SIZE_Y;
+
 	int n = Render::Init();
 	if(n) return n;
 	Tile::Init();
@@ -202,15 +227,15 @@ int main(int argc, char** argv){
 	auto jkl_text = std::make_shared<Text>("",        													 glm::vec2(10,202), 16, glm::vec3(1.0,1.0,1.0));
 	auto adjfov_text = std::make_shared<Text>("",                                glm::vec2(10,222), 16, glm::vec3(1.0,1.0,1.0));
 
-	auto tri_text = std::make_shared<Text>("Triangles: ",         glm::vec2(1230,22), 16, glm::vec3(1.0,0.5,0.5));
-	auto res_text = std::make_shared<Text>("Tile size: ",         glm::vec2(1230,42), 16, glm::vec3(1.0,0.5,0.5));
-	auto rendertime_text = std::make_shared<Text>("Frame time: ", glm::vec2(1230,62), 16, glm::vec3(1.0,0.5,0.5));
-	auto fps_text = std::make_shared<Text>("FPS: ",               glm::vec2(1230,82), 16, glm::vec3(1.0,0.5,0.5));
+	auto tri_text = std::make_shared<Text>("Triangles: ",         glm::vec2(Render::WINDOW_SIZE_X - 170,22), 16, glm::vec3(1.0,0.5,0.5));
+	auto res_text = std::make_shared<Text>("Tile size: ",         glm::vec2(Render::WINDOW_SIZE_X - 170,42), 16, glm::vec3(1.0,0.5,0.5));
+	auto rendertime_text = std::make_shared<Text>("Frame time: ", glm::vec2(Render::WINDOW_SIZE_X - 170,62), 16, glm::vec3(1.0,0.5,0.5));
+	auto fps_text = std::make_shared<Text>("FPS: ",               glm::vec2(Render::WINDOW_SIZE_X - 170,82), 16, glm::vec3(1.0,0.5,0.5));
 
-	auto lig_text = std::make_shared<Text>("Light contrast: low",      glm::vec2(1070,22), 16, glm::vec3(0.5,0.5,1.0));
-	auto lan_text = std::make_shared<Text>("Light angle: ",            glm::vec2(1070,42), 16, glm::vec3(0.5,0.5,1.0));
-	     fov_text = std::make_shared<Text>("Camera FOV: 0",            glm::vec2(1070,62), 16, glm::vec3(0.5,0.5,1.0));
-	auto tsc_text = std::make_shared<Text>("Terrain scale: realistic", glm::vec2(1070,82), 16, glm::vec3(0.5,0.5,1.0));
+	auto lig_text = std::make_shared<Text>("Light contrast: low",      glm::vec2(Render::WINDOW_SIZE_X - 330,22), 16, glm::vec3(0.5,0.5,1.0));
+	auto lan_text = std::make_shared<Text>("Light angle: ",            glm::vec2(Render::WINDOW_SIZE_X - 330,42), 16, glm::vec3(0.5,0.5,1.0));
+	     fov_text = std::make_shared<Text>("Camera FOV: 0",            glm::vec2(Render::WINDOW_SIZE_X - 330,62), 16, glm::vec3(0.5,0.5,1.0));
+	auto tsc_text = std::make_shared<Text>("Terrain scale: realistic", glm::vec2(Render::WINDOW_SIZE_X - 330,82), 16, glm::vec3(0.5,0.5,1.0));
 
 	// Setup cameras
 	glm::vec4 center = FindCenter();
